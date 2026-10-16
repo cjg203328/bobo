@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { createRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { InfiniteCanvas } from "../src/components/canvas/infinite-canvas";
+import { InfiniteCanvas } from "../src/components/canvas/huabu";
 import { canvasAppearanceForTheme } from "../src/lib/canvas/canvas-appearance";
 import { applyCanvasLiveViewport, CANVAS_GRAPHICS_VIEWPORT_PREVIEW_EVENT, CANVAS_VIEWPORT_PREVIEW_EVENT } from "../src/lib/canvas/canvas-live-viewport";
 import { viewportAtScale } from "../src/lib/canvas/canvas-viewport";

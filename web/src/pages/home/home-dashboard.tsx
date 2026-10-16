@@ -2,7 +2,7 @@ import { ArrowRight, Plus, RefreshCw } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import type { CanvasLibrarySummary } from "@/services/api/workspace-data";
 import { ProjectPreview } from "@/components/canvas/canvas-project-card";
-import { beefTVCapabilityItems } from "./home-data";
+import { huabuCapabilityItems } from "./home-data";
 function formatDate(value: string) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "刚刚更新";
@@ -24,7 +24,7 @@ export function HomeDashboard({ projects, loading, error, onRetry }: { projects:
             </section>
 
             <nav className="huabu-capabilities" aria-label="创作能力">
-                {beefTVCapabilityItems.map(({ id, label, detail, to, icon: Icon, disabled }) => (
+                {huabuCapabilityItems.map(({ id, label, detail, to, icon: Icon, disabled }) => (
                     disabled ? (
                         <span key={id} className="huabu-capability is-disabled" aria-disabled="true" title={`${label}：${detail}`}>
                             <span className="huabu-capability-icon"><Icon /></span>

@@ -39,7 +39,7 @@ describe("canvas visual contrast", () => {
         expect(canvasThemes.dark.canvas.dot).toBe("rgba(175,175,175,.24)");
         expect(canvasThemes.dark.canvas.line).toBe("rgba(175,175,175,.24)");
 
-        const source = await Bun.file(new URL("../src/components/canvas/infinite-canvas.tsx", import.meta.url)).text();
+        const source = await Bun.file(new URL("../src/components/canvas/huabu.tsx", import.meta.url)).text();
         expect(source).toContain('opacity: mode === "dots" ? 0.34 : 0.46');
     });
 

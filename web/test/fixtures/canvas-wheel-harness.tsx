@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
-import { InfiniteCanvas } from "../../src/components/canvas/infinite-canvas";
+import { InfiniteCanvas } from "../../src/components/canvas/huabu";
 
 function Harness() {
     const containerRef = useRef<HTMLDivElement>(null);
