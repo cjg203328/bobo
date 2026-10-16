@@ -16,10 +16,10 @@ test('release rejects missing runtime and unsupported target', () => {
 });
 
 test('bundled runtime, locked dependencies, and paths with spaces', () => {
-  const runtime = process.env.BEEFTV_NODE_RUNTIME;
+  const runtime = process.env.HUABU_NODE_RUNTIME;
   expect(runtime).toBeTruthy();
   const target = `${process.platform === 'win32' ? 'windows' : process.platform}/${process.arch === 'x64' ? 'amd64' : 'arm64'}`;
-  const scratch = mkdtempSync(path.join(tmpdir(), 'beeftv package test '));
+  const scratch = mkdtempSync(path.join(tmpdir(), 'huabu package test '));
   try {
     const runtimeCopy = path.join(scratch, 'runtime source with spaces');
     const relative = process.platform === 'win32' ? 'node.exe' : 'bin/node';
@@ -42,10 +42,10 @@ test('bundled runtime, locked dependencies, and paths with spaces', () => {
 }, 240000);
 
 test('packaged server starts with local imports and makes zero model requests', async () => {
-  const runtime = process.env.BEEFTV_NODE_RUNTIME;
+  const runtime = process.env.HUABU_NODE_RUNTIME;
   expect(runtime).toBeTruthy();
   const target = `${process.platform === 'win32' ? 'windows' : process.platform}/${process.arch === 'x64' ? 'amd64' : 'arm64'}`;
-  const scratch = mkdtempSync(path.join(tmpdir(), 'beeftv packaged server '));
+  const scratch = mkdtempSync(path.join(tmpdir(), 'huabu packaged server '));
   const requests = [];
   let modelRequests = 0;
   // The host's request budget classifies model calls by origin, so keep this separate from ops.
@@ -54,9 +54,9 @@ test('packaged server starts with local imports and makes zero model requests', 
     response.writeHead(500).end('No model requests allowed in packaging tests');
   });
   const ops = createServer((request, response) => {
-    requests.push({ method: request.method, path: request.url, host: request.headers['x-beeftv-agent-token'] });
+    requests.push({ method: request.method, path: request.url, host: request.headers['x-huabu-agent-token'] });
     response.setHeader('Content-Type', 'application/json');
-    if (request.method !== 'GET' || request.url !== '/api/ops' || request.headers['x-beeftv-agent-token'] !== 'test-host') {
+    if (request.method !== 'GET' || request.url !== '/api/ops' || request.headers['x-huabu-agent-token'] !== 'test-host') {
       response.writeHead(403).end(JSON.stringify({ code: 403 }));
       return;
     }
@@ -81,10 +81,10 @@ test('packaged server starts with local imports and makes zero model requests', 
     let spawnError;
     child = spawn(bundled, ['server.mjs'], { cwd: destination, stdio: ['ignore', 'pipe', 'pipe'], env: {
       PATH: '', HOME: scratch, USERPROFILE: scratch, ...(process.env.SystemRoot ? { SystemRoot: process.env.SystemRoot } : {}),
-      BEEFTV_OPS_URL: `${opsURL}/api`, BEEFTV_AGENT_HOST_TOKEN: 'test-host',
-      BEEFTV_AGENT_DATA_DIR: path.join(scratch, 'data'), BEEFTV_AGENT_PORT: String(port),
-      BEEFTV_AGENT_MODEL: 'packaging-test-model', BEEFTV_AGENT_API: 'openai-completions',
-      BEEFTV_AGENT_BASE_URL: providerURL, BEEFTV_AGENT_API_KEY: 'test-placeholder', BEEFTV_AGENT_TOTAL_REQUEST_BUDGET: '0',
+      HUABU_OPS_URL: `${opsURL}/api`, HUABU_AGENT_HOST_TOKEN: 'test-host',
+      HUABU_AGENT_DATA_DIR: path.join(scratch, 'data'), HUABU_AGENT_PORT: String(port),
+      HUABU_AGENT_MODEL: 'packaging-test-model', HUABU_AGENT_API: 'openai-completions',
+      HUABU_AGENT_BASE_URL: providerURL, HUABU_AGENT_API_KEY: 'test-placeholder', HUABU_AGENT_TOTAL_REQUEST_BUDGET: '0',
     } });
     child.stdout.on('data', (chunk) => { output += chunk; });
     child.stderr.on('data', (chunk) => { output += chunk; });

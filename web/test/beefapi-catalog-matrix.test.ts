@@ -4,7 +4,7 @@ import { mergeFetchedChannelModelProfiles } from "../src/lib/channel-model-catal
 import { createModelChannel, defaultConfig, normalizeConfigSnapshot, resolveModelRequestConfig } from "../src/stores/use-config-store";
 
 test("the fetched BeefAPI catalog routes every generation family after refresh and reload", () => {
-    const channel = createModelChannel({ id: "beefapi", baseUrl: "https://beeftv.app", models: catalog.map(m => m.id) });
+    const channel = createModelChannel({ id: "beefapi", baseUrl: "https://huabu.app", models: catalog.map(m => m.id) });
     const fetched = catalog.map(m => ({ id: m.id, supportedEndpointTypes: m.supported_endpoint_types }));
     const config = normalizeConfigSnapshot({ config: { ...defaultConfig, channels: [{ ...channel, modelProfiles: mergeFetchedChannelModelProfiles(channel, fetched) }] } }).config;
     expect(catalog).toHaveLength(47);
@@ -19,7 +19,7 @@ test("the fetched BeefAPI catalog routes every generation family after refresh a
 });
 
 test("hosted Kling repairs stale unrestricted resolutions and duration controls", () => {
-    const channel = createModelChannel({ id: "beefapi", baseUrl: "https://beeftv.app", models: ["kling-video-v3"] });
+    const channel = createModelChannel({ id: "beefapi", baseUrl: "https://huabu.app", models: ["kling-video-v3"] });
     const config = normalizeConfigSnapshot({ config: { ...defaultConfig, channels: [channel] } }).config;
     const video = config.channels[0]!.modelProfiles![0]!.capabilityConfig!.video!;
     expect(video.resolutions).toEqual(["720p"]);

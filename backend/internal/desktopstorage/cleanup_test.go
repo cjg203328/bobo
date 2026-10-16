@@ -71,12 +71,12 @@ func TestWorkspaceLockRejectsOtherInstancesAndReleases(t *testing.T) {
 }
 
 func TestCrossVolumeMigration(t *testing.T) {
-	volume := os.Getenv("BEEFTV_TEST_SECOND_VOLUME")
+	volume := os.Getenv("HUABU_TEST_SECOND_VOLUME")
 	if volume == "" {
 		t.Skip("native cross-volume fixture not requested")
 	}
 	root := t.TempDir()
-	target, err := os.MkdirTemp(volume, "BeefTV-migration-test-")
+	target, err := os.MkdirTemp(volume, "Huabu-migration-test-")
 	if err != nil {
 		t.Fatal(err)
 	}

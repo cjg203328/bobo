@@ -29,17 +29,17 @@ afterEach(() => {
 
 describe("public release boundary", () => {
     test("exports source while excluding private state and generated artifacts", () => {
-        const source = temporaryDirectory("beeftv-public-source-");
-        const destinationParent = temporaryDirectory("beeftv-public-destination-");
+        const source = temporaryDirectory("huabu-public-source-");
+        const destinationParent = temporaryDirectory("huabu-public-destination-");
         const destination = join(destinationParent, "snapshot");
 
-        fixtureFile(source, "README.md", "# BeefTV\n");
+        fixtureFile(source, "README.md", "# Huabu\n");
         fixtureFile(source, "LICENSE", "MIT\n");
         fixtureFile(source, "NOTICE", "Third-party notices\n");
-        fixtureFile(source, "backend/go.mod", "module example.invalid/beeftv/backend\n");
-        fixtureFile(source, "web/package.json", '{"name":"beeftv"}\n');
+        fixtureFile(source, "backend/go.mod", "module example.invalid/huabu/backend\n");
+        fixtureFile(source, "web/package.json", '{"name":"huabu"}\n');
         fixtureFile(source, "web/src/main.tsx", "export {};\n");
-        fixtureFile(source, "web/scripts/beeftv-local-network-audit.mjs", "export {};\n");
+        fixtureFile(source, "web/scripts/huabu-local-network-audit.mjs", "export {};\n");
         fixtureFile(source, "web/scripts/private-audit.mjs", "export {};\n");
         fixtureFile(source, ".git/config");
         fixtureFile(source, ".worktrees/private/HEAD");
@@ -53,7 +53,7 @@ describe("public release boundary", () => {
         fixtureFile(source, "backend/desktop");
         fixtureFile(source, "backend/cmd/desktop/frontend/dist/.gitkeep", "");
         fixtureFile(source, "backend/cmd/desktop/frontend/dist/index.html", "generated");
-        fixtureFile(source, "backend/cmd/desktop/build/bin/BeefTV.app/Contents/MacOS/BeefTV");
+        fixtureFile(source, "backend/cmd/desktop/build/bin/Huabu.app/Contents/MacOS/Huabu");
         fixtureFile(source, "debug.log");
         fixtureFile(source, "release.dmg");
         fixtureFile(source, "plugin-packages/example.beeftv-plugin");
@@ -62,7 +62,7 @@ describe("public release boundary", () => {
 
         expect(result.status).toBe(0);
         expect(existsSync(join(destination, "web/src/main.tsx"))).toBe(true);
-        expect(existsSync(join(destination, "web/scripts/beeftv-local-network-audit.mjs"))).toBe(true);
+        expect(existsSync(join(destination, "web/scripts/huabu-local-network-audit.mjs"))).toBe(true);
         expect(existsSync(join(destination, "web/scripts/private-audit.mjs"))).toBe(false);
         expect(existsSync(join(destination, ".git"))).toBe(false);
         expect(existsSync(join(destination, ".worktrees"))).toBe(false);
@@ -83,15 +83,15 @@ describe("public release boundary", () => {
     });
 
     test("audit rejects a forbidden artifact and accepts the clean export", () => {
-        const source = temporaryDirectory("beeftv-public-audit-source-");
-        const destinationParent = temporaryDirectory("beeftv-public-audit-destination-");
+        const source = temporaryDirectory("huabu-public-audit-source-");
+        const destinationParent = temporaryDirectory("huabu-public-audit-destination-");
         const destination = join(destinationParent, "snapshot");
 
-        fixtureFile(source, "README.md", "# BeefTV\n");
+        fixtureFile(source, "README.md", "# Huabu\n");
         fixtureFile(source, "LICENSE", "MIT\n");
         fixtureFile(source, "NOTICE", "Third-party notices\n");
-        fixtureFile(source, "backend/go.mod", "module example.invalid/beeftv/backend\n");
-        fixtureFile(source, "web/package.json", '{"name":"beeftv"}\n');
+        fixtureFile(source, "backend/go.mod", "module example.invalid/huabu/backend\n");
+        fixtureFile(source, "web/package.json", '{"name":"huabu"}\n');
 
         expect(spawnSync("sh", [exportScript, source, destination]).status).toBe(0);
         fixtureFile(destination, ".git/config", `[core]\n\trepositoryformatversion = 0\n\tworktree = ${destination}\n`);
@@ -106,9 +106,9 @@ describe("public release boundary", () => {
     });
 
     test("export refuses to merge into an existing destination", () => {
-        const source = temporaryDirectory("beeftv-public-existing-source-");
-        const destination = temporaryDirectory("beeftv-public-existing-destination-");
-        fixtureFile(source, "README.md", "# BeefTV\n");
+        const source = temporaryDirectory("huabu-public-existing-source-");
+        const destination = temporaryDirectory("huabu-public-existing-destination-");
+        fixtureFile(source, "README.md", "# Huabu\n");
 
         const result = spawnSync("sh", [exportScript, source, destination], { encoding: "utf8" });
 

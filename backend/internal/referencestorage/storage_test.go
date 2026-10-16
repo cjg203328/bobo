@@ -86,7 +86,7 @@ func TestUploadSignsPUTAndRequiresAnonymousReadableMedia(t *testing.T) {
 			})}
 			link, err := upload(context.Background(), config, path, client)
 			if mode == "success" {
-				if err != nil || !strings.HasPrefix(link, config.PublicBaseURL+"/beeftv/references/") {
+				if err != nil || !strings.HasPrefix(link, config.PublicBaseURL+"/huabu/references/") {
 					t.Fatalf("upload %q %v", link, err)
 				}
 			} else if err == nil {

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { createDurableTurnBudget } from './durable-turn-budget.mjs';
 import { spendModelRequest, spendToolStep } from './request-budget.mjs';
 test('turn request and tool budgets survive reopen and cannot reset by switching identity', (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-turn-budget-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-turn-budget-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const entry = { sessionId: 'durable:test', turn: { turnId: 'turn' }, generation: {}, budgetDirectory: directory };
   let budget = createDurableTurnBudget(entry, { maxRequests: 1, maxToolSteps: 1 });
   assert(spendModelRequest(budget).allowed); assert(spendToolStep(budget).allowed);

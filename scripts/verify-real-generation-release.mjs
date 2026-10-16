@@ -468,7 +468,7 @@ if (version === 'v1.7.11' && receipt.ownerException?.scope === 'canvas-image-bin
 if (version === 'v1.7.10' && receipt.liveTestWaiver?.scope === 'seedance-display-names-only') {
   const evidence = value => Array.isArray(value) && value.length > 0 && value.every(nonempty);
   if (receipt.liveTestWaiver.approvedBy !== 'Ender'
-    || receipt.liveTestWaiver.instruction !== 'beeftv本次豁免 直接上线'
+    || receipt.liveTestWaiver.instruction !== 'huabu本次豁免 直接上线'
     || !evidence(receipt.liveTestWaiver.evidence)) fail('v1.7.10 requires exact owner waiver');
   if (receipt.budgetCNY !== 0 || receipt.spentCNY !== 0 || receipt.newSpentCNY !== 0 || receipt.pendingCNY !== 0
     || receipt.liveMatrixStatus !== 'not_run_owner_waived' || !Array.isArray(receipt.cases) || receipt.cases.length !== 0) fail('v1.7.10 must record no new paid calls and an unexecuted matrix');

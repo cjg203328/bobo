@@ -13,7 +13,7 @@ type Progress = {
     startedAt?: string;
     visitedLibrary?: boolean;
 };
-const key = "beeftv:first-creation:v1";
+const key = "huabu:first-creation:v1";
 const initial: Progress = { status: "new", step: 0, skipped: [] };
 function read(): Progress {
     try {

@@ -22,7 +22,7 @@ foreach ($binary in @("ffmpeg.exe", "ffprobe.exe")) {
 
 $commit = "4f5ae23172ba60fd7bc11ef671cca678842c7072"
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
-$scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("beeftv-depth-build-" + [guid]::NewGuid().ToString("N"))
+$scratch = Join-Path ([System.IO.Path]::GetTempPath()) ("huabu-depth-build-" + [guid]::NewGuid().ToString("N"))
 $runtime = Join-Path $scratch "runtime"
 $destination = (New-Item -ItemType Directory -Path $OutputDir -Force).FullName
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
@@ -79,7 +79,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "运行包搬移自检失败" }
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $name = "beeftv-depth-runtime-v1-windows-amd64-$Variant.zip"
+    $name = "huabu-depth-runtime-v1-windows-amd64-$Variant.zip"
     $archivePath = Join-Path $destination $name
     if (Test-Path -LiteralPath $archivePath) { throw "目标运行包已存在，拒绝覆盖: $archivePath" }
     [System.IO.Compression.ZipFile]::CreateFromDirectory($relocated, $archivePath)

@@ -62,7 +62,7 @@ class PublicationTests(unittest.TestCase):
             def do_GET(self):
                 agent = self.headers.get("User-Agent", "")
                 requests.append((self.path, agent))
-                if not re.fullmatch(r"BeefTV-Desktop-Updater/v\d+\.\d+\.\d+", agent):
+                if not re.fullmatch(r"Huabu-Desktop-Updater/v\d+\.\d+\.\d+", agent):
                     self.send_error(403)
                     return
                 content = store.objects.get(self.path.lstrip("/"))
@@ -92,17 +92,17 @@ class PublicationTests(unittest.TestCase):
         self.verify_command = self.verifier.start()
         self.addCleanup(self.verifier.stop)
         self.publisher = release.Publisher(self.store, release.PublicHTTP(opener), "/tmp/update-release",
-                                           "https://updates.beefapi.com/beeftv", lambda *args: None)
+                                           "https://updates.beefapi.com/huabu", lambda *args: None)
 
     def manifest(self, version="v1.5.7", omit=None):
         platforms = {}
         for platform in sorted(release.PLATFORMS):
             if platform == omit:
                 continue
-            name = f"BeefTV-{version}-{platform}.zip"
+            name = f"Huabu-{version}-{platform}.zip"
             data = (version + platform).encode() * 32
             (self.root / name).write_bytes(data)
-            platforms[platform] = {"url": f"https://updates.beefapi.com/beeftv/{version}/{name}",
+            platforms[platform] = {"url": f"https://updates.beefapi.com/huabu/{version}/{name}",
                                    "size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
         payload = {"schema": 1, "version": version, "commit": "a" * 40, "notes": "test release", "platforms": platforms}
         path = self.root / f"{version}.json"
@@ -116,10 +116,10 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(self.store.writes, [])
         names = ['darwin-arm64.dmg', 'darwin-amd64.dmg', 'windows-amd64-setup.exe', 'linux-amd64.deb']
         for name in names:
-            (self.root / ('BeefTV-v1.5.7-' + name)).write_bytes(name.encode())
+            (self.root / ('Huabu-v1.5.7-' + name)).write_bytes(name.encode())
         self.publisher.stage(manifest, self.root, with_installers=True)
         self.assertNotIn(release.LATEST, self.store.objects)
-        key = release.PREFIX + '/v1.5.7/BeefTV-v1.5.7-linux-amd64.deb'
+        key = release.PREFIX + '/v1.5.7/Huabu-v1.5.7-linux-amd64.deb'
         self.assertEqual(self.store.objects[key], b'linux-amd64.deb')
         self.store.objects[key] = b'corrupt'
         with self.assertRaises(release.PublishError):
@@ -131,20 +131,20 @@ class PublicationTests(unittest.TestCase):
         self.publisher.stage(manifest, self.root)
         self.assertNotIn(release.LATEST, self.store.objects)
         self.assertEqual(len(self.store.writes), len(release.PLATFORMS) + 1)
-        self.assertTrue(all(agent == "BeefTV-Desktop-Updater/v1.5.7" for _, agent in self.public_requests))
+        self.assertTrue(all(agent == "Huabu-Desktop-Updater/v1.5.7" for _, agent in self.public_requests))
         self.publisher.stage(manifest, self.root)
         self.assertEqual(len(self.store.writes), len(release.PLATFORMS) + 1)
         self.assertEqual(self.verify_command.call_args.args[0], ["/tmp/update-release", "verify", "--envelope", str(manifest)])
 
     def test_public_readback_uses_updater_user_agent_instead_of_urllib_default(self):
         data = b"public release asset"
-        self.store.objects["beeftv/probe"] = data
-        url = f"http://127.0.0.1:{self.server.server_port}/beeftv/probe"
+        self.store.objects["huabu/probe"] = data
+        url = f"http://127.0.0.1:{self.server.server_port}/huabu/probe"
         with self.assertRaises(urllib.error.HTTPError) as failure:
             urllib.request.urlopen(url)
         self.assertEqual(failure.exception.code, 403)
         release.PublicHTTP().check(url, len(data), hashlib.sha256(data).hexdigest(), version="v1.5.8")
-        self.assertEqual(self.public_requests[-1][1], "BeefTV-Desktop-Updater/v1.5.8")
+        self.assertEqual(self.public_requests[-1][1], "Huabu-Desktop-Updater/v1.5.8")
 
     def test_incomplete_platform_set_cannot_activate(self):
         manifest = self.manifest(omit="windows-amd64")
@@ -154,7 +154,7 @@ class PublicationTests(unittest.TestCase):
 
     def test_missing_local_archive_and_bad_hash_write_nothing(self):
         manifest = self.manifest()
-        source = self.root / "BeefTV-v1.5.7-windows-amd64.zip"
+        source = self.root / "Huabu-v1.5.7-windows-amd64.zip"
         source.unlink()
         with self.assertRaisesRegex(release.PublishError, "Local archive"):
             self.publisher.stage(manifest, self.root)
@@ -173,7 +173,7 @@ class PublicationTests(unittest.TestCase):
     def test_existing_immutable_version_cannot_be_overwritten(self):
         manifest = self.manifest()
         self.publisher.stage(manifest, self.root)
-        key = "beeftv/v1.5.7/BeefTV-v1.5.7-darwin-amd64.zip"
+        key = "huabu/v1.5.7/Huabu-v1.5.7-darwin-amd64.zip"
         self.store.objects[key] = b"existing different version content"
         writes = len(self.store.writes)
         with self.assertRaisesRegex(release.PublishError, "Immutable"):
@@ -184,7 +184,7 @@ class PublicationTests(unittest.TestCase):
     def test_missing_or_corrupt_public_asset_blocks_activation(self):
         manifest = self.manifest()
         self.publisher.stage(manifest, self.root)
-        key = "beeftv/v1.5.7/BeefTV-v1.5.7-windows-amd64.zip"
+        key = "huabu/v1.5.7/Huabu-v1.5.7-windows-amd64.zip"
         original = self.store.objects.pop(key)
         with self.assertRaises(release.PublishError):
             self.publisher.activate(manifest)
@@ -200,7 +200,7 @@ class PublicationTests(unittest.TestCase):
         new = self.manifest()
         self.publisher.stage(new, self.root)
         self.publisher.activate(new)
-        backups = [value for key, value in self.store.objects.items() if key.startswith("beeftv/latest-backups/")]
+        backups = [value for key, value in self.store.objects.items() if key.startswith("huabu/latest-backups/")]
         self.assertEqual(backups, [old.read_bytes()])
         self.assertEqual(self.store.objects[release.LATEST], new.read_bytes())
         self.assertIn((release.LATEST, release.REVALIDATE), self.store.writes)
@@ -249,7 +249,7 @@ class PublicationTests(unittest.TestCase):
         payload = json.loads(base64.b64decode(json.loads(manifest.read_text())["payload"]))
         metadata = {"draft": False, "prerelease": False, "published_at": "now", "tag_name": payload["version"],
                     "target_commitish": payload["commit"], "assets": [{"name": name, "state": "uploaded"} for name in
-                    ["desktop-update.json"] + [f"BeefTV-{payload['version']}-{platform}.zip" for platform in release.PLATFORMS]]}
+                    ["desktop-update.json"] + [f"Huabu-{payload['version']}-{platform}.zip" for platform in release.PLATFORMS]]}
         latest_tag = "v1.5.6"
 
         def response(command):
@@ -274,7 +274,7 @@ class PublicationTests(unittest.TestCase):
         self.store.objects[key] = manifest.read_bytes()
         self.publisher.activate(manifest)
         self.assertEqual(self.store.objects[release.LATEST], manifest.read_bytes())
-        self.assertIn(("/" + key, "BeefTV-Desktop-Updater/v1.5.7"), self.public_requests)
+        self.assertIn(("/" + key, "Huabu-Desktop-Updater/v1.5.7"), self.public_requests)
 
 
 class S3AdapterTests(unittest.TestCase):
@@ -286,8 +286,8 @@ class S3AdapterTests(unittest.TestCase):
 
     def test_put_uses_conditional_write_and_never_passes_credentials(self):
         with patch.object(release, "run", return_value=subprocess.CompletedProcess([], 0, "{}", "")) as runner:
-            s3 = release.S3("https://example.r2.cloudflarestorage.com", "beeftv-releases")
-            self.assertTrue(s3.put("beeftv/v1.5.7/file.zip", Path("/tmp/file"), release.IMMUTABLE))
+            s3 = release.S3("https://example.r2.cloudflarestorage.com", "huabu-releases")
+            self.assertTrue(s3.put("huabu/v1.5.7/file.zip", Path("/tmp/file"), release.IMMUTABLE))
             self.assertEqual(runner.call_args.args[0][-2:], ["--if-none-match", "*"])
             self.assertTrue(s3.put(release.LATEST, Path("/tmp/feed"), release.REVALIDATE, etag='"old"'))
             self.assertEqual(runner.call_args.args[0][-2:], ["--if-match", '"old"'])
@@ -295,7 +295,7 @@ class S3AdapterTests(unittest.TestCase):
     def test_permission_failure_is_not_treated_as_absent(self):
         with patch.object(release, "run", return_value=subprocess.CompletedProcess([], 1, "", "(AccessDenied) credential")):
             with self.assertRaisesRegex(release.PublishError, "Cannot inspect"):
-                release.S3("https://r2.example", "beeftv-releases").get(release.LATEST, "/tmp/unused")
+                release.S3("https://r2.example", "huabu-releases").get(release.LATEST, "/tmp/unused")
 
 
 if __name__ == "__main__":

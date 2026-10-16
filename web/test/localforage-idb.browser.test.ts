@@ -12,12 +12,12 @@ let browser: Browser;
 let directory: string;
 
 beforeAll(async () => {
-    directory = mkdtempSync(join(tmpdir(), "beeftv-idb-browser-"));
+    directory = mkdtempSync(join(tmpdir(), "huabu-idb-browser-"));
     const dist = join(directory, "dist");
     await build({
         configFile: false, root: resolve(import.meta.dir, ".."), publicDir: false,
         cacheDir: join(directory, "cache"), logLevel: "error",
-        define: { __BEEFTV_HEAVY_MEDIA_ENABLED__: "false", __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""' },
+        define: { __HUABU_HEAVY_MEDIA_ENABLED__: "false", __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""' },
         resolve: { alias: { "@": resolve(import.meta.dir, "../src") } },
         build: { outDir: dist, emptyOutDir: true, rolldownOptions: { input: resolve(import.meta.dir, "fixtures/localforage-idb-harness.html") } },
     });

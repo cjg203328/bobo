@@ -6,15 +6,15 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { build } from "vite";
 
-const enabled = process.env.BEEFTV_BROWSER_WORKER_TEST === "1";
+const enabled = process.env.HUABU_BROWSER_WORKER_TEST === "1";
 test.skipIf(!enabled)("所有视频入口按需准备预览，失败可重试，可播放原件不转码", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "beeftv-video-recovery-"));
+    const dir = mkdtempSync(join(tmpdir(), "huabu-video-recovery-"));
     const file = join(dir, "preview.mp4");
     const result = spawnSync("ffmpeg", ["-nostdin", "-v", "error", "-f", "lavfi", "-i", "color=c=red:s=64x48:r=5:d=0.4", "-c:v", "libx264", "-pix_fmt", "yuv420p", file]);
     if (result.status !== 0) throw new Error(result.stderr.toString());
     const dist = join(dir, "dist");
     await build({ configFile: false, root: join(import.meta.dir, ".."), publicDir: false, logLevel: "error",
-        define: { __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""', __BEEFTV_HEAVY_MEDIA_ENABLED__: "false", "import.meta.env.VITE_CANVAS_LOCAL_MODE": '"false"', "import.meta.env.VITE_CANVAS_BACKEND_URL": '"/api"' },
+        define: { __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""', __HUABU_HEAVY_MEDIA_ENABLED__: "false", "import.meta.env.VITE_CANVAS_LOCAL_MODE": '"false"', "import.meta.env.VITE_CANVAS_BACKEND_URL": '"/api"' },
         resolve: { alias: { "@": join(import.meta.dir, "../src") } },
         build: { outDir: dist, emptyOutDir: true, rolldownOptions: { input: join(import.meta.dir, "fixtures/canvas-video-recovery-harness.html") } },
     });

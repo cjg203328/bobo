@@ -2,7 +2,7 @@
 
 ## 已验证的问题
 
-v1.6.20～v1.6.22 的旧 EXE 只接受 `BeefTV.exe` 和 `plugin-packages`，会在安装前拒绝包含 `agent-host` 或 `cli` 的包。v1.6.23 的 EXE 接受新布局，但 v1.7.1 包漏装 CLI，因此该次升级也失败。v1.6.23 和 v1.7.1 的真实 helper 能替换为 v1.7.2 并启动对应运行时。
+v1.6.20～v1.6.22 的旧 EXE 只接受 `Huabu.exe` 和 `plugin-packages`，会在安装前拒绝包含 `agent-host` 或 `cli` 的包。v1.6.23 的 EXE 接受新布局，但 v1.7.1 包漏装 CLI，因此该次升级也失败。v1.6.23 和 v1.7.1 的真实 helper 能替换为 v1.7.2 并启动对应运行时。
 
 当前清单协议严格拒绝未知字段；旧客户端的 User-Agent 只有版本号，没有平台字段。服务端不能通过这个请求只识别 Windows。v1.5.7 才切到当前 Cloudflare 更新源，更早客户端不在该入口的可修复范围。
 

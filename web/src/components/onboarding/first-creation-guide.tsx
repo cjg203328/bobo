@@ -19,7 +19,7 @@ const lessons = [
 const sample = "一只穿着黄色雨衣的小狗，站在雨后的街道上，温暖的插画风格。";
 
 export function OnboardingEntry({ compact = false }: { compact?: boolean }) {
-    return <button type="button" className={`app-workspace-nav-link first-creation-entry${compact ? " is-collapsed" : ""}`} aria-label="新手引导" title="新手引导" onClick={() => window.dispatchEvent(new Event("beeftv:open-guide"))}>
+    return <button type="button" className={`app-workspace-nav-link first-creation-entry${compact ? " is-collapsed" : ""}`} aria-label="新手引导" title="新手引导" onClick={() => window.dispatchEvent(new Event("huabu:open-guide"))}>
         <span className="app-workspace-nav-main flex min-w-0 items-center gap-2.5">
             <span className="app-workspace-nav-icon" aria-hidden><HelpCircle className="size-4 shrink-0" strokeWidth={1.8} /></span>
             {!compact && <span className="app-workspace-nav-title truncate">新手引导</span>}
@@ -55,8 +55,8 @@ export function FirstCreationGuide() {
     }, [hydrated, projects.length, guide.status]);
     useEffect(() => {
         const open = () => { guide.restart(); setCollapsed(false); setWelcome(true); };
-        window.addEventListener("beeftv:open-guide", open);
-        return () => window.removeEventListener("beeftv:open-guide", open);
+        window.addEventListener("huabu:open-guide", open);
+        return () => window.removeEventListener("huabu:open-guide", open);
     }, [guide.restart]);
     useEffect(() => { nodeStepStartedAt.current = step === "node" ? Date.now() : null; }, [step]);
     useEffect(() => {
@@ -170,7 +170,7 @@ export function FirstCreationGuide() {
         bottom: Math.min(window.innerHeight, highlightRect.bottom + 8),
     };
     return <>
-        <AppModal open={finished} transitionName="" maskTransitionName="" title="引导已结束" onCancel={() => setFinished(false)} footer={<Button type="primary" onClick={() => setFinished(false)}>继续使用 BeefTV</Button>} width={420}>
+        <AppModal open={finished} transitionName="" maskTransitionName="" title="引导已结束" onCancel={() => setFinished(false)} footer={<Button type="primary" onClick={() => setFinished(false)}>继续使用 Huabu</Button>} width={420}>
             <p className="first-creation-intro">随时从侧栏重新打开引导。</p>
         </AppModal>
         <AppModal open={welcome} transitionName="" maskTransitionName="" title="完成第一次创作" onCancel={dismiss} footer={null} width={420} destroyOnHidden>

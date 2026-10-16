@@ -92,7 +92,7 @@
       "sourceDigest": "4d013a63e4daab6268936d282387ad2dcf68989ba3e75abc0fb0f44e9de37fd3",
       "evidence": [
         "docs/release-evidence/v1.7.2-targeted.md#integrated-checks",
-        "Final source scripts/verify-beeftv-local-release.sh passed, including production web build."
+        "Final source scripts/verify-huabu-local-release.sh passed, including production web build."
       ]
     },
     "ci": {

@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	PluginPackageFormat    = "beeftv.plugin/package-v1"
+	PluginPackageFormat    = "huabu.plugin/package-v1"
 	PluginPackageExtension = ".beeftv-plugin"
 	PluginPackageMaxBytes  = 48 << 20
 	PluginManifestMaxBytes = 512 << 10

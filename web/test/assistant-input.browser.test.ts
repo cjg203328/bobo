@@ -56,7 +56,7 @@ beforeAll(async () => {
         if (pathname === "/harness.css") return new Response(css, { headers: { "content-type": "text/css" } });
         if (pathname === "/api/agent-clients" && req.method === "POST") {
             externalConnections.push(await req.json());
-            return ok({ client: { id: "external-fixture", kind: "codex", label: "Codex", mode: "read-write" }, setup: { kind: "codex", title: "Codex", command: "beeftv connect fixture-only" } });
+            return ok({ client: { id: "external-fixture", kind: "codex", label: "Codex", mode: "read-write" }, setup: { kind: "codex", title: "Codex", command: "huabu connect fixture-only" } });
         }
         if (pathname === "/api/resources" && req.method === "POST") {
             uploadKeys.push(req.headers.get("X-Idempotency-Key") || "");
@@ -188,7 +188,7 @@ test("real Sidebar handles file, paste, drop, attachment-only, purpose/range, dr
     expect(await page.getByRole("button", { name: "停止", exact: true }).count()).toBe(0);
     expect(chats).toHaveLength(2);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: "/tmp/beeftv-assistant-input-ui.png" }); await page.close();
+    await page.screenshot({ path: "/tmp/huabu-assistant-input-ui.png" }); await page.close();
 }, 30000);
 
 test("asset registration failure remains unsent; explicit upload retry keeps its idempotency key and invalid range blocks send", async () => {
@@ -213,7 +213,7 @@ test("asset registration failure remains unsent; explicit upload retry keeps its
     expect(chats).toHaveLength(before);
     await page.waitForFunction(async () => (await (window as any).assistantInputFixture.draft())?.attachments.some((item: any) => item.name === "range.wav" && item.end === 3));
     await page.evaluate(() => new Promise<void>((resolve, reject) => {
-        const opening = indexedDB.open("beeftv-assistant-input");
+        const opening = indexedDB.open("huabu-assistant-input");
         opening.onerror = () => reject(opening.error);
         opening.onsuccess = () => {
             const database = opening.result, transaction = database.transaction("drafts", "readwrite"), store = transaction.objectStore("drafts");
@@ -345,7 +345,7 @@ test("permission choices persist by workspace; trusted active mode locks the tur
     await page.waitForFunction(() => !document.querySelector<HTMLInputElement>('input[aria-label="助手权限"]')?.disabled);
     expect(await selectedText()).toBe("完全访问");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: "/tmp/beeftv-assistant-permissions-390.png" });
+    await page.screenshot({ path: "/tmp/huabu-assistant-permissions-390.png" });
     await page.close();
 }, 20000);
 
@@ -354,13 +354,13 @@ test("external Agent connection has no permission chooser and submits only the c
     await page.goto(server.url.toString().replace("localhost", "127.0.0.1"));
     await page.getByRole("button", { name: "连接外部 Agent", exact: true }).click();
     const panel = page.locator(".agent-connect-panel");
-    await panel.getByText("连接后可使用 BeefTV 的全部创作工具。每次操作的审批由 Codex 负责。", { exact: true }).waitFor();
+    await panel.getByText("连接后可使用 Huabu 的全部创作工具。每次操作的审批由 Codex 负责。", { exact: true }).waitFor();
     expect(await panel.getByRole("radio").count()).toBe(0);
     const connected = page.waitForResponse(response => response.url().endsWith("/agent-clients"));
     await panel.getByRole("button", { name: "生成连接配置", exact: true }).click(); await connected;
     expect(externalConnections.at(-1)).toEqual({ kind: "codex" });
     await panel.getByRole("status").filter({ hasText: "等待工具连接" }).waitFor();
-    await page.screenshot({ path: "/tmp/beeftv-external-agent-connect.png" });
+    await page.screenshot({ path: "/tmp/huabu-external-agent-connect.png" });
     await page.close();
 }, 15000);
 
@@ -389,7 +389,7 @@ test("cross-canvas receipts report every target and one atomic undo refreshes al
     expect(undoRequests).toHaveLength(before + 2);
     expect(undoRequests.at(-1)).toEqual({ canvasId: "input-canvas" });
     expect(await page.evaluate(() => (window as any).assistantInputFixture.changedCanvases())).toEqual(["input-canvas", "other-canvas", "input-canvas", "other-canvas"]);
-    await page.screenshot({ path: "/tmp/beeftv-assistant-cross-canvas-undo.png" });
+    await page.screenshot({ path: "/tmp/huabu-assistant-cross-canvas-undo.png" });
     await page.close();
 }, 15000);
 

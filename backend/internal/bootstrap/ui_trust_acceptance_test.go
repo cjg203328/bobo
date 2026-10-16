@@ -9,7 +9,7 @@ import (
 )
 
 func TestOpsAcceptanceClientCannotBecomeUIOrManageClients(t *testing.T) {
-	t.Setenv("BEEFTV_UI_BOOTSTRAP", "")
+	t.Setenv("HUABU_UI_BOOTSTRAP", "")
 	h := newDesktopHarness(t)
 	registry := agentops.NewClientRegistry(h.dataDir)
 	for _, mode := range []agentops.ClientMode{agentops.ClientReadOnly, agentops.ClientReadWrite} {
@@ -36,7 +36,7 @@ func TestOpsAcceptanceClientCannotBecomeUIOrManageClients(t *testing.T) {
 					// Exercise handler-level rejection after passing the desktop transport gate.
 					w := h.call(requestOptions{method: route.method, path: route.path, body: `{"kind":"codex","label":"forbidden","mode":"read-write"}`,
 						clientID: client.ID, clientToken: token, launchToken: h.rt.LaunchToken(), uiBootstrap: h.rt.UIBootstrapToken(), origin: "wails://wails",
-						extraHeaders: map[string]string{"X-Beeftv-Ui-Session": uiToken}})
+						extraHeaders: map[string]string{"X-Huabu-Ui-Session": uiToken}})
 					if w.Code != http.StatusForbidden {
 						t.Fatalf("client elevated: %d %s", w.Code, w.Body.String())
 					}
@@ -53,7 +53,7 @@ func TestOpsAcceptanceClientCannotBecomeUIOrManageClients(t *testing.T) {
 }
 
 func TestOpsAcceptanceUIBootstrapCredentialIsolation(t *testing.T) {
-	t.Setenv("BEEFTV_UI_BOOTSTRAP", "")
+	t.Setenv("HUABU_UI_BOOTSTRAP", "")
 	h := newDesktopHarness(t)
 	foreign := newDesktopHarness(t)
 	for _, tc := range []struct{ name, launch, bootstrap string }{
@@ -82,8 +82,8 @@ func TestOpsAcceptanceUIBootstrapCredentialIsolation(t *testing.T) {
 }
 
 func TestOpsAcceptanceOriginAndLoopbackAtRouter(t *testing.T) {
-	t.Setenv("BEEFTV_ALLOWED_ORIGINS", "https://app.beeftv.local")
-	t.Setenv("BEEFTV_UI_BOOTSTRAP", "")
+	t.Setenv("HUABU_ALLOWED_ORIGINS", "https://app.huabu.local")
+	t.Setenv("HUABU_UI_BOOTSTRAP", "")
 	h := newDesktopHarness(t)
 	client, token, err := agentops.NewClientRegistry(h.dataDir).Register("acceptance", agentops.ClientReadOnly)
 	if err != nil {
@@ -96,13 +96,13 @@ func TestOpsAcceptanceOriginAndLoopbackAtRouter(t *testing.T) {
 		{"same-origin", "127.0.0.1:54321", "127.0.0.1:12345", "http://127.0.0.1:54321", 200},
 		{"no-origin", "127.0.0.1:54321", "127.0.0.1:12345", "", 200},
 		{"ipv6-loopback", "[::1]:54321", "[::1]:12345", "http://[::1]:54321", 200},
-		{"allowed-origin", "127.0.0.1:54321", "127.0.0.1:12345", "https://app.beeftv.local", 200},
+		{"allowed-origin", "127.0.0.1:54321", "127.0.0.1:12345", "https://app.huabu.local", 200},
 		{"different-port", "127.0.0.1:54321", "127.0.0.1:12345", "http://127.0.0.1:54322", 403},
 		{"localhost-suffix", "127.0.0.1:54321", "127.0.0.1:12345", "http://localhost.attacker.example", 403},
-		{"allowlist-suffix", "127.0.0.1:54321", "127.0.0.1:12345", "https://app.beeftv.local.attacker.example", 403},
+		{"allowlist-suffix", "127.0.0.1:54321", "127.0.0.1:12345", "https://app.huabu.local.attacker.example", 403},
 		{"opaque-origin", "127.0.0.1:54321", "127.0.0.1:12345", "null", 403},
-		{"foreign-host", "attacker.example", "127.0.0.1:12345", "https://app.beeftv.local", 403},
-		{"foreign-remote", "127.0.0.1:54321", "203.0.113.4:12345", "https://app.beeftv.local", 403},
+		{"foreign-host", "attacker.example", "127.0.0.1:12345", "https://app.huabu.local", 403},
+		{"foreign-remote", "127.0.0.1:54321", "203.0.113.4:12345", "https://app.huabu.local", 403},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			for _, ui := range []bool{false, true} {
@@ -118,9 +118,9 @@ func TestOpsAcceptanceOriginAndLoopbackAtRouter(t *testing.T) {
 				r.Header.Set("X-Forwarded-Host", "127.0.0.1:54321")
 				if ui {
 					r.Header.Set("X-Desktop-Token", h.rt.LaunchToken())
-					r.Header.Set("X-Beeftv-UI-Bootstrap", h.rt.UIBootstrapToken())
+					r.Header.Set("X-Huabu-UI-Bootstrap", h.rt.UIBootstrapToken())
 				} else {
-					r.Header.Set("X-Beeftv-Client", client.ID)
+					r.Header.Set("X-Huabu-Client", client.ID)
 					r.Header.Set("Authorization", "Bearer "+token)
 				}
 				w := httptest.NewRecorder()

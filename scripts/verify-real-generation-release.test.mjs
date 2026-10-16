@@ -33,7 +33,7 @@ function copyGate(dir) {
 }
 
 function setupRepo(version) {
-  const dir = mkdtempSync(join(tmpdir(), 'beeftv-receipt-'));
+  const dir = mkdtempSync(join(tmpdir(), 'huabu-receipt-'));
   const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
   git('init');
   copyGate(dir);
@@ -461,7 +461,7 @@ test('v1.7.10 name-only waiver retains native, review, financial and package gat
     const value = {
       version: 'v1.7.10', sourceDigest, budgetCNY: 0, spentCNY: 0, newSpentCNY: 0, pendingCNY: 0,
       liveMatrixStatus: 'not_run_owner_waived', cases: [], releaseComplete: false,
-      liveTestWaiver: { approvedBy: 'Ender', instruction: 'beeftv本次豁免 直接上线', scope: 'seedance-display-names-only', evidence },
+      liveTestWaiver: { approvedBy: 'Ender', instruction: 'huabu本次豁免 直接上线', scope: 'seedance-display-names-only', evidence },
       priorFinancialUncertainty: { status: 'unresolved', carriedFromVersion: 'v1.7.9', pendingCNY: null, evidence },
       review: { result: 'approved', independent: true, reviewer: 'fixture', sourceDigest, evidence },
       upgrade: { preservedData: true, sourceDigest, evidence },

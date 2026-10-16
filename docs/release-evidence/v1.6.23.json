@@ -396,7 +396,7 @@
       "commands": [
         {
           "command": "go test -count=1 -v -run \\^\\(TestLaterEditsNotLostOnUndo\\)\\$ ./internal/assistantturns",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "conflict_undo-later-edits.log",
           "sha256": "e8c7c664de88b03b0a112b8b6810ac7e3c3cd0addfaccd621de06bc3fda7c2a1",
@@ -404,7 +404,7 @@
         },
         {
           "command": "go test -count=1 -v -run \\^\\(TestUndoAssistantTurnRejectsLaterCanvasChanges\\|TestUndoAssistantTurnPreservesExternalWriteDuringTurn\\|TestUndoAssistantTurnRejectsSameNodeExternalEdit\\)\\$ ./internal/app",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "conflict_undo-interleaved-and-later.log",
           "sha256": "1e64470514135976a05a67eefba676e17248a952fa0c5532a740bf051858d36e",
@@ -412,7 +412,7 @@
         },
         {
           "command": "go test -count=1 -v -run \\^\\(TestLocalUpdateKeepsNonTargetDataAndBlocksStaleRevision\\)\\$ ./internal/agentops",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "conflict_undo-stale-revision.log",
           "sha256": "1b9d0836891ac5d651d710c80a2a9455b4b3c9558e5735d469029170a889cdfa",
@@ -420,7 +420,7 @@
         },
         {
           "command": "go test -count=1 -v -run \\^\\(TestFailedWriteDoesNotLeaveReceipt\\)\\$ ./internal/operations",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "conflict_undo-failed-stale-write.log",
           "sha256": "d828f1a8354835fe70e5aa63aa1ef3c0bca8f00627aebb1f969f49678171dd1b",
@@ -428,7 +428,7 @@
         },
         {
           "command": "go test -count=1 ./internal/assistantturns",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "conflict-binding-effects.log",
           "sha256": "9f79d9040162bfeb436af56852ee1a7689c8644379f813a017b3019a07e0f02f",
@@ -436,7 +436,7 @@
         },
         {
           "command": "bun test agent-host/operation-bridge.test.mjs agent-host/canvas-turn.test.mjs",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
           "exitCode": 0,
           "log": "binding-replay.log",
           "sha256": "61b78a8f11c80187a80fc5be73017c1a3a55e79f03776ee194cbae3d89b3f5ba",
@@ -463,7 +463,7 @@
       "commands": [
         {
           "command": "bun test agent-host/interrupted-host.test.mjs -t SIGKILL\\ after\\ a\\ tool\\ receipt",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
           "exitCode": 0,
           "log": "host_recovery-sigkill.log",
           "sha256": "7b7a379d1148941b20598bfff5158d1a0c470216517a3c35391e4acc7de908c5",
@@ -491,7 +491,7 @@
       "commands": [
         {
           "command": "go test -count=1 -v -run \\^\\(TestAssistantScopeAllowsOnlyVerifiedResources\\|TestEmptyAssistantScopeDeniesExecution\\)\\$ ./internal/agentops",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "scope_isolation-allows.log",
           "sha256": "a0726d420b58cf408979e00d7a55f7c1de63233511309adbba0736efe16eed5e",
@@ -499,15 +499,15 @@
         },
         {
           "command": "go test -count=1 -v -run \\^\\(TestAuthorizationHappensBeforeReplay\\|TestAssistantCannotUseWorkspaceWideOps\\|TestAssistantWithoutScopeFailsClosed\\)\\$ ./internal/operations",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002/backend",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002/backend",
           "exitCode": 0,
           "log": "scope_isolation-execute.log",
           "sha256": "f5fb5b2471edb84747448b4f86ad2b32bb018e0c70ed140f0d006d51a5e58197",
           "startedAt": "2026-10-02T12:36:47Z"
         },
         {
-          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/host-runtime-probe.mjs /Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002 /Volumes/ExternalWork/Scratch/beeftv-full-refactor-20261002/release-v1.6.23/deterministic-agent-f6e23ba/host-runtime-probe.json",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/host-runtime-probe.mjs /Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002 /Volumes/ExternalWork/Scratch/huabu-full-refactor-20261002/release-v1.6.23/deterministic-agent-f6e23ba/host-runtime-probe.json",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
           "exitCode": 0,
           "log": "scope_and_budget-host-probe.log",
           "sha256": "cf54ff6d07c20d7b178d810af54004b9277e3454adabd7571333b8baaf511e46",
@@ -535,8 +535,8 @@
       ],
       "commands": [
         {
-          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/host-runtime-probe.mjs /Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002 /Volumes/ExternalWork/Scratch/beeftv-full-refactor-20261002/release-v1.6.23/deterministic-agent-f6e23ba/host-runtime-probe.json",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/host-runtime-probe.mjs /Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002 /Volumes/ExternalWork/Scratch/huabu-full-refactor-20261002/release-v1.6.23/deterministic-agent-f6e23ba/host-runtime-probe.json",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
           "exitCode": 0,
           "log": "scope_and_budget-host-probe.log",
           "sha256": "cf54ff6d07c20d7b178d810af54004b9277e3454adabd7571333b8baaf511e46",
@@ -544,15 +544,15 @@
         },
         {
           "command": "bun test agent-host/request-budget.test.mjs",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
           "exitCode": 0,
           "log": "budget-counters.log",
           "sha256": "0fec6d27cb6b65acd370308415d11cdbbfce910b3dcfe43eba1a131fbbbba9a3",
           "startedAt": "2026-10-02T12:37:37Z"
         },
         {
-          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/durable-budget-probe.mjs /Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
-          "directory": "/Volumes/ExternalWork/Worktrees/BeefTV/full-refactor-20261002",
+          "command": "/Users/sunny/.nvm/versions/node/v24.15.0/bin/node agent-host/test-support/durable-budget-probe.mjs /Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
+          "directory": "/Volumes/ExternalWork/Worktrees/Huabu/full-refactor-20261002",
           "exitCode": 0,
           "log": "budget-durable-probe.log",
           "sha256": "d1089dd19ed06b2054ded032fb64399a574a56efc32526767445d5b0595aa761",
@@ -1520,5 +1520,5 @@
     ],
     "limitations": "Unknown refunds remain unresolved; authorization permits release only and is not proof of refund or exact total pending."
   },
-  "evidenceRoot": "/Volumes/ExternalWork/Scratch/beeftv-full-refactor-20261002/release-v1.6.23"
+  "evidenceRoot": "/Volumes/ExternalWork/Scratch/huabu-full-refactor-20261002/release-v1.6.23"
 }

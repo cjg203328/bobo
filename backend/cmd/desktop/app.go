@@ -129,7 +129,7 @@ func (a *DesktopApp) RuntimeConfig() DesktopRuntimeConfig {
 	return DesktopRuntimeConfig{BaseURL: runtime.BaseURL(), LaunchToken: runtime.LaunchToken(), UIBootstrapToken: runtime.UIBootstrapToken()}
 }
 
-func (a *DesktopApp) OpenBeefTVGitHub() error {
+func (a *DesktopApp) OpenHuabuGitHub() error {
 	ctx, err := a.dialogContext()
 	if err != nil {
 		return err
@@ -138,16 +138,16 @@ func (a *DesktopApp) OpenBeefTVGitHub() error {
 	return nil
 }
 
-func (a *DesktopApp) OpenBeefTVWebsite() error {
+func (a *DesktopApp) OpenHuabuWebsite() error {
 	ctx, err := a.dialogContext()
 	if err != nil {
 		return err
 	}
-	wailsruntime.BrowserOpenURL(ctx, "https://beeftv.app/")
+	wailsruntime.BrowserOpenURL(ctx, "https://huabu.app/")
 	return nil
 }
 
-func (a *DesktopApp) OpenBeefTVX() error {
+func (a *DesktopApp) OpenHuabuX() error {
 	ctx, err := a.dialogContext()
 	if err != nil {
 		return err

@@ -4,13 +4,13 @@ import { beefAPIConnectionLabel } from "../src/services/api/beefapi-connection";
 import { channelRequest } from "../src/services/api/custom-channel-relay";
 
 test("both brands retain strict managed endpoint recognition and relay credentials", () => {
-    for (const baseUrl of ["https://beeftv.app", "https://enterprise.beefapi.com"]) {
+    for (const baseUrl of ["https://huabu.app", "https://enterprise.beefapi.com"]) {
         expect(isBeefAPIEndpoint(baseUrl + "/v1")).toBe(true);
         const request = channelRequest({baseUrl, apiKey: "", apiFormat: "openai"}, baseUrl + "/v1/models");
         expect(request.url).toContain("/ai/custom");
         expect(JSON.stringify(request)).not.toContain("Bearer ");
     }
-    for (const baseUrl of ["http://beeftv.app", "https://beeftv.app:444", "https://beeftv.app.evil.test", "https://user@beeftv.app", "https://evil.test/beeftv.app"]) {
+    for (const baseUrl of ["http://huabu.app", "https://huabu.app:444", "https://huabu.app.evil.test", "https://user@huabu.app", "https://evil.test/huabu.app"]) {
         expect(isBeefAPIEndpoint(baseUrl)).toBe(false);
     }
 });

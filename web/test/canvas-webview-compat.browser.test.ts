@@ -28,10 +28,10 @@ for (const empty of [true, false]) test(`canvas mounts and searches without Arra
     page.on("pageerror", (error) => errors.push(error.message));
     try {
         await page.addInitScript(() => { Reflect.deleteProperty(Array.prototype, "toSorted"); });
-        await page.route("https://beeftv.test/**", (route) => route.fulfill(new URL(route.request().url()).pathname === "/app.js"
+        await page.route("https://huabu.test/**", (route) => route.fulfill(new URL(route.request().url()).pathname === "/app.js"
             ? { contentType: "text/javascript", body: script }
             : { contentType: "text/html", body: '<div id="root"></div><script type="module" src="/app.js"></script>' }));
-        await page.goto(`https://beeftv.test/${empty ? "?empty" : ""}`);
+        await page.goto(`https://huabu.test/${empty ? "?empty" : ""}`);
         expect(await page.evaluate(() => typeof Array.prototype.toSorted)).toBe("undefined");
         await page.getByTestId("canvas-ready").waitFor();
         expect(await page.getByRole("dialog").count()).toBe(0);

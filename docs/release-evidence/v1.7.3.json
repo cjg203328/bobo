@@ -95,7 +95,7 @@
         "sha256": "76a372e80e3be245d664a9a62757fa807d48426b0881a1dc8f32c5c2e38445b0",
         "size": 158370138,
         "evidence": [
-          "https://updates.beefapi.com/beeftv/v1.7.3/BeefTV-v1.7.3-darwin-amd64.zip",
+          "https://updates.beefapi.com/huabu/v1.7.3/Huabu-v1.7.3-darwin-amd64.zip",
           "https://github.com/glanderness/BeefTV/actions/runs/37172723287"
         ]
       },
@@ -104,7 +104,7 @@
         "sha256": "02040df5c5687fd5f487e68412c401d8d3dac21d5ac0694f754caf0a7022ff59",
         "size": 153977952,
         "evidence": [
-          "https://updates.beefapi.com/beeftv/v1.7.3/BeefTV-v1.7.3-darwin-arm64.zip",
+          "https://updates.beefapi.com/huabu/v1.7.3/Huabu-v1.7.3-darwin-arm64.zip",
           "https://github.com/glanderness/BeefTV/actions/runs/37172723287"
         ]
       },
@@ -113,7 +113,7 @@
         "sha256": "7651388abf0c76b77ff6c24d702c3e6008b6307068c382570cf1a6cf228891e8",
         "size": 145122891,
         "evidence": [
-          "https://updates.beefapi.com/beeftv/v1.7.3/BeefTV-v1.7.3-windows-amd64.zip",
+          "https://updates.beefapi.com/huabu/v1.7.3/Huabu-v1.7.3-windows-amd64.zip",
           "https://github.com/glanderness/BeefTV/actions/runs/37172723287"
         ]
       }
@@ -123,7 +123,7 @@
   "publication": {
     "status": "passed",
     "release": "https://github.com/glanderness/BeefTV/releases/tag/v1.7.3",
-    "feed": "https://updates.beefapi.com/beeftv/desktop-update.json",
+    "feed": "https://updates.beefapi.com/huabu/desktop-update.json",
     "signatureVerified": true,
     "allPublicArchivesDownloadedAndHashVerified": true
   }

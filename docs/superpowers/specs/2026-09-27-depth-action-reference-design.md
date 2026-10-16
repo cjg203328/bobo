@@ -1,8 +1,8 @@
-# BeefTV 深度动作捕捉设计
+# Huabu 深度动作捕捉设计
 
 ## 1. 目标与产品边界
 
-在视频节点顶部的“视频处理”菜单中增加“深度动作捕捉”。用户点击后无需配置参数，BeefTV 自动准备可选的本地 Depth Runtime 与 Video Depth Anything Small 权重，执行固定标准参数的深度视频推理，并在画布上创建可直接播放的结果视频节点。
+在视频节点顶部的“视频处理”菜单中增加“深度动作捕捉”。用户点击后无需配置参数，Huabu 自动准备可选的本地 Depth Runtime 与 Video Depth Anything Small 权重，执行固定标准参数的深度视频推理，并在画布上创建可直接播放的结果视频节点。
 
 产品文案沿用用户指定的“深度动作捕捉”，但技术实现输出的是时间连续的单目相对深度视频，不输出骨骼、关节坐标、BVH、FBX 或 SMPL 数据。功能说明应称其为“将普通视频转换为近白远黑的深度动作参考视频”，避免让用户误解为 3D 骨骼捕捉。
 
@@ -11,7 +11,7 @@
 - 视频节点的“视频处理”菜单依次包含“视频剪辑”“画面裁切”“深度动作捕捉”。
 - 点击后立即创建与源视频关联的结果占位节点，不显示参数弹窗。
 - 首次使用时持续显示 Runtime 和模型的下载阶段、百分比、已下载大小与总大小。
-- 下载完成后自动推理、编码、校验并把结果写入 BeefTV 资源体系。
+- 下载完成后自动推理、编码、校验并把结果写入 Huabu 资源体系。
 - 成功后占位节点直接变成可播放的视频节点；失败后保留节点并显示原因和“重新生成”。
 - 第二次使用命中已校验缓存，不重复下载。
 
@@ -21,7 +21,7 @@
 
 输入合同：
 
-- 输入来自当前用户有权访问的 BeefTV 视频资源，不重复上传。
+- 输入来自当前用户有权访问的 Huabu 视频资源，不重复上传。
 - 支持现有 FFmpeg 能探测和解码的 MP4、MOV、WebM。
 - 最大时长 15 秒；允许一个输入帧时长的探测误差，超过时提示用户先使用视频剪辑。
 - 推理前统一处理旋转信息、像素格式和可变帧率；最高处理 30 fps，第一版保留不高于 30 fps 的源帧率。
@@ -115,7 +115,7 @@ Worker 只能读取任务指定的输入文件和 Runtime/model 目录，只能�
 
 主应用不包含 Python、PyTorch、OpenCV、Video Depth Anything 权重或完整推理环境。
 
-缓存目录使用 BeefTV 用户数据目录下的版本化路径：
+缓存目录使用 Huabu 用户数据目录下的版本化路径：
 
 ```text
 runtimes/depth/<runtime-version>/darwin-arm64/
@@ -128,7 +128,7 @@ Runtime 包包含：
 - 独立 Python Runtime
 - 固定版本的 PyTorch/TorchVision、OpenCV、NumPy 和必要依赖
 - 固定 commit 的最小 Video Depth Anything 源码
-- BeefTV Depth Worker
+- Huabu Depth Worker
 - LICENSE、NOTICE 和版本元数据
 
 模型缓存包含 Small 权重和模型 manifest。Small 权重固定为已批准的 SHA-256；备用源只允许下载该权重，不允许运行远端源码。
@@ -137,7 +137,7 @@ Runtime 包包含：
 
 ### 6.1 Manifest
 
-BeefTV GitHub Release 发布一个签名的 Depth manifest，字段至少包括：
+Huabu GitHub Release 发布一个签名的 Depth manifest，字段至少包括：
 
 - schema version
 - Runtime/model 版本
@@ -147,7 +147,7 @@ BeefTV GitHub Release 发布一个签名的 Depth manifest，字段至少包括�
 - 文件大小
 - SHA-256
 - 解压后大小
-- 最低 BeefTV 版本
+- 最低 Huabu 版本
 - Runtime 与模型兼容范围
 - 签名与签名算法标识
 
@@ -155,8 +155,8 @@ BeefTV GitHub Release 发布一个签名的 Depth manifest，字段至少包括�
 
 ### 6.2 下载和回退
 
-- Runtime 主源为 BeefTV GitHub Release。第一版 Runtime 没有未审核的第三方备用源；主源失败时明确提示重试。
-- Small 权重主源为 BeefTV GitHub Release，备用源为 Hugging Face 官方固定地址。
+- Runtime 主源为 Huabu GitHub Release。第一版 Runtime 没有未审核的第三方备用源；主源失败时明确提示重试。
+- Small 权重主源为 Huabu GitHub Release，备用源为 Hugging Face 官方固定地址。
 - 下载使用 `.download` 临时文件和 HTTP Range 断点续传。
 - 每个文件最多进行有限次带退避重试；主源确认失败后才切换备用源。
 - Range 不被服务器接受时安全地从头下载，不拼接不兼容响应。
@@ -167,7 +167,7 @@ BeefTV GitHub Release 发布一个签名的 Depth manifest，字段至少包括�
 
 ### 6.3 缓存与更新
 
-- 已校验缓存通过本地 manifest、文件大小和 SHA-256 判断，不因 BeefTV 应用升级自动删除。
+- 已校验缓存通过本地 manifest、文件大小和 SHA-256 判断，不因 Huabu 应用升级自动删除。
 - 新 Runtime 先并行安装到新版本目录，自检成功后切换；失败继续使用当前兼容版本。
 - 第一版设置页提供查看占用空间、修复组件和删除深度组件。
 - 删除只针对解析后的 Depth Runtime/model 精确目录，不影响项目视频、任务结果或其他模型。

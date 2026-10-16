@@ -12,7 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 async function withHost(run, envExtra = {}, options = {}) {
   const { slowFirstModel = true } = options;
-  const directory = mkdtempSync(path.join(tmpdir(), 'beeftv session lifecycle '));
+  const directory = mkdtempSync(path.join(tmpdir(), 'huabu session lifecycle '));
   const hostToken = 'synthetic-lifecycle-host';
   let child;
   let base;
@@ -31,7 +31,7 @@ async function withHost(run, envExtra = {}, options = {}) {
   const api = async (route, body) => {
     const response = await fetch(base + route, {
       method: body === undefined ? 'GET' : 'POST',
-      headers: { 'content-type': 'application/json', 'X-Beeftv-Agent-Token': hostToken },
+      headers: { 'content-type': 'application/json', 'X-Huabu-Agent-Token': hostToken },
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: AbortSignal.timeout(20000),
     });
@@ -42,7 +42,7 @@ async function withHost(run, envExtra = {}, options = {}) {
   };
   const ops = createServer(async (req, res) => {
     res.setHeader('content-type', 'application/json');
-    if (req.headers['x-beeftv-agent-token'] !== hostToken) { res.writeHead(403).end('{}'); return; }
+    if (req.headers['x-huabu-agent-token'] !== hostToken) { res.writeHead(403).end('{}'); return; }
     if (req.url === '/api/ops') {
       res.end(JSON.stringify({ code: 0, data: { ops: [{ id: 'canvas.get', summary: 'Read', readOnly: true, scope: 'canvas', params: { type: 'object', properties: { canvasId: { type: 'string' } }, required: ['canvasId'] } }] } }));
       return;
@@ -89,15 +89,15 @@ async function withHost(run, envExtra = {}, options = {}) {
     base = `http://127.0.0.1:${port}`;
     const env = {
       ...process.env,
-      BEEFTV_AGENT_DATA_DIR: directory,
-      BEEFTV_AGENT_HOST_TOKEN: hostToken,
-      BEEFTV_AGENT_PORT: String(port),
-      BEEFTV_OPS_URL: `http://127.0.0.1:${opsPort}/api`,
-      BEEFTV_AGENT_API: 'openai-completions',
-      BEEFTV_AGENT_MODEL: 'synthetic',
-      BEEFTV_AGENT_API_KEY: 'synthetic-only',
-      BEEFTV_AGENT_BASE_URL: `http://127.0.0.1:${modelPort}/v1`,
-      BEEFTV_AGENT_TURN_TIMEOUT_MS: '20000',
+      HUABU_AGENT_DATA_DIR: directory,
+      HUABU_AGENT_HOST_TOKEN: hostToken,
+      HUABU_AGENT_PORT: String(port),
+      HUABU_OPS_URL: `http://127.0.0.1:${opsPort}/api`,
+      HUABU_AGENT_API: 'openai-completions',
+      HUABU_AGENT_MODEL: 'synthetic',
+      HUABU_AGENT_API_KEY: 'synthetic-only',
+      HUABU_AGENT_BASE_URL: `http://127.0.0.1:${modelPort}/v1`,
+      HUABU_AGENT_TURN_TIMEOUT_MS: '20000',
       ...envExtra,
     };
     const start = async () => {
@@ -114,7 +114,7 @@ async function withHost(run, envExtra = {}, options = {}) {
       const exited = new Promise((resolve) => child.once('close', resolve));
       child.kill('SIGTERM');
       await exited;
-      if (modelId) env.BEEFTV_AGENT_MODEL = modelId;
+      if (modelId) env.HUABU_AGENT_MODEL = modelId;
       await start();
     };
     await start();
@@ -259,7 +259,7 @@ for (const failFirstModel of [false, true]) test(`真实宿主：旧 JSONL 交�
       { type: 'session', version: 3, id: sessionId, timestamp, cwd: path.join(directory, 'workspace', canvasKey(canvasId)) },
       { type: 'message', id: 'user-old', parentId: null, timestamp, message: { role: 'user', content: [{ type: 'text', text: '旧会话里的原始需求' }], timestamp: 1791374400000 } },
       { type: 'message', id: 'assistant-old', parentId: 'user-old', timestamp, message: { role: 'assistant', content: [{ type: 'text', text: '旧会话里的历史回执' }], timestamp: 1791374401000 } },
-      { type: 'custom', id: 'turn-old', parentId: 'assistant-old', timestamp, customType: 'beeftv.canvas.turn',
+      { type: 'custom', id: 'turn-old', parentId: 'assistant-old', timestamp, customType: 'huabu.canvas.turn',
         data: { turnId: 'legacy-turn', userText: '旧会话里的原始需求', reply: '旧会话里的历史回执', toolCalls: [], proposals: [], error: null, cancelled: false, createdAt: timestamp } },
     ];
     writeFileSync(path.join(canvasDir, `2026-10-07T12-00-00-000Z_${sessionId}.jsonl`), rows.map((row) => JSON.stringify(row)).join('\n') + '\n');
@@ -312,7 +312,7 @@ test('真实宿主：旧会话交接首轮断线，重启后重发原请求复�
     writeFileSync(path.join(canvasDir, `2026-10-07T12-00-00-000Z_${sessionId}.jsonl`), JSON.stringify(row) + '\n');
     const body = { canvasId, sessionId, turnId: 'lost-response', requestId: 'lost-response', message: '保留这条消息' };
     const controller = new AbortController();
-    const response = await fetch(base + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Beeftv-Agent-Token': hostToken }, body: JSON.stringify(body), signal: controller.signal });
+    const response = await fetch(base + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Huabu-Agent-Token': hostToken }, body: JSON.stringify(body), signal: controller.signal });
     const reader = response.body.getReader();
     const first = new TextDecoder().decode((await reader.read()).value);
     const successor = JSON.parse(first.trim().split('\n')[0]).sessionId;

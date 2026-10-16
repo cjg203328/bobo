@@ -6,7 +6,7 @@ import (
 )
 
 func TestBothDesktopBrandsKeepSeedanceContracts(t *testing.T) {
-	for _, origin := range []string{"https://beeftv.app", "https://enterprise.beefapi.com"} {
+	for _, origin := range []string{"https://huabu.app", "https://enterprise.beefapi.com"} {
 		config := providerConfig{BaseURL: origin, Model: "seedance-2.0", InterfaceType: "newapi"}
 		if !isBeefAPIVideoConfig(context.Background(), config) || !isBeefAPISeedancePreuploadConfig(context.Background(), config) {
 			t.Fatalf("missing video or preupload contract for %s", origin)

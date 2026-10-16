@@ -108,16 +108,16 @@ func (s *Service) requestDeviceCode() (deviceCodeResponse, error) {
 		Hostname:      s.hostname,
 	}, nil)
 	if err != nil {
-		return deviceCodeResponse{}, fmt.Errorf("无法连接 BeefTV 服务，请检查网络后重试")
+		return deviceCodeResponse{}, fmt.Errorf("无法连接 Huabu 服务，请检查网络后重试")
 	}
 	if response.StatusCode >= 300 {
 		if response.StatusCode == http.StatusTooManyRequests {
 			return deviceCodeResponse{}, fmt.Errorf("连接尝试过于频繁，请稍后重试")
 		}
 		if response.StatusCode >= 500 {
-			return deviceCodeResponse{}, fmt.Errorf("BeefTV 连接服务暂时不可用，请稍后重试")
+			return deviceCodeResponse{}, fmt.Errorf("Huabu 连接服务暂时不可用，请稍后重试")
 		}
-		return deviceCodeResponse{}, fmt.Errorf("BeefTV 服务未接受连接，请更新应用后重试")
+		return deviceCodeResponse{}, fmt.Errorf("Huabu 服务未接受连接，请更新应用后重试")
 	}
 	var result deviceCodeResponse
 	if err := json.Unmarshal(raw, &result); err != nil || strings.TrimSpace(result.DeviceCode) == "" || strings.TrimSpace(result.UserCode) == "" {
@@ -221,7 +221,7 @@ func (s *Service) cancelRemote(deviceCode string) error {
 }
 
 func (s *Service) remoteConnection(apiKey string) (connectionView, int, error) {
-	request, err := http.NewRequestWithContext(s.lifecycle, http.MethodGet, TokenBaseURL(s.Origin())+"/beeftv/connection", nil)
+	request, err := http.NewRequestWithContext(s.lifecycle, http.MethodGet, TokenBaseURL(s.Origin())+"/huabu/connection", nil)
 	if err != nil {
 		return connectionView{}, 0, err
 	}
@@ -244,7 +244,7 @@ func (s *Service) remoteConnection(apiKey string) (connectionView, int, error) {
 }
 
 func (s *Service) revokeRemote(apiKey string) error {
-	request, err := http.NewRequestWithContext(s.lifecycle, http.MethodDelete, TokenBaseURL(s.Origin())+"/beeftv/connection", nil)
+	request, err := http.NewRequestWithContext(s.lifecycle, http.MethodDelete, TokenBaseURL(s.Origin())+"/huabu/connection", nil)
 	if err != nil {
 		return err
 	}

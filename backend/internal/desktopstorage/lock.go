@@ -13,7 +13,7 @@ func Lock(path string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	return LockFile(filepath.Join(filepath.Dir(path), "."+filepath.Base(path)+".beeftv-lock"))
+	return LockFile(filepath.Join(filepath.Dir(path), "."+filepath.Base(path)+".huabu-lock"))
 }
 
 // LockFile lets the host place a lock outside Windows AppData virtualization.
@@ -27,7 +27,7 @@ func LockFile(path string) (*os.File, error) {
 	}
 	if err := lockFile(file); err != nil {
 		file.Close()
-		return nil, errors.New("此数据目录正在被另一实例使用，请先关闭其他 BeefTV 窗口")
+		return nil, errors.New("此数据目录正在被另一实例使用，请先关闭其他 Huabu 窗口")
 	}
 	return file, nil
 }

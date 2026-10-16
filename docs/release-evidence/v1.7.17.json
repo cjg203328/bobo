@@ -79,7 +79,7 @@
     "localReleaseGate": {
       "status": "passed",
       "sourceDigest": "cf1cbd23e51a2fe181857731473fd52b8ec304b00b91d826b68e85e828e826c9",
-      "evidence": ["scripts/verify-beeftv-local-release.sh passed during canonical macOS build; 24/24 release authorization gate tests passed", "docs/release-evidence/v1.7.17-review.md#确定性验证"]
+      "evidence": ["scripts/verify-huabu-local-release.sh passed during canonical macOS build; 24/24 release authorization gate tests passed", "docs/release-evidence/v1.7.17-review.md#确定性验证"]
     },
     "ci": {
       "status": "passed",

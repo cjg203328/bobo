@@ -29,7 +29,7 @@ test("H3 2K price includes the first-five-reference-image allowance", () => {
 
 test("H3 base transport sends reference images to the multimodal route", async () => {
     const model = "minimax-h3";
-    const channel = createModelChannel({id:"beefapi",baseUrl:"https://beeftv.app",models:[model]});
+    const channel = createModelChannel({id:"beefapi",baseUrl:"https://huabu.app",models:[model]});
     channel.modelProfiles = mergeFetchedChannelModelProfiles(channel,[{id:model,supportedEndpointTypes:["openai-video"],videoCapabilitiesVersion:"h3-base",videoCapabilities:{
         references:{promptMaxChars:50000,minImages:0,maxImages:9,maxImageBytes:31457280,maxVideos:3,maxVideoBytes:52428800,maxAudios:3,maxAudioBytes:15000000},
         duration:{selection:"range",min:5,max:15,step:1,default:5},ratios:["16:9","adaptive"],defaultRatio:"16:9",resolutions:["2k","480p","768p","4k"],defaultResolution:"2k",generateAudio:{supported:false,default:true},watermark:{supported:false,default:false},operations:["text_to_video","image_to_video","audio_to_video","reference_to_video"],defaultOperation:"text_to_video",
@@ -54,7 +54,7 @@ test("H3 base transport sends reference images to the multimodal route", async (
 
 test("H3 direct transport keeps end-only roles, 768p and local media", async () => {
     const model = "minimax-h3-max-turbo";
-    const channel = createModelChannel({id: "beefapi", baseUrl: "https://beeftv.app", models: [model]});
+    const channel = createModelChannel({id: "beefapi", baseUrl: "https://huabu.app", models: [model]});
     channel.modelProfiles = mergeFetchedChannelModelProfiles(channel, [{id: model, supportedEndpointTypes: ["openai-video"], videoCapabilitiesVersion: "test-gateway-h3", videoCapabilities: {
         references: {promptMaxChars: 50000, minImages: 0, maxImages: 2, maxImageBytes: 31457280, maxVideos: 0, maxAudios: 1, maxAudioBytes: 15000000, minAudioDurationSeconds: 2},
         duration: {selection: "range", min: 1, max: 15, step: 1, default: 5},

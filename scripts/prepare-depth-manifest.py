@@ -24,7 +24,7 @@ def verify_file(root, entry):
 def prepare(root):
     runtimes = {}
     for variant in ("cpu", "cuda"):
-        name = f"beeftv-depth-runtime-v1-windows-amd64-{variant}.zip"
+        name = f"huabu-depth-runtime-v1-windows-amd64-{variant}.zip"
         meta = json.loads((root / (name + ".json")).read_text(encoding="utf-8-sig"))
         if meta["name"] != name or not 0 < meta["files"] <= 50000 or not 0 < meta["expandedSize"] <= 12 << 30:
             raise ValueError("invalid runtime metadata")

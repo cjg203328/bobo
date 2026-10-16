@@ -30,7 +30,7 @@ def validate_preview_contract(source: Path, preview: Path) -> VideoMetadata:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="验证 BeefTV 深度运行包的真实模型推理")
+    parser = argparse.ArgumentParser(description="验证 Huabu 深度运行包的真实模型推理")
     parser.add_argument("--device", choices=("cpu", "cuda"), required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
     parser.add_argument("--work-dir", type=Path, required=True)

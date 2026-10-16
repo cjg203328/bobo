@@ -22,7 +22,7 @@ my-plugin.beeftv-plugin
 
 ```json
 {
-  "apiVersion": "beeftv.plugin/v1",
+  "apiVersion": "huabu.plugin/v1",
   "id": "acme-comfyui", "name": "Acme ComfyUI", "version": "1.0.0", "author": "Acme", "description": "通过工作流贡献提供视频生成能力",
   "permissions": ["generation.run", "media.read"],
   "configuration": { "fields": [{ "name": "apiKey", "type": "secret", "label": "API Token", "required": true }] },

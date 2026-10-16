@@ -1,2 +1,2 @@
-"""Standalone depth-reference video generator for BeefTV."""
+"""Standalone depth-reference video generator for Huabu."""
 

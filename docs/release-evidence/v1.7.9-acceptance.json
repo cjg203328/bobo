@@ -20,8 +20,8 @@
       "status": "approved_layered",
       "evidence": [
         "portrait-catalog-independent-review.json",
-        "beeftv-independent-review.json",
-        "beeftv-ratio-independent-review.json"
+        "huabu-independent-review.json",
+        "huabu-ratio-independent-review.json"
       ],
       "testOnlyFixReview": "9620a1c authored by tv_release_audit and independently diff-reviewed by root; catalog7e70798 authored by tv_quote_guard and independently reviewed by tv_release_audit."
     },
@@ -425,7 +425,7 @@
   "restart": {
     "candidateGit": "7e707983e087b4913245236ccd27b69c47849fe8",
     "sourceDigest": "3f2489a9fa52e45d0e0f0771c22c2430e939ad1f14443b3ecb5a6e0475f5e40c",
-    "restartMethod": "Root reports native super+q; application list isRunning false; reopen /Applications/BeefTV.app",
+    "restartMethod": "Root reports native super+q; application list isRunning false; reopen /Applications/Huabu.app",
     "processChanged": true,
     "checks": {
       "configRevision": true,
@@ -481,7 +481,7 @@
   },
   "evidenceFiles": [
     {
-      "name": "beeftv-agent-deterministic-checks.json",
+      "name": "huabu-agent-deterministic-checks.json",
       "sha256": "475c6e8e4df985bbcc86e2051228ee117859f410453e9c90505adedd2e65ea7b"
     },
     {

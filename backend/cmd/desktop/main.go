@@ -55,7 +55,7 @@ func main() {
 
 func desktopAppOptions(app *DesktopApp) *options.App {
 	return &options.App{
-		Title:            "BeefTV",
+		Title:            "Huabu",
 		Width:            1440,
 		Height:           960,
 		BackgroundColour: &options.RGBA{R: 13, G: 15, B: 18, A: 255},

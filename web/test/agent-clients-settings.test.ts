@@ -34,7 +34,7 @@ describe("外部 Agent 接入 API", () => {
     test("列表按信封解包，并同时给出已连接客户端和命令行工具状态", async () => {
         const data = {
             clients: [{ id: "c-1", label: "Codex", kind: "codex", mode: "read-only", createdAt: "2026-09-20T02:00:00Z", lastUsedAt: null }],
-            cli: { path: "/Applications/BeefTV.app/Contents/Resources/beeftv", available: true, installCommand: "ln -s /x/beeftv /usr/local/bin/beeftv" },
+            cli: { path: "/Applications/Huabu.app/Contents/Resources/huabu", available: true, installCommand: "ln -s /x/huabu /usr/local/bin/huabu" },
         };
         await withStubbedApi({ code: 0, data, msg: "ok" }, 200, async (recorded) => {
             await expect(listAgentClients()).resolves.toEqual(data);
@@ -72,7 +72,7 @@ describe("外部 Agent 接入 API", () => {
 
 describe("接入内容按客户端类型选命令或配置", () => {
     test("Claude Desktop 使用配置文件而非 Claude Code 命令", () => {
-        const block = agentClientSetupBlock({ kind: "claude-desktop", title: "T", json: '{"mcpServers":{"beeftv":{}}}' });
+        const block = agentClientSetupBlock({ kind: "claude-desktop", title: "T", json: '{"mcpServers":{"huabu":{}}}' });
         expect(block?.format).toBe("json");
         expect(block?.instruction).toContain("保留已有服务");
         expect(block?.instruction).toContain("完全退出");
@@ -80,15 +80,15 @@ describe("接入内容按客户端类型选命令或配置", () => {
     });
     test("codex / claude 展示终端命令", () => {
         for (const kind of ["codex", "claude"] as const) {
-            const block = agentClientSetupBlock({ kind, title: "T", command: "beeftv mcp add", json: '{"mcpServers":{}}' });
-            expect(block).toMatchObject({ text: "beeftv mcp add", format: "command" });
+            const block = agentClientSetupBlock({ kind, title: "T", command: "huabu mcp add", json: '{"mcpServers":{}}' });
+            expect(block).toMatchObject({ text: "huabu mcp add", format: "command" });
             expect(block?.instruction).toContain("PowerShell");
         }
     });
 
     test("cursor 展示配置并指向 ~/.cursor/mcp.json", () => {
-        const block = agentClientSetupBlock({ kind: "cursor", title: "T", command: "beeftv mcp add", json: '{"mcpServers":{"beeftv":{}}}' });
-        expect(block).toMatchObject({ text: '{"mcpServers":{"beeftv":{}}}', format: "json", instruction: "粘贴到 ~/.cursor/mcp.json。" });
+        const block = agentClientSetupBlock({ kind: "cursor", title: "T", command: "huabu mcp add", json: '{"mcpServers":{"huabu":{}}}' });
+        expect(block).toMatchObject({ text: '{"mcpServers":{"huabu":{}}}', format: "json", instruction: "粘贴到 ~/.cursor/mcp.json。" });
     });
 
     test("其他 MCP 客户端展示配置，指引不提 Cursor 的路径", () => {
@@ -99,7 +99,7 @@ describe("接入内容按客户端类型选命令或配置", () => {
 
     test("只给到另一种形式时按实际内容展示，不留空白", () => {
         expect(agentClientSetupBlock({ kind: "codex", title: "T", json: '{"mcpServers":{}}' })).toMatchObject({ format: "json" });
-        expect(agentClientSetupBlock({ kind: "cursor", title: "T", command: "beeftv mcp add" })).toMatchObject({ format: "command" });
+        expect(agentClientSetupBlock({ kind: "cursor", title: "T", command: "huabu mcp add" })).toMatchObject({ format: "command" });
         expect(agentClientSetupBlock({ kind: "codex", title: "T" })).toBeNull();
         expect(agentClientSetupBlock(undefined)).toBeNull();
     });

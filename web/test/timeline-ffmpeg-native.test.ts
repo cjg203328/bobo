@@ -29,15 +29,15 @@ function createNativeEngine(dir: string): TimelineRenderEngine {
 }
 
 test("native/wasm encoder fixture is opt-in; absent runtime is skipped instead of false-green", () => {
-    if (process.env.BEEFTV_NATIVE_FFMPEG_TEST === "1") {
+    if (process.env.HUABU_NATIVE_FFMPEG_TEST === "1") {
         expect(spawnSync("ffmpeg", ["-version"]).status).toBe(0);
         expect(spawnSync("ffprobe", ["-version"]).status).toBe(0);
     }
 });
 
 // Opt-in real local encoder test, not browser E2E. No network or paid media.
-test.skipIf(process.env.BEEFTV_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: shared six-second-mix plan, original audio, voice, BGM and Chinese subtitles", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "beeftv-timeline-fixture-"));
+test.skipIf(process.env.HUABU_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: shared six-second-mix plan, original audio, voice, BGM and Chinese subtitles", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "huabu-timeline-fixture-"));
     const run = (args: string[]) => {
         const result = spawnSync("ffmpeg", ["-hide_banner", "-y", ...args], { cwd: dir, maxBuffer: 16 * 1024 * 1024 });
         if (result.status !== 0) throw new Error(result.stderr.toString());
@@ -149,8 +149,8 @@ test.skipIf(process.env.BEEFTV_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: share
     } finally { rmSync(dir, { recursive: true, force: true }); }
 }, 120000);
 
-test.skipIf(process.env.BEEFTV_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: shared gap-silent-fade plan, offsets, silent video, fades, subtitle frame", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "beeftv-gap-silent-"));
+test.skipIf(process.env.HUABU_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: shared gap-silent-fade plan, offsets, silent video, fades, subtitle frame", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "huabu-gap-silent-"));
     const run = (args: string[]) => {
         const result = spawnSync("ffmpeg", ["-hide_banner", "-y", ...args], { cwd: dir, maxBuffer: 16 * 1024 * 1024 });
         if (result.status !== 0) throw new Error(result.stderr.toString());
@@ -195,8 +195,8 @@ test.skipIf(process.env.BEEFTV_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: share
     } finally { rmSync(dir, { recursive: true, force: true }); }
 }, 120000);
 
-test.skipIf(process.env.BEEFTV_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: image+gap+subtitle terminates with bounded duration and mixed audio", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "beeftv-image-gap-"));
+test.skipIf(process.env.HUABU_NATIVE_FFMPEG_TEST !== "1")("native FFmpeg: image+gap+subtitle terminates with bounded duration and mixed audio", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "huabu-image-gap-"));
     const run = (args: string[], timeout = 20_000) => {
         const result = spawnSync("ffmpeg", ["-hide_banner", "-y", ...args], { cwd: dir, maxBuffer: 16 * 1024 * 1024, timeout, killSignal: "SIGKILL" });
         if (result.error) throw result.error;

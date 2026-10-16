@@ -61,9 +61,9 @@ test("actual middle-frame menu clears its time and request assembly accepts refe
             expect(keyframe.error).toBeUndefined();
             expect(errors).toEqual([]);
             expect(await page.getByTestId("controls").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-            if (process.env.BEEFTV_UI_EVIDENCE_DIR) {
-                mkdirSync(process.env.BEEFTV_UI_EVIDENCE_DIR, { recursive: true });
-                await page.getByTestId("controls").screenshot({ path: `${process.env.BEEFTV_UI_EVIDENCE_DIR}/h3-middle-cleared-${dark ? "dark-390" : "light-desktop"}.png` });
+            if (process.env.HUABU_UI_EVIDENCE_DIR) {
+                mkdirSync(process.env.HUABU_UI_EVIDENCE_DIR, { recursive: true });
+                await page.getByTestId("controls").screenshot({ path: `${process.env.HUABU_UI_EVIDENCE_DIR}/h3-middle-cleared-${dark ? "dark-390" : "light-desktop"}.png` });
             }
         } finally { await page.close(); }
     }

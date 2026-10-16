@@ -20,10 +20,10 @@ const (
 	OutputHeight    = 1080
 	OutputName      = "depth-action-reference.mp4"
 
-	pythonEnv   = "BEEFTV_DEPTH_PYTHON"
-	toolDirEnv  = "BEEFTV_DEPTH_TOOL_DIR"
-	runtimeEnv  = "BEEFTV_DEPTH_RUNTIME"
-	manifestEnv = "BEEFTV_DEPTH_MANIFEST_URL"
+	pythonEnv   = "HUABU_DEPTH_PYTHON"
+	toolDirEnv  = "HUABU_DEPTH_TOOL_DIR"
+	runtimeEnv  = "HUABU_DEPTH_RUNTIME"
+	manifestEnv = "HUABU_DEPTH_MANIFEST_URL"
 
 	defaultManifestURL        = "https://github.com/glanderness/BeefTV/releases/download/v1.5.5/depth-runtime-manifest.json"
 	defaultWindowsManifestURL = "https://github.com/glanderness/BeefTV/releases/download/depth-runtime-v2/depth-runtime-manifest.v2.json"

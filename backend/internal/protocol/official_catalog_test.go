@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	manifestContractStart            = "<!-- BEEFTV_PLUGIN_MANIFEST_START -->"
-	manifestContractEnd              = "<!-- BEEFTV_PLUGIN_MANIFEST_END -->"
+	manifestContractStart            = "<!-- HUABU_PLUGIN_MANIFEST_START -->"
+	manifestContractEnd              = "<!-- HUABU_PLUGIN_MANIFEST_END -->"
 	manifestDocumentationPlaceholder = "<当前插件的完整 documentation，由 README.md 与 docs/interface.md 拼接而成；为避免 JSON 递归，此处不重复展开正文。>"
 )
 
@@ -37,7 +37,7 @@ func TestOfficialProtocolPackagesAreSelfContainedDeclarativePlugins(t *testing.T
 		if err != nil {
 			t.Fatalf("parse %s: %v", filepath.Base(path), err)
 		}
-		if pkg.Manifest.APIVersion != "beeftv.plugin/v2" {
+		if pkg.Manifest.APIVersion != "huabu.plugin/v2" {
 			t.Fatalf("%s apiVersion = %q", filepath.Base(path), pkg.Manifest.APIVersion)
 		}
 		if strings.HasPrefix(strings.TrimSpace(pkg.Manifest.Runtime.Backend), "host:") {

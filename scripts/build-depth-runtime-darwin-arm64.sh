@@ -4,13 +4,13 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TOOL_DIR="$ROOT_DIR/tools/depth-capture"
 OUTPUT_DIR="${1:-$ROOT_DIR/build/depth-runtime}"
-STAGE_DIR="$(mktemp -d /tmp/beeftv-depth-runtime.XXXXXX)"
+STAGE_DIR="$(mktemp -d /tmp/huabu-depth-runtime.XXXXXX)"
 RUNTIME_STAGE="$STAGE_DIR/runtime"
 VDA_COMMIT="4f5ae23172ba60fd7bc11ef671cca678842c7072"
 MODEL_SHA256="13379300b739e659f076a59d52e9801bd8d38c541a7e71f73bbca4dcfb013609"
 MODEL_SIZE="116440756"
 MODEL_NAME="video_depth_anything_vits.pth"
-ARCHIVE_NAME="beeftv-depth-runtime-v1-darwin-arm64.zip"
+ARCHIVE_NAME="huabu-depth-runtime-v1-darwin-arm64.zip"
 
 trap 'rm -rf "$STAGE_DIR"' EXIT
 
@@ -44,12 +44,12 @@ printf '%s\n' \
   > "$RUNTIME_STAGE/.venv/bin/python"
 chmod 0750 "$RUNTIME_STAGE/.venv/bin/python"
 
-if [[ -n "${BEEFTV_VDA_SOURCE_DIR:-}" ]]; then
-  if [[ "$(git -C "$BEEFTV_VDA_SOURCE_DIR" rev-parse HEAD)" != "$VDA_COMMIT" ]]; then
-    echo "BEEFTV_VDA_SOURCE_DIR is not at the required commit $VDA_COMMIT" >&2
+if [[ -n "${HUABU_VDA_SOURCE_DIR:-}" ]]; then
+  if [[ "$(git -C "$HUABU_VDA_SOURCE_DIR" rev-parse HEAD)" != "$VDA_COMMIT" ]]; then
+    echo "HUABU_VDA_SOURCE_DIR is not at the required commit $VDA_COMMIT" >&2
     exit 1
   fi
-  rsync -a "$BEEFTV_VDA_SOURCE_DIR/" "$STAGE_DIR/vda-repo/"
+  rsync -a "$HUABU_VDA_SOURCE_DIR/" "$STAGE_DIR/vda-repo/"
 else
   git -c http.version=HTTP/1.1 clone --filter=blob:none --no-checkout https://github.com/DepthAnything/Video-Depth-Anything.git "$STAGE_DIR/vda-repo"
   git -C "$STAGE_DIR/vda-repo" checkout "$VDA_COMMIT"

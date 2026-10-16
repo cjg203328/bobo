@@ -85,7 +85,7 @@ for(const [path,body,type] of [['/models/gemini:streamGenerateContent',{stream:t
   const result=await read(await fetchModelWithProgressIdle(f.url+path,request(path,body).options,{timeoutMs:20}));assert(!result.error);assert.equal(result.text,'unchanged');
 });
 test('official Durable retries idle body with partial retained, one completed tool and SQLite history reopen', {timeout:20000}, async t=>{
-  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'beeftv-model-idle-'));let calls=0;const toolIds=[];let store;
+  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'huabu-model-idle-'));let calls=0;const toolIds=[];let store;
   const server=http.createServer(async(req,res)=>{
     let raw='';for await(const chunk of req)raw+=chunk;const payload=JSON.parse(raw);calls++;
     res.writeHead(200,{'content-type':'text/event-stream'});

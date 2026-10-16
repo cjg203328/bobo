@@ -5,7 +5,7 @@ import { H3_STYLES, isH3Style } from "../../src/lib/h3-video";
 export const h3Models = ["minimax-h3", "minimax-h3-max", "minimax-h3-max-turbo"];
 export const h3StyleModels = Object.keys(H3_STYLES);
 
-export function h3AspectConfig(model = "minimax-h3-max-turbo", baseUrl = "https://beeftv.app") {
+export function h3AspectConfig(model = "minimax-h3-max-turbo", baseUrl = "https://huabu.app") {
     const models = [...h3Models, ...h3StyleModels];
     const channel = createModelChannel({ id: "beefapi", baseUrl, models });
     channel.modelProfiles = mergeFetchedChannelModelProfiles(channel, models.map((id) => ({

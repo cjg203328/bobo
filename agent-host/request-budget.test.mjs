@@ -73,10 +73,10 @@ describe("总预算", () => {
 
 describe("server 接线", () => {
     test("ops 调用带宿主凭据与当前回合，不再用 owner 凭据自报身份", () => {
-        expect(bridgeSource).toContain("'X-Beeftv-Agent-Token': hostToken");
-        expect(bridgeSource).toContain("'X-Beeftv-Agent-Turn': turnId");
-        expect(serverSource).not.toContain("X-Beeftv-Owner");
-        expect(bridgeSource).not.toContain("X-Beeftv-Owner");
+        expect(bridgeSource).toContain("'X-Huabu-Agent-Token': hostToken");
+        expect(bridgeSource).toContain("'X-Huabu-Agent-Turn': turnId");
+        expect(serverSource).not.toContain("X-Huabu-Owner");
+        expect(bridgeSource).not.toContain("X-Huabu-Owner");
     });
 
     test("预算按轮构造并跑在独立的异步上下文里", () => {

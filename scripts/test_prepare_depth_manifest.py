@@ -13,7 +13,7 @@ spec.loader.exec_module(module)
 class ManifestTests(unittest.TestCase):
     def fixture(self, root):
         for variant in ("cpu", "cuda"):
-            name = f"beeftv-depth-runtime-v1-windows-amd64-{variant}.zip"
+            name = f"huabu-depth-runtime-v1-windows-amd64-{variant}.zip"
             content = b"runtime"
             meta = dict(name=name, size=len(content), sha256=hashlib.sha256(content).hexdigest(), files=1, expandedSize=100)
             if variant == "cuda":
@@ -34,7 +34,7 @@ class ManifestTests(unittest.TestCase):
             payload = module.prepare(root)
             self.assertEqual(len(payload["runtimes"]), 2)
             self.assertEqual(len(payload["runtimes"]["windows-amd64/cuda"]["parts"]), 2)
-            part = root / "beeftv-depth-runtime-v1-windows-amd64-cuda.zip.part-002"
+            part = root / "huabu-depth-runtime-v1-windows-amd64-cuda.zip.part-002"
             part.write_bytes(b"xxxx")
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
                 module.prepare(root)
@@ -43,7 +43,7 @@ class ManifestTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.fixture(root)
-            path = root / "beeftv-depth-runtime-v1-windows-amd64-cuda.zip.json"
+            path = root / "huabu-depth-runtime-v1-windows-amd64-cuda.zip.json"
             meta = json.loads(path.read_text(encoding="utf-8-sig"))
             meta["sha256"] = "0" * 64
             path.write_text(json.dumps(meta))

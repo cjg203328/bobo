@@ -42,7 +42,7 @@ const { useAssetStore } = await import("@/stores/use-asset-store");
 const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
 
 const backendDir = resolve(import.meta.dir, "../../backend");
-const serverBin = join(tmpdir(), `beeftv-archive-restore-server-${process.pid}`);
+const serverBin = join(tmpdir(), `huabu-archive-restore-server-${process.pid}`);
 const videoBytes = new Uint8Array([9, 8, 7, 6]);
 const audioBytes = new Uint8Array([5, 4, 3, 2, 1]);
 const drawingPreviewBytes = new Uint8Array([11, 12, 13, 14, 15]);
@@ -269,7 +269,7 @@ afterAll(() => {
 });
 
 test("valid archive restores into isolated SQLite, survives backend restart, and keeps media bytes plus timeline", async () => {
-    const dataDir = mkdtempSync(join(tmpdir(), "beeftv-archive-sqlite-"));
+    const dataDir = mkdtempSync(join(tmpdir(), "huabu-archive-sqlite-"));
     let server: RunningServer | undefined;
     try {
         server = await startServer(dataDir);
@@ -351,7 +351,7 @@ test("valid archive restores into isolated SQLite, survives backend restart, and
 }, 180_000);
 
 test("canonical readback still rejects lost nodes, connections, or title and rolls back SQLite restore", async () => {
-    const dataDir = mkdtempSync(join(tmpdir(), "beeftv-archive-sqlite-content-"));
+    const dataDir = mkdtempSync(join(tmpdir(), "huabu-archive-sqlite-content-"));
     let server: RunningServer | undefined;
     try {
         server = await startServer(dataDir);
@@ -378,7 +378,7 @@ test("canonical readback still rejects lost nodes, connections, or title and rol
 }, 180_000);
 
 test("missing archive entry and persist failure do not create a saved SQLite canvas", async () => {
-    const dataDir = mkdtempSync(join(tmpdir(), "beeftv-archive-sqlite-neg-"));
+    const dataDir = mkdtempSync(join(tmpdir(), "huabu-archive-sqlite-neg-"));
     let server: RunningServer | undefined;
     try {
         server = await startServer(dataDir);

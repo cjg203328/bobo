@@ -14,8 +14,8 @@ import (
 
 const (
 	payloadSchema       = 1
-	defaultFeedURL      = "https://updates.beefapi.com/beeftv/desktop-update.json"
-	defaultDownloadHost = "https://updates.beefapi.com/beeftv"
+	defaultFeedURL      = "https://updates.beefapi.com/huabu/desktop-update.json"
+	defaultDownloadHost = "https://updates.beefapi.com/huabu"
 	updaterImportPath   = "huabu/backend/internal/desktopupdate"
 )
 
@@ -51,7 +51,7 @@ func cmdSign(args []string, stdout, stderr io.Writer) error {
 	downloadBase := fs.String("download-base", defaultDownloadHost, "prefix for per-version asset URLs")
 	requirePlatforms := fs.String("require-platforms", "", "comma-separated platforms that must all be present")
 	var assets assetFlags
-	fs.Var(&assets, "asset", "platform=path, repeatable (example: darwin-arm64=/tmp/BeefTV-v1.6.0-darwin-arm64.zip)")
+	fs.Var(&assets, "asset", "platform=path, repeatable (example: darwin-arm64=/tmp/Huabu-v1.6.0-darwin-arm64.zip)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func cmdSign(args []string, stdout, stderr io.Writer) error {
 			return err
 		}
 		if !derivedPublicEquals(private, public) {
-			return fmt.Errorf("private key does not match --expect-public-key / BEEFTV_UPDATER_PUBLIC_KEY")
+			return fmt.Errorf("private key does not match --expect-public-key / HUABU_UPDATER_PUBLIC_KEY")
 		}
 	}
 
@@ -170,7 +170,7 @@ func cmdPrintLdflags(args []string, stdout, stderr io.Writer) error {
 		return fmt.Errorf("print-ldflags: %w; unsigned desktop builds cannot publish an updater feed", err)
 	}
 	feed := strings.TrimSpace(*feedURL)
-	if envFeed := strings.TrimSpace(os.Getenv("BEEFTV_UPDATER_FEED_URL")); envFeed != "" && feed == defaultFeedURL {
+	if envFeed := strings.TrimSpace(os.Getenv("HUABU_UPDATER_FEED_URL")); envFeed != "" && feed == defaultFeedURL {
 		feed = envFeed
 	}
 	if !strings.HasPrefix(feed, "https://") {

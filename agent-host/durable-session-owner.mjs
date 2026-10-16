@@ -17,16 +17,16 @@ import { SKILL_LOAD_PARAMETERS, createSkillCatalogSection, expandSkillContent, l
 // On-disk format tag written into manifests and host state since 1.0.4; not the
 // package version. Changing it rejects every existing session as mismatched.
 export const DURABLE_VERSION = '1.0.4';
-const STATE = defineDoc({ kind: 'beeftv.host', version: 1, scope: 'session',
+const STATE = defineDoc({ kind: 'huabu.host', version: 1, scope: 'session',
   initial: () => ({ version: DURABLE_VERSION, canvasId: '', sessionId: '', active: null, turns: [], loadedSkills: [] }) });
 export const THINKING_LEVELS = ['off', 'minimal', 'low', 'medium', 'high'];
 // The root agent's reasoning level; budgets follow pi-ai's DEFAULT_THINKING_BUDGETS.
 export function agentThinkingLevel(env = process.env) {
-  const value = String(env.BEEFTV_AGENT_THINKING || '').trim().toLowerCase();
+  const value = String(env.HUABU_AGENT_THINKING || '').trim().toLowerCase();
   return THINKING_LEVELS.includes(value) ? value : 'low';
 }
 const CTX = BACKGROUND_CONTEXT;
-const supplementMarker = (id) => `[BEEFTV_INPUT:${id}]`;
+const supplementMarker = (id) => `[HUABU_INPUT:${id}]`;
 function supplementContent(id, content) {
   return [{ type: 'text', text: supplementMarker(id) }, ...(typeof content === 'string' ? [{ type: 'text', text: content }] : content)];
 }
@@ -220,7 +220,7 @@ export function createDurableSessionStore({ sessionRoot, workspaceRoot, getModel
       },
     }));
     entry.toolNames = tools.map((tool) => tool.name);
-    const operationExtension=defineExtension({ name: 'beeftv.operations.v1', tools, hooks: [hook(GenerationTask, {
+    const operationExtension=defineExtension({ name: 'huabu.operations.v1', tools, hooks: [hook(GenerationTask, {
       beforeRequest: async (request) => {
         for (;;) {
           if (entry.generation.pendingInputError) throw fail(entry.generation.pendingInputError.reason);
@@ -263,7 +263,7 @@ export function createDurableSessionStore({ sessionRoot, workspaceRoot, getModel
       registry.install(defineExtension({...operationExtension,tools:selected}));
       if(entry.root) await entry.root.configure({tools:selected,instructions:`${SYSTEM_PROMPT}\n${mode==='read-only'?'只能读取工作区内容，不能修改或生成。':mode==='full-access'?'可读取和修改本工作区的所有画布。付费生成必须等待用户确认。':'仅修改当前画布；其他画布只读。'}`},CTX);
     };
-    if (skills) registry.install(defineExtension({ name: 'beeftv.skills.v1', sections: [createSkillCatalogSection({
+    if (skills) registry.install(defineExtension({ name: 'huabu.skills.v1', sections: [createSkillCatalogSection({
       readCatalog: (signal) => skills.readCatalog(entry, signal, entry.turn.turnId), cache: entry.skillCatalog })] }));
     for (const extension of await extensions(entry)) registry.install(extension);
     entry.harness = await Harness.open(await openNodeSqliteStorage(path.join(dir, `${uuid}.sqlite`)), {

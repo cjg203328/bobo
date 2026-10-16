@@ -31,7 +31,7 @@ for (const width of [1280, 390]) for (const dark of [false, true]) test(`links f
         const bounds = await page.getByRole("dialog").boundingBox();
         expect(bounds!.x).toBeGreaterThanOrEqual(0);
         expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
-        await page.screenshot({ path: `/tmp/beeftv-reference-links-${width}-${dark}.png` });
+        await page.screenshot({ path: `/tmp/huabu-reference-links-${width}-${dark}.png` });
         await submit.click();
         await page.getByText("confirmed", { exact: true }).waitFor();
         await page.getByRole("button", { name: "生成", exact: true }).click();

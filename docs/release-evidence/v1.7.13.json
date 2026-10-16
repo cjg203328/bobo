@@ -2256,7 +2256,7 @@
     "archives": [
       {
         "platform": "darwin-amd64",
-        "url": "https://updates.beefapi.com/beeftv/v1.7.13/BeefTV-v1.7.13-darwin-amd64.zip",
+        "url": "https://updates.beefapi.com/huabu/v1.7.13/Huabu-v1.7.13-darwin-amd64.zip",
         "sha256": "1e9c98c007520af8d3cff449fa2f068edff46ef75284afd0a51cdc8c6cd7220c",
         "sizeBytes": 160677701,
         "sourceDigest": "3a190aaf93eb2f72bf2331e7f302cd01c3f31e6dd9ceb0b407542b9d8284cc0a",
@@ -2267,7 +2267,7 @@
       },
       {
         "platform": "darwin-arm64",
-        "url": "https://updates.beefapi.com/beeftv/v1.7.13/BeefTV-v1.7.13-darwin-arm64.zip",
+        "url": "https://updates.beefapi.com/huabu/v1.7.13/Huabu-v1.7.13-darwin-arm64.zip",
         "sha256": "833bbf3dbb3ca911ca616257fb07c6485bdaada7c7cd02dadf7b77442358df19",
         "sizeBytes": 156268347,
         "sourceDigest": "3a190aaf93eb2f72bf2331e7f302cd01c3f31e6dd9ceb0b407542b9d8284cc0a",
@@ -2278,7 +2278,7 @@
       },
       {
         "platform": "windows-amd64",
-        "url": "https://updates.beefapi.com/beeftv/v1.7.13/BeefTV-v1.7.13-windows-amd64.zip",
+        "url": "https://updates.beefapi.com/huabu/v1.7.13/Huabu-v1.7.13-windows-amd64.zip",
         "sha256": "0f85b0adf4d6c561a8358c87f8909e41c9674a1b278688b33277f86aec5578c3",
         "sizeBytes": 147454246,
         "sourceDigest": "3a190aaf93eb2f72bf2331e7f302cd01c3f31e6dd9ceb0b407542b9d8284cc0a",
@@ -2305,9 +2305,9 @@
       ],
       "releaseURL": "https://github.com/glanderness/BeefTV/releases/tag/v1.7.13",
       "publishedAt": "2026-10-08T09:14:19Z",
-      "feedURL": "https://updates.beefapi.com/beeftv/desktop-update.json",
+      "feedURL": "https://updates.beefapi.com/huabu/desktop-update.json",
       "feedSHA256": "813543d5c1984415ba4b2de3574b3a4418d7ac75c9b9f889b13cd54211c630f3",
-      "websiteURL": "https://beeftv.app/data/releases.json",
+      "websiteURL": "https://huabu.app/data/releases.json",
       "websiteLatestVersion": "v1.7.13"
     },
     "windowsReleasedUpgradeAndRollback": {

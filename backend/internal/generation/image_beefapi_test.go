@@ -29,7 +29,7 @@ func TestBeefAPIHyImageUsesGenerationJSONForReferences(t *testing.T) {
 	for _, count := range []int{0, 1, 3} {
 		port := &captureImagePort{}
 		ctx := WithRuntime(context.Background(), Runtime{Images: port})
-		input := Input{Mode: "image", Prompt: "画一只小猫", Config: Config{BaseURL: "https://beeftv.app", APIKey: "synthetic", Model: "hy-image-v3", InterfaceType: "chat-completion", Size: "16:9"}}
+		input := Input{Mode: "image", Prompt: "画一只小猫", Config: Config{BaseURL: "https://huabu.app", APIKey: "synthetic", Model: "hy-image-v3", InterfaceType: "chat-completion", Size: "16:9"}}
 		for i := 0; i < count; i++ {
 			input.ReferenceImages = append(input.ReferenceImages, Media{DataURL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII="})
 		}
@@ -52,7 +52,7 @@ func TestBeefAPIHyImageUsesGenerationJSONForReferences(t *testing.T) {
 }
 
 func TestExecuteRepairsOldHyImageProtocolForBothBaseURLs(t *testing.T) {
-	for _, base := range []string{"https://beeftv.app", "https://beeftv.app/v1", "https://enterprise.beefapi.com/v1"} {
+	for _, base := range []string{"https://huabu.app", "https://huabu.app/v1", "https://enterprise.beefapi.com/v1"} {
 		port := &captureImagePort{}
 		ctx := WithRuntime(context.Background(), taskRuntime(func(r *Runtime) { r.Images = port }))
 		_, err := Execute(ctx, Input{Mode: "image", Prompt: "test", Config: Config{BaseURL: base, APIKey: "synthetic", Model: "hy-image-v3", InterfaceType: "chat-completion", Size: "1:1"}})
@@ -74,7 +74,7 @@ func TestBeefAPIHyImageRejectsUnsupportedInputBeforeSubmit(t *testing.T) {
 		func(i *Input) { i.ReferenceImages = []Media{{DataURL: "data:image/png;base64,bm90LWFuLWltYWdl"}} },
 	} {
 		port := &captureImagePort{}
-		input := Input{Mode: "image", Prompt: "test", Config: Config{BaseURL: "https://beeftv.app", Model: "hy-image-v3", Size: "1:1"}}
+		input := Input{Mode: "image", Prompt: "test", Config: Config{BaseURL: "https://huabu.app", Model: "hy-image-v3", Size: "1:1"}}
 		change(&input)
 		_, err := RunImageTask(WithRuntime(context.Background(), Runtime{Images: port}), input)
 		if err == nil || port.calls != 0 {

@@ -22,28 +22,28 @@ func (h *Host) buildEnv(provider assistant.Provider, pin childPin) []string {
 	set := func(key, value string) {
 		env = setEnvValue(env, key, value)
 	}
-	set("BEEFTV_AGENT_DATA_DIR", h.dataDir())
-	set("BEEFTV_AGENT_MODEL", provider.Model)
-	set("BEEFTV_AGENT_BASE_URL", hostBaseURL(provider.BaseURL, provider.Protocol))
-	set("BEEFTV_AGENT_API", hostAPI(provider.Protocol))
-	set("BEEFTV_OPS_URL", opsBaseURL(pin.OpsURL, h.backendAddr()))
-	set("BEEFTV_AGENT_HOST_TOKEN", h.hostToken())
-	set("BEEFTV_AGENT_DESKTOP_TOKEN", pin.DesktopTok)
-	set("BEEFTV_AGENT_API_KEY", provider.APIKey)
+	set("HUABU_AGENT_DATA_DIR", h.dataDir())
+	set("HUABU_AGENT_MODEL", provider.Model)
+	set("HUABU_AGENT_BASE_URL", hostBaseURL(provider.BaseURL, provider.Protocol))
+	set("HUABU_AGENT_API", hostAPI(provider.Protocol))
+	set("HUABU_OPS_URL", opsBaseURL(pin.OpsURL, h.backendAddr()))
+	set("HUABU_AGENT_HOST_TOKEN", h.hostToken())
+	set("HUABU_AGENT_DESKTOP_TOKEN", pin.DesktopTok)
+	set("HUABU_AGENT_API_KEY", provider.APIKey)
 	if pin.Port > 0 {
-		set("BEEFTV_AGENT_PORT", strconv.Itoa(pin.Port))
+		set("HUABU_AGENT_PORT", strconv.Itoa(pin.Port))
 	} else {
-		set("BEEFTV_AGENT_PORT", "")
+		set("HUABU_AGENT_PORT", "")
 	}
-	set("BEEFTV_AGENT_INSTANCE_NONCE", pin.Nonce)
-	set("BEEFTV_AGENT_LISTEN_FD", pin.ListenFD)
+	set("HUABU_AGENT_INSTANCE_NONCE", pin.Nonce)
+	set("HUABU_AGENT_LISTEN_FD", pin.ListenFD)
 	if pin.Lifetime {
-		set("BEEFTV_AGENT_LIFETIME_STDIN", "1")
+		set("HUABU_AGENT_LIFETIME_STDIN", "1")
 	} else {
-		set("BEEFTV_AGENT_LIFETIME_STDIN", "")
+		set("HUABU_AGENT_LIFETIME_STDIN", "")
 	}
-	set("BEEFTV_OWNER_TOKEN", "")
-	set("BEEFTV_AGENT_HOST_URL", "")
+	set("HUABU_OWNER_TOKEN", "")
+	set("HUABU_AGENT_HOST_URL", "")
 	return env
 }
 
@@ -65,7 +65,7 @@ func filterInheritedEnv(inherited []string) []string {
 func stripInheritedKey(key string) bool {
 	upper := strings.ToUpper(strings.TrimSpace(key))
 	switch upper {
-	case "BEEFTV_OWNER_TOKEN", "BEEFTV_OPS_URL", "BEEFTV_AGENT_HOST_URL":
+	case "HUABU_OWNER_TOKEN", "HUABU_OPS_URL", "HUABU_AGENT_HOST_URL":
 		return true
 	case "OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_API_BASE", "OPENAI_ORG_ID", "OPENAI_ORGANIZATION":
 		return true
@@ -82,7 +82,7 @@ func stripInheritedKey(key string) bool {
 		"CLAUDE_API_KEY", "NPM_TOKEN", "NODE_AUTH_TOKEN":
 		return true
 	}
-	if strings.HasPrefix(upper, "BEEFTV_AGENT_") {
+	if strings.HasPrefix(upper, "HUABU_AGENT_") {
 		return !agentTunableKey(upper)
 	}
 	return false
@@ -92,11 +92,11 @@ func stripInheritedKey(key string) bool {
 // Credentials, listen identity, model, and ops URL are never tunables.
 func agentTunableKey(upper string) bool {
 	switch upper {
-	case "BEEFTV_AGENT_MAX_TOKENS", "BEEFTV_AGENT_CONTEXT_WINDOW",
-		"BEEFTV_AGENT_TURN_TIMEOUT_MS", "BEEFTV_AGENT_MAX_REQUESTS_PER_TURN",
-		"BEEFTV_AGENT_MAX_TOOL_STEPS_PER_TURN", "BEEFTV_AGENT_TOTAL_REQUEST_BUDGET",
-		"BEEFTV_AGENT_ALLOWED_ORIGIN", "BEEFTV_AGENT_READ_ONLY",
-		"BEEFTV_AGENT_MAX_REQUESTS", "BEEFTV_AGENT_THINKING":
+	case "HUABU_AGENT_MAX_TOKENS", "HUABU_AGENT_CONTEXT_WINDOW",
+		"HUABU_AGENT_TURN_TIMEOUT_MS", "HUABU_AGENT_MAX_REQUESTS_PER_TURN",
+		"HUABU_AGENT_MAX_TOOL_STEPS_PER_TURN", "HUABU_AGENT_TOTAL_REQUEST_BUDGET",
+		"HUABU_AGENT_ALLOWED_ORIGIN", "HUABU_AGENT_READ_ONLY",
+		"HUABU_AGENT_MAX_REQUESTS", "HUABU_AGENT_THINKING":
 		return true
 	}
 	return false

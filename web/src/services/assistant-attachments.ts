@@ -71,7 +71,7 @@ export function attachmentFromCanvasReference(reference: CanvasResourceReference
     return { resourceId, kind: reference.kind as AssistantAttachment["kind"], name: reference.title || reference.label, mimeType: "", bytes: 0,
         purpose: "analysis", ...(reference.assetId ? { assetId: reference.assetId } : { nodeId: reference.nodeId }) };
 }
-const drafts = localforage.createInstance({ name: "beeftv-assistant-input", storeName: "drafts" });
+const drafts = localforage.createInstance({ name: "huabu-assistant-input", storeName: "drafts" });
 const draftWrites = new Map<string, Promise<unknown>>();
 export type AssistantInputDraft = { text: string; attachments: AssistantAttachment[]; skills: AssistantSkillSelection[] };
 export async function readAssistantInputDraft(canvasId: string, expected: CapturedUserScope) {

@@ -7,7 +7,7 @@ import { spawn } from 'node:child_process';
 import { modelFixture } from './test-support/durable-model-switch-probe.mjs';
 
 test('official persisted idle sessions follow trusted new model; history retained; client ref ignored', { timeout: 30000 }, async () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-model-switch-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-model-switch-'));
   let fixture;
   try {
     fixture = await modelFixture(directory, 'astra', ['astra']);
@@ -36,7 +36,7 @@ test('official persisted idle sessions follow trusted new model; history retaine
 });
 
 test('SIGKILL recovery never switches active turn; unavailable frozen model rejects before dispatch', { timeout: 30000 }, async () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-model-resume-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-model-resume-'));
   let fixture;
   try {
     const child = spawn(process.execPath, [new URL('./test-support/durable-model-switch-probe.mjs', import.meta.url).pathname, 'crash', directory], { stdio: ['ignore', 'pipe', 'pipe'] });

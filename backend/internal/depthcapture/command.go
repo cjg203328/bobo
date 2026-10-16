@@ -28,7 +28,7 @@ func probeCUDA(ctx context.Context, python, toolDir, modelRuntime, goos string, 
 			return err
 		}
 	}
-	workDir, err := os.MkdirTemp("", "beeftv-depth-cuda-probe-*")
+	workDir, err := os.MkdirTemp("", "huabu-depth-cuda-probe-*")
 	if err != nil {
 		return err
 	}

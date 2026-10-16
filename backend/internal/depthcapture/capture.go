@@ -72,7 +72,7 @@ func (s *Service) Process(ctx context.Context, task *model.Task) error {
 	if err := s.progress(task, "准备视频", 8); err != nil {
 		return err
 	}
-	workDir, err := s.mkdirTemp("", "beeftv-depth-*")
+	workDir, err := s.mkdirTemp("", "huabu-depth-*")
 	if err != nil {
 		return s.failUnlessCanceled(ctx, task, stageFailed, ErrTempDir.Error())
 	}

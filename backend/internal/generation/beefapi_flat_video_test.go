@@ -137,7 +137,7 @@ func (p *videoRepairCapture) Intercept(req *http.Request) (bool, []byte, string,
 
 func TestExecuteRepairsStaleHostedVideoProtocolBeforeValidation(t *testing.T) {
 	for _, name := range []string{"grok-imagine-video-1.5", "kling-video-v3"} {
-		for _, base := range []string{"https://beeftv.app", "https://enterprise.beefapi.com/v1", "https://custom.example"} {
+		for _, base := range []string{"https://huabu.app", "https://enterprise.beefapi.com/v1", "https://custom.example"} {
 			port := &videoRepairCapture{}
 			ctx := WithRuntime(context.Background(), taskRuntime(func(r *Runtime) { r.Images = port }))
 			input := Input{Mode: "video", Prompt: "a red ball", Config: Config{BaseURL: base, APIKey: "synthetic", Model: name, InterfaceType: "chat-completion", VideoSeconds: "5", VQuality: "720", Size: "16:9"}}

@@ -72,7 +72,7 @@ func defaultFallbackManifest() *depthruntime.Manifest {
 	return &depthruntime.Manifest{
 		Version: 1,
 		Runtime: depthruntime.Artifact{
-			URLs:         []string{"https://github.com/glanderness/BeefTV/releases/download/v1.5.5/beeftv-depth-runtime-v1-darwin-arm64.zip"},
+			URLs:         []string{"https://github.com/glanderness/BeefTV/releases/download/v1.5.5/huabu-depth-runtime-v1-darwin-arm64.zip"},
 			Size:         294629974,
 			SHA256:       "f606dee084ec9d38d76a80e409e4cb9a80ad7db51c18778285a63e8f24376682",
 			Files:        23_481,

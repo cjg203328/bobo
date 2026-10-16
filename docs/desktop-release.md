@@ -1,46 +1,46 @@
-# BeefTV 桌面发布
+# Huabu 桌面发布
 
 生产桌面包使用仓库根目录的 `VERSION` 作为唯一版本源。发布脚本会把版本号、当前 Git 提交和 UTC 构建时间同时注入前端与 Go 后端，并生成不依赖 Vite 开发服务器的 Wails 应用包。
 
 带自动更新的生产包还要注入更新源地址和 Ed25519 公钥。密钥、草稿发布、签名清单和回滚语义见下方「桌面自动更新」。`v1.5.2` 及以前的安装包不含更新器，不能靠补发清单给已经装好的二进制补上自动更新。
 
-本地合同检查仍由 `scripts/verify-beeftv-local-release.sh` 负责。macOS 发布脚本会先跑该门禁；Windows 发布脚本只做本机打包，不重复整套门禁。
+本地合同检查仍由 `scripts/verify-huabu-local-release.sh` 负责。macOS 发布脚本会先跑该门禁；Windows 发布脚本只做本机打包，不重复整套门禁。
 
-前端未压缩产物的默认体积上限为 105 MiB，可通过 `BEEFTV_WEB_BUDGET_MIB` 调整。包含 FFmpeg、MediaPipe 和预设资源的主线基线约为 99.24 MiB；自动更新增量约 25 KiB。此上限不是 zip 下载大小。
+前端未压缩产物的默认体积上限为 105 MiB，可通过 `HUABU_WEB_BUDGET_MIB` 调整。包含 FFmpeg、MediaPipe 和预设资源的主线基线约为 99.24 MiB；自动更新增量约 25 KiB。此上限不是 zip 下载大小。
 
 ## macOS
 
 ```bash
-./scripts/build-beeftv-release.sh
+./scripts/build-huabu-release.sh
 ```
 
-如果系统没有全局 Go，可通过 `BEEFTV_GO_DIR` 指定本地工具链目录：
+如果系统没有全局 Go，可通过 `HUABU_GO_DIR` 指定本地工具链目录：
 
 ```bash
-BEEFTV_GO_DIR=/tmp/beeftv-go.rpIfVN/go ./scripts/build-beeftv-release.sh
+HUABU_GO_DIR=/tmp/huabu-go.rpIfVN/go ./scripts/build-huabu-release.sh
 ```
 
 生产自动更新包需要额外环境变量：
 
 | 变量 | 作用 |
 | --- | --- |
-| `BEEFTV_UPDATER_PUBLIC_KEY` | 注入更新源公钥；缺省则更新器保持关闭 |
-| `BEEFTV_UPDATER_FEED_URL` | 可选，默认官方 `desktop-update.json` 地址 |
-| `BEEFTV_WAILS_PLATFORM` | 可选，例如 `darwin/arm64` 或 `darwin/amd64` |
-| `BEEFTV_SKIP_LOCAL_VERIFY` | 设为 `1` 时跳过本地门禁；发布流水线的校验作业会跑门禁 |
-| `BEEFTV_EXTRA_LDFLAGS` | 追加到 Wails `-ldflags` |
+| `HUABU_UPDATER_PUBLIC_KEY` | 注入更新源公钥；缺省则更新器保持关闭 |
+| `HUABU_UPDATER_FEED_URL` | 可选，默认官方 `desktop-update.json` 地址 |
+| `HUABU_WAILS_PLATFORM` | 可选，例如 `darwin/arm64` 或 `darwin/amd64` |
+| `HUABU_SKIP_LOCAL_VERIFY` | 设为 `1` 时跳过本地门禁；发布流水线的校验作业会跑门禁 |
+| `HUABU_EXTRA_LDFLAGS` | 追加到 Wails `-ldflags` |
 
 产物：
 
 ```text
-backend/cmd/desktop/build/bin/BeefTV.app
-backend/cmd/desktop/build/bin/BeefTV.app/Contents/Resources/plugin-packages/*.beeftv-plugin
+backend/cmd/desktop/build/bin/Huabu.app
+backend/cmd/desktop/build/bin/Huabu.app/Contents/Resources/plugin-packages/*.beeftv-plugin
 ```
 
 验收重点：
 
-- `backend/cmd/desktop/build/bin/BeefTV.app` 存在；
-- Wails 将 `frontend/dist` 编译进应用二进制；应用包内应存在 `Contents/MacOS/BeefTV`，并由构建日志确认完成 `Compiling frontend` 与 `Packaging application`；
+- `backend/cmd/desktop/build/bin/Huabu.app` 存在；
+- Wails 将 `frontend/dist` 编译进应用二进制；应用包内应存在 `Contents/MacOS/Huabu`，并由构建日志确认完成 `Compiling frontend` 与 `Packaging application`；
 - macOS `Info.plist` 的 `CFBundleShortVersionString` 和 `CFBundleVersion` 与根目录 `VERSION`（去掉 `v` 前缀）一致；
 - `/api/health/live` 与 `/api/system/version` 返回的版本信息来自同一份发布元数据；
 - 发布启动不需要 `127.0.0.1:3000` 的 Vite 开发服务器。
@@ -50,17 +50,17 @@ backend/cmd/desktop/build/bin/BeefTV.app/Contents/Resources/plugin-packages/*.be
 在仓库根目录执行：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-beeftv-windows-release.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-huabu-windows-release.ps1
 ```
 
 产物：
 
 ```text
-backend\cmd\desktop\build\bin\BeefTV.exe
+backend\cmd\desktop\build\bin\Huabu.exe
 backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 ```
 
-官方插件必须和 `BeefTV.exe` 放在同一目录下的 `plugin-packages\`。从开始菜单、快捷方式或资源管理器启动时，工作目录不一定是仓库或 exe 所在目录；应用按可执行文件位置查找官方插件，不依赖当前工作目录。
+官方插件必须和 `Huabu.exe` 放在同一目录下的 `plugin-packages\`。从开始菜单、快捷方式或资源管理器启动时，工作目录不一定是仓库或 exe 所在目录；应用按可执行文件位置查找官方插件，不依赖当前工作目录。
 
 ### 本机前提
 
@@ -69,7 +69,7 @@ backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 | 前提 | 用途 | 依据 |
 | --- | --- | --- |
 | Windows 10/11 amd64 | Wails Windows 目标 | [Wails CLI platforms](https://wails.io/docs/reference/cli) |
-| Go 1.25 或更新，且在 PATH（或 `BEEFTV_GO_DIR\bin\go.exe`） | 编译桌面后端；`backend/go.mod` 要求 1.25 | 仓库 `backend/go.mod` |
+| Go 1.25 或更新，且在 PATH（或 `HUABU_GO_DIR\bin\go.exe`） | 编译桌面后端；`backend/go.mod` 要求 1.25 | 仓库 `backend/go.mod` |
 | Bun 在 PATH | `wails.json` 的 `bun install --frozen-lockfile` 与 `bun run build:desktop` | 仓库 `backend/cmd/desktop/wails.json` |
 | `CGO_ENABLED` 不能是 `0` | `gorm.io/driver/sqlite` 依赖 `github.com/mattn/go-sqlite3` | [go-sqlite3 README](https://github.com/mattn/go-sqlite3#windows) |
 | PATH 中的 `gcc`/`clang`，或可执行的 `CC` | 编译 go-sqlite3。Go 1.25 起 Windows CGO 需要支持 DWARF 5 的 GCC（binutils 2.37 或更新） | [go-sqlite3 Windows](https://github.com/mattn/go-sqlite3#windows)、[Go Minimum Requirements · cgo](https://go.dev/wiki/MinimumRequirements#cgo) |
@@ -84,27 +84,27 @@ backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 
 构建使用与 macOS 相同的 Wails 模块 `github.com/wailsapp/wails/v2/cmd/wails@v2.16.0`，并显式传入 `-platform windows/amd64`、`-webview2 download`。Wails 把生产二进制写到 `build/bin`。缺少 WebView2 时，下载策略会提示安装官方 bootstrapper。
 
-本脚本不生成 NSIS 安装包。Wails 的 `-nsis` 需要另装 NSIS，且默认安装脚本是否包含 `plugin-packages\` 未经本仓库验证。当前支持的发布形态是：把 `BeefTV.exe` 和旁边的 `plugin-packages\` 一起分发。
+本脚本不生成 NSIS 安装包。Wails 的 `-nsis` 需要另装 NSIS，且默认安装脚本是否包含 `plugin-packages\` 未经本仓库验证。当前支持的发布形态是：把 `Huabu.exe` 和旁边的 `plugin-packages\` 一起分发。
 
 ### NSIS 安装包
 
-`scripts/package-desktop-installer.py --platform windows-amd64` 调用 `scripts/installers/windows.nsi`，把 `BeefTV.exe`、`plugin-packages\`、`agent-host\`、`cli\`、`media-runtime\` 等载荷打成 `BeefTV-vX.Y.Z-windows-amd64-setup.exe`。
+`scripts/package-desktop-installer.py --platform windows-amd64` 调用 `scripts/installers/windows.nsi`，把 `Huabu.exe`、`plugin-packages\`、`agent-host\`、`cli\`、`media-runtime\` 等载荷打成 `Huabu-vX.Y.Z-windows-amd64-setup.exe`。
 
-- 安装位置可选。默认 `%LOCALAPPDATA%\Programs\BeefTV`；覆盖安装默认沿用上一次的安装位置（读取注册表 `InstallLocation`），用户仍可另选。静默安装用 `/D=<目录>` 指定。
-- 无论选择哪个文件夹，安装包都装入其下名为 `BeefTV` 的子目录：选择 `D:\Apps` 会安装到 `D:\Apps\BeefTV`。
-- 安装器以当前用户权限运行（`RequestExecutionLevel user`）。它会拒绝盘符根目录、非空的非 BeefTV 目录（避免覆盖用户数据）以及当前用户无写权限的目录（例如 `Program Files`，需改用其他文件夹），并在目录页给出提示。
+- 安装位置可选。默认 `%LOCALAPPDATA%\Programs\Huabu`；覆盖安装默认沿用上一次的安装位置（读取注册表 `InstallLocation`），用户仍可另选。静默安装用 `/D=<目录>` 指定。
+- 无论选择哪个文件夹，安装包都装入其下名为 `Huabu` 的子目录：选择 `D:\Apps` 会安装到 `D:\Apps\Huabu`。
+- 安装器以当前用户权限运行（`RequestExecutionLevel user`）。它会拒绝盘符根目录、非空的非 Huabu 目录（避免覆盖用户数据）以及当前用户无写权限的目录（例如 `Program Files`，需改用其他文件夹），并在目录页给出提示。
 - 卸载只删除随包文件、`agent-host`、`plugin-packages`、`cli`、`media-runtime` 和根目录清单内的文件；未知用户文件保留。安装位置的临时暂存和备份目录与被替换目录同卷，替换完成前不删除旧程序。
 
 在非 Windows 主机交叉编译出来的 exe，不能当作 Windows 验收通过。
 
 ## 启动目录与数据目录
 
-桌面进程默认数据目录来自 Go 的 `os.UserConfigDir()`，再拼 `BeefTV`：
+桌面进程默认数据目录来自 Go 的 `os.UserConfigDir()`，再拼 `Huabu`：
 
 | 系统 | 默认数据目录 |
 | --- | --- |
-| Windows | `%AppData%\BeefTV`（Roaming） |
-| macOS | `~/Library/Application Support/BeefTV` |
+| Windows | `%AppData%\Huabu`（Roaming） |
+| macOS | `~/Library/Application Support/Huabu` |
 
 其中包含 SQLite、本地资源和迁移备份。隔离调试时设置 `CANVAS_DESKTOP_DATA_DIR`，或启动桌面程序时传入 `--data-dir=/绝对路径/独立测试目录`；启动参数优先于环境变量，拒绝相对路径和文件系统根目录。`CANVAS_BACKEND_DATA_DIR` 只作用于 `cmd/server`，不会改桌面数据目录。
 
@@ -112,7 +112,7 @@ backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 
 需要知道的限制：
 
-- 未签名的 `BeefTV.exe` 可能被 SmartScreen 拦截；本脚本不签名。
+- 未签名的 `Huabu.exe` 可能被 SmartScreen 拦截；本脚本不签名。
 - 构建机没有 C 编译器时，脚本会失败。常见 MSYS2/MinGW 路径若存在但不在 PATH，脚本会指出路径，不会自动加入 PATH。
 - 数据库连接串目前把数据目录与 `/open_ai_canvas.db` 直接拼接。Windows 一般接受正斜杠；数据目录名里如果出现 `?` 或 `#`，可能被当成 DSN 参数。
 
@@ -134,12 +134,12 @@ backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 
 | 系统 | 被替换 | 不会进更新包、也不会被替换 |
 | --- | --- | --- |
-| macOS | `BeefTV.app` | `~/Library/Application Support/BeefTV` |
-| Windows | `BeefTV.exe` 和旁边的 `plugin-packages\*.beeftv-plugin` | `%AppData%\BeefTV` |
+| macOS | `Huabu.app` | `~/Library/Application Support/Huabu` |
+| Windows | `Huabu.exe` 和旁边的 `plugin-packages\*.beeftv-plugin` | `%AppData%\Huabu` |
 
 应用包身份和可执行文件路径保持不变，所以前端 IndexedDB 会继续可用。官方插件随应用包更新；用户自己装的插件如果放在数据目录里，会留下来。
 
-程序与数据必须使用独立目录。尤其不要把 Windows zip 解压到 `%AppData%\BeefTV`，也不要将 `CANVAS_DESKTOP_DATA_DIR` 指向 exe 所在目录。更新器会在退出前拒绝这类目录重叠。
+程序与数据必须使用独立目录。尤其不要把 Windows zip 解压到 `%AppData%\Huabu`，也不要将 `CANVAS_DESKTOP_DATA_DIR` 指向 exe 所在目录。更新器会在退出前拒绝这类目录重叠。
 
 更新包禁止带上 `.env`、SQLite 数据库和 `.settings-key`。打包工具遇到用户数据目录会直接拒绝。
 
@@ -161,8 +161,8 @@ Windows 目前也不做 Authenticode 签名。SmartScreen 可能拦截首次手�
 ```bash
 cd backend
 go run ./cmd/update-release gen-key \
-  --private-key /path/to/beeftv-updater.private \
-  --public-key /path/to/beeftv-updater.public
+  --private-key /path/to/huabu-updater.private \
+  --public-key /path/to/huabu-updater.public
 ```
 
 私钥文件权限是 `0600`，内容是 64 字节 Ed25519 私钥的标准 Base64。公钥是 32 字节公钥的标准 Base64。
@@ -171,21 +171,21 @@ GitHub 仓库配置：
 
 | 位置 | 名称 | 内容 |
 | --- | --- | --- |
-| Actions secret | `BEEFTV_UPDATER_PRIVATE_KEY` | 私钥文件全文 |
-| Actions variable | `BEEFTV_UPDATER_PUBLIC_KEY` | 公钥文件全文 |
+| Actions secret | `HUABU_UPDATER_PRIVATE_KEY` | 私钥文件全文 |
+| Actions variable | `HUABU_UPDATER_PUBLIC_KEY` | 公钥文件全文 |
 
 发布流水线会用私钥推导公钥，必须和变量一致，否则失败，不会发布未签名更新源。
 
 本地要打带更新器的包时，导出公钥即可：
 
 ```bash
-export BEEFTV_UPDATER_PUBLIC_KEY="$(tr -d '[:space:]' < /path/to/beeftv-updater.public)"
-./scripts/build-beeftv-release.sh
+export HUABU_UPDATER_PUBLIC_KEY="$(tr -d '[:space:]' < /path/to/huabu-updater.public)"
+./scripts/build-huabu-release.sh
 ```
 
 脚本会把下面两个链接期变量写进二进制：
 
-- `infinite-canvas/backend/internal/desktopupdate.FeedURL` = `https://updates.beefapi.com/beeftv/desktop-update.json`
+- `infinite-canvas/backend/internal/desktopupdate.FeedURL` = `https://updates.beefapi.com/huabu/desktop-update.json`
 - `infinite-canvas/backend/internal/desktopupdate.PublicKey` = 公钥 Base64
 
 两个都为空时，应用里的更新器保持关闭，但仍显示当前版本。
@@ -201,10 +201,10 @@ export BEEFTV_UPDATER_PUBLIC_KEY="$(tr -d '[:space:]' < /path/to/beeftv-updater.
 正式文件名固定为：
 
 ```text
-BeefTV-vX.Y.Z-darwin-arm64.zip
-BeefTV-vX.Y.Z-darwin-amd64.zip
-BeefTV-vX.Y.Z-windows-amd64.zip
-BeefTV-vX.Y.Z-linux-amd64.zip
+Huabu-vX.Y.Z-darwin-arm64.zip
+Huabu-vX.Y.Z-darwin-amd64.zip
+Huabu-vX.Y.Z-windows-amd64.zip
+Huabu-vX.Y.Z-linux-amd64.zip
 desktop-update.json
 ```
 
@@ -212,14 +212,14 @@ Actions 中的 `desktop-*` 临时安装包保留 7 天，用于发布任务之�
 
 zip 里的布局：
 
-- macOS：`BeefTV.app/...`，保留可执行权限；内部安全符号链接会被解成普通文件，不会写成 zip 符号链接项。
-- Windows：根目录的 `BeefTV.exe` 和 `plugin-packages/*.beeftv-plugin`。
-- Linux x64：`BeefTV-linux/` 内包含 `BeefTV`、`cli/beeftv`、`agent-host/` 和 `plugin-packages/`。在 Ubuntu 24.04 原生构建，使用 GTK3 和 WebKitGTK 4.1；安装依赖和启动方法见 [Linux 安装说明](linux-install.md)。更新和回滚替换整个程序目录，用户数据留在配置目录。
+- macOS：`Huabu.app/...`，保留可执行权限；内部安全符号链接会被解成普通文件，不会写成 zip 符号链接项。
+- Windows：根目录的 `Huabu.exe` 和 `plugin-packages/*.beeftv-plugin`。
+- Linux x64：`Huabu-linux/` 内包含 `Huabu`、`cli/huabu`、`agent-host/` 和 `plugin-packages/`。在 Ubuntu 24.04 原生构建，使用 GTK3 和 WebKitGTK 4.1；安装依赖和启动方法见 [Linux 安装说明](linux-install.md)。更新和回滚替换整个程序目录，用户数据留在配置目录。
 
 从 v1.5.7 起，更新清单和安装包托管在 Cloudflare R2：
 
 ```text
-https://updates.beefapi.com/beeftv/desktop-update.json
+https://updates.beefapi.com/huabu/desktop-update.json
 ```
 
 流水线先建 draft，四个平台构建任务把包保存为 Actions 产物。收齐后生成签名清单，先将版本包和版本清单写入 R2 不可变路径并从公开域名读回校验。之后发布 GitHub Release，最后原子替换 CF 的最新清单。失败或缺包不会激活 CF 更新源。GitHub 同时保留同一份签名清单，供旧客户端迁移。
@@ -230,13 +230,13 @@ v1.5.6 及以前的更新器仍内置 GitHub 清单地址。如果旧客户端�
 
 ### Cloudflare 发布配置
 
-使用专用 R2 bucket `beeftv-releases`，自定义域名 `updates.beefapi.com`，TLS 最低 1.2。只放公开发行文件，不混放用户素材。正式文件路径为 `beeftv/vX.Y.Z/<文件名>`，最新清单为 `beeftv/desktop-update.json`。版本对象长期缓存且不可变，最新清单使用禁止缓存的响应头。
+使用专用 R2 bucket `huabu-releases`，自定义域名 `updates.beefapi.com`，TLS 最低 1.2。只放公开发行文件，不混放用户素材。正式文件路径为 `huabu/vX.Y.Z/<文件名>`，最新清单为 `huabu/desktop-update.json`。版本对象长期缓存且不可变，最新清单使用禁止缓存的响应头。
 
 仓库 Actions 需要以下配置：
 
-- Secret `BEEFTV_R2_ACCESS_KEY_ID`、`BEEFTV_R2_SECRET_ACCESS_KEY`：仅对这个 bucket 拥有对象读写权限的 S3 凭据，不使用账户管理员令牌。
-- Variable `BEEFTV_R2_ENDPOINT`：该账户的官方 HTTPS R2 S3 endpoint。
-- 原有 `BEEFTV_UPDATER_PRIVATE_KEY` 和 `BEEFTV_UPDATER_PUBLIC_KEY` 保持不变。
+- Secret `HUABU_R2_ACCESS_KEY_ID`、`HUABU_R2_SECRET_ACCESS_KEY`：仅对这个 bucket 拥有对象读写权限的 S3 凭据，不使用账户管理员令牌。
+- Variable `HUABU_R2_ENDPOINT`：该账户的官方 HTTPS R2 S3 endpoint。
+- 原有 `HUABU_UPDATER_PRIVATE_KEY` 和 `HUABU_UPDATER_PUBLIC_KEY` 保持不变。
 
 `scripts/publish-desktop-r2.py` 复用 `update-release verify` 验签，使用 AWS CLI v2 上传；发布机必须支持 `put-object` 的 `IfMatch`、`IfNoneMatch` 条件写。`stage` 只准备版本对象；`activate` 确认 GitHub 最新正式版本及公开清单与本次签名清单一致、全部公开对象可校验后，备份上一份清单，再通过 ETag 条件写切换。公网检查使用该版本客户端的请求标识。重复执行同一版本是幂等的，已有对象内容不同或试图降级会失败。
 
@@ -262,25 +262,25 @@ Apple 公证不在这条工作流里。macOS 作业沿用现有脚本的 ad hoc 
 cd backend
 go run ./cmd/update-release package \
   --platform darwin-arm64 \
-  --input cmd/desktop/build/bin/BeefTV.app \
-  --output /tmp/BeefTV-vX.Y.Z-darwin-arm64.zip
+  --input cmd/desktop/build/bin/Huabu.app \
+  --output /tmp/Huabu-vX.Y.Z-darwin-arm64.zip
 go run ./cmd/update-release sign \
   --version vX.Y.Z \
   --commit "$(git rev-parse HEAD)" \
   --changelog ../CHANGELOG.md \
-  --private-key /path/to/beeftv-updater.private \
-  --expect-public-key "$(tr -d '[:space:]' < /path/to/beeftv-updater.public)" \
+  --private-key /path/to/huabu-updater.private \
+  --expect-public-key "$(tr -d '[:space:]' < /path/to/huabu-updater.public)" \
   --require-platforms darwin-arm64,darwin-amd64,windows-amd64,linux-amd64 \
-  --asset darwin-arm64=/tmp/BeefTV-vX.Y.Z-darwin-arm64.zip \
-  --asset darwin-amd64=/tmp/BeefTV-vX.Y.Z-darwin-amd64.zip \
-  --asset windows-amd64=/tmp/BeefTV-vX.Y.Z-windows-amd64.zip \
-  --asset linux-amd64=/tmp/BeefTV-vX.Y.Z-linux-amd64.zip \
+  --asset darwin-arm64=/tmp/Huabu-vX.Y.Z-darwin-arm64.zip \
+  --asset darwin-amd64=/tmp/Huabu-vX.Y.Z-darwin-amd64.zip \
+  --asset windows-amd64=/tmp/Huabu-vX.Y.Z-windows-amd64.zip \
+  --asset linux-amd64=/tmp/Huabu-vX.Y.Z-linux-amd64.zip \
   --output /tmp/desktop-update.json
 ```
 
 ### 回滚
 
-客户端在退出前校验并把更新准备到程序所在磁盘；无写入权限、磁盘空间不足或签名错误时保留当前运行的应用。替换/启动失败会尝试恢复旧程序。程序旁的 `.beeftv-update-*` 目录暂存旧程序和恢复记录；本地后端启动、界面挂载、素材与画布缓存成功加载，且本地工作区与两类资源列表读取成功后，客户端自动清理同一安装位置已成功升级的目录（包括旧版本遗留目录）。失败、回滚、记录不完整或含额外文件的目录继续保留。Windows 升级锁随句柄关闭删除；macOS 保留零字节 `.BeefTV.update.lock`，防止仍使用旧版锁协议的助手并发替换应用，它不存储升级包或旧程序。清理失败不阻塞使用，下次启动重试。已启动的新进程不会自动降级，以免把迁移后的数据库交给旧程序；恢复旧程序时需另行确认数据库兼容或还原匹配的数据备份。
+客户端在退出前校验并把更新准备到程序所在磁盘；无写入权限、磁盘空间不足或签名错误时保留当前运行的应用。替换/启动失败会尝试恢复旧程序。程序旁的 `.huabu-update-*` 目录暂存旧程序和恢复记录；本地后端启动、界面挂载、素材与画布缓存成功加载，且本地工作区与两类资源列表读取成功后，客户端自动清理同一安装位置已成功升级的目录（包括旧版本遗留目录）。失败、回滚、记录不完整或含额外文件的目录继续保留。Windows 升级锁随句柄关闭删除；macOS 保留零字节 `.Huabu.update.lock`，防止仍使用旧版锁协议的助手并发替换应用，它不存储升级包或旧程序。清理失败不阻塞使用，下次启动重试。已启动的新进程不会自动降级，以免把迁移后的数据库交给旧程序；恢复旧程序时需另行确认数据库兼容或还原匹配的数据备份。
 
 已经发布的版本不能收回。已经更新成功的用户，不会因为删除 GitHub Release 而回到旧包。
 

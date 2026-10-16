@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -31,13 +32,16 @@ func TestExternalCLIAndMCPRealBusinessUpload(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 	dir := t.TempDir()
-	bin := filepath.Join(dir, "beeftv")
-	build := exec.CommandContext(ctx, "go", "build", "-o", bin, "./cmd/beeftv")
+	bin := filepath.Join(dir, "huabu")
+	if runtime.GOOS == "windows" {
+		bin += ".exe"
+	}
+	build := exec.CommandContext(ctx, "go", "build", "-o", bin, "./cmd/huabu")
 	build.Dir = filepath.Join("..", "..")
 	if out, err := build.CombinedOutput(); err != nil {
 		t.Fatal(err, string(out))
 	}
-	env := append(os.Environ(), "BEEFTV_BASE_URL="+server.URL+"/api", "BEEFTV_CLIENT_ID="+reg.ID, "BEEFTV_CLIENT_TOKEN="+token, "BEEFTV_OWNER_TOKEN=", "BEEFTV_DESKTOP_TOKEN=")
+	env := append(os.Environ(), "HUABU_BASE_URL="+server.URL+"/api", "HUABU_CLIENT_ID="+reg.ID, "HUABU_CLIENT_TOKEN="+token, "HUABU_OWNER_TOKEN=", "HUABU_DESKTOP_TOKEN=")
 	run := func(args ...string) []byte {
 		command := exec.CommandContext(ctx, bin, args...)
 		command.Env = env

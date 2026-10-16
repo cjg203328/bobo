@@ -45,7 +45,7 @@ const server = createServer(async (req, res) => {
   if (req.url === '/ops') { res.end(JSON.stringify({ code: 0, data: { ops: descriptors } })); return; }
   if (req.url.startsWith('/ops/')) {
     const request = JSON.parse(raw), state = read();
-    assert.equal(req.headers['x-beeftv-agent-turn'], 'fixture-turn');
+    assert.equal(req.headers['x-huabu-agent-turn'], 'fixture-turn');
     assert.equal(request.params.canvasId, phase==='permission-full'?'other':'canvas');
     state.executions++;
     const replayed = Boolean(state.receipts[request.opId]);
@@ -78,7 +78,7 @@ const server = createServer(async (req, res) => {
   }
   if (phase.startsWith('pending-')) {
     if (modelRequests === 1) { arrived(); await gate; send(res, 'canvas_nodes_create'); }
-    else { assert(JSON.stringify(request.messages).includes('image_url')); assert(JSON.stringify(request.messages).includes('BEEFTV_INPUT:picture')); send(res); }
+    else { assert(JSON.stringify(request.messages).includes('image_url')); assert(JSON.stringify(request.messages).includes('HUABU_INPUT:picture')); send(res); }
     return;
   }
   if (['partial-stop', 'persisted-supplement-stop', 'persisted-supplement-stop-crash', 'prep-error-partial'].includes(phase)) {

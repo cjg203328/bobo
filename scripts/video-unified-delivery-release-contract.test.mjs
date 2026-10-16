@@ -134,7 +134,7 @@ test('exact version allows honest original-task retrieval while retaining curren
 });
 
 test('entrypoint derives video protocol roster and rejects stale source or next-version reuse', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'beeftv-original-video-gate-'));
+  const dir = mkdtempSync(join(tmpdir(), 'huabu-original-video-gate-'));
   try {
     const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
     mkdirSync(join(dir, 'scripts')); mkdirSync(join(dir, 'docs/release-evidence'), { recursive: true });

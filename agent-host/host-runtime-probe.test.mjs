@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 let receipt;
 beforeAll(() => {
-  const scratch = mkdtempSync(path.join(tmpdir(), 'beeftv runtime receipt '));
+  const scratch = mkdtempSync(path.join(tmpdir(), 'huabu runtime receipt '));
   try {
     const output = path.join(scratch, 'receipt.json');
     const child = spawnSync('node', [path.join(root, 'agent-host/test-support/host-runtime-probe.mjs'), root, output], { cwd: root, encoding: 'utf8', timeout: 150000 });

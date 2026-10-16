@@ -8,7 +8,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 const config=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
 let child,base,log='',killed=false,calls=0;
 const forwarded=[];
-const headers={'content-type':'application/json','X-Beeftv-Agent-Token':config.hostToken};
+const headers={'content-type':'application/json','X-Huabu-Agent-Token':config.hostToken};
 const listen=s=>new Promise(r=>s.listen(0,'127.0.0.1',()=>r(s.address().port)));
 const body=async req=>{let raw='';for await(const data of req)raw+=data;return raw};
 const api=async(route,data)=>fetch(base+route,{headers,method:data===undefined?'GET':'POST',body:data===undefined?undefined:JSON.stringify(data),signal:AbortSignal.timeout(10000)});
@@ -30,7 +30,7 @@ const provider=createServer(async(req,res)=>{
 });
 try{
  const proxyPort=await listen(proxy),modelPort=await listen(provider);const reservation=createServer();const port=await listen(reservation);await new Promise(r=>reservation.close(r));base=`http://127.0.0.1:${port}`;
- const env={...process.env,BEEFTV_AGENT_DATA_DIR:config.directory,BEEFTV_AGENT_PORT:String(port),BEEFTV_AGENT_HOST_TOKEN:config.hostToken,BEEFTV_OPS_URL:`http://127.0.0.1:${proxyPort}`,BEEFTV_AGENT_API_KEY:'fixture',BEEFTV_AGENT_API:'openai-completions',BEEFTV_AGENT_MODEL:'synthetic',BEEFTV_AGENT_BASE_URL:`http://127.0.0.1:${modelPort}/v1`,BEEFTV_AGENT_TOTAL_REQUEST_BUDGET:'0'};
+ const env={...process.env,HUABU_AGENT_DATA_DIR:config.directory,HUABU_AGENT_PORT:String(port),HUABU_AGENT_HOST_TOKEN:config.hostToken,HUABU_OPS_URL:`http://127.0.0.1:${proxyPort}`,HUABU_AGENT_API_KEY:'fixture',HUABU_AGENT_API:'openai-completions',HUABU_AGENT_MODEL:'synthetic',HUABU_AGENT_BASE_URL:`http://127.0.0.1:${modelPort}/v1`,HUABU_AGENT_TOTAL_REQUEST_BUDGET:'0'};
  async function start(){child=spawn(process.execPath,[path.join(config.root,'agent-host/server.mjs')],{cwd:config.root,env,stdio:['ignore','pipe','pipe']});child.stdout.on('data',d=>{log+=d});child.stderr.on('data',d=>{log+=d});await until(async()=>{try{return(await fetch(base+'/health',{signal:AbortSignal.timeout(200)})).ok}catch{return false}})}
  await start();const pending=api('/chat',{canvasId:config.canvasId,turnId:config.turnId,message:'Move one node in each of two canvases',permissionMode:'read-only',revisionBefore:1}).then(r=>r.text()).catch(()=>{});
  await until(()=>killed&&(child.signalCode!==null||child.exitCode!==null));await pending;

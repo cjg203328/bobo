@@ -9,7 +9,7 @@ let retryReads = 0;
 let releaseSlow: (() => void) | undefined;
 let slow: Promise<void>;
 beforeAll(async () => {
-    dir = mkdtempSync(`${tmpdir()}/beeftv-derived-preview-`);
+    dir = mkdtempSync(`${tmpdir()}/huabu-derived-preview-`);
     for (const color of ["red", "blue"]) {
         const result = Bun.spawnSync(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", `color=c=${color}:s=320x180:d=1`, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart", `${dir}/${color}.mp4`]);
         if (result.exitCode) throw new Error(result.stderr.toString());

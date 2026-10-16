@@ -13,7 +13,7 @@ import { createLegacyHistory } from './session-owner.mjs';
 const worker = fileURLToPath(new URL('./durable-owner-fixture.mjs', import.meta.url));
 const processTest = (name, fn) => test(name, { timeout: 60000 }, fn);
 for (const action of ['create', 'activate']) processTest(`failed Durable ${action} closes candidate and preserves the current owner`, async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-pointer-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-pointer-'));
   const fixture = await modelFixture(directory, 'fixture', ['fixture']);
   try {
     let current = await fixture.store.createSession('canvas');
@@ -63,7 +63,7 @@ test('failed or unanswered submission cannot reuse a prior assistant as a succes
   assert.equal(budget.errorReason, 'turn_request_budget_exhausted');
 });
 processTest('legacy handoff survives failed pointer publication and restart without duplicate sessions or resetting context', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-handoff-publication-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-handoff-publication-'));
   let fixture = await modelFixture(directory, 'fixture', ['fixture']);
   try {
     const previous = await fixture.store.createSession('canvas');
@@ -96,18 +96,18 @@ processTest('legacy handoff survives failed pointer publication and restart with
   }
 });
 for (const phase of ['pending-success', 'pending-failure', 'pending-stop', 'partial-stop', 'multi-steer', 'persisted-supplement-stop', 'prep-error-partial']) processTest(`official owner ${phase} preserves latest input and current partial`, async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), `beeftv-durable-${phase}-`)); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), `huabu-durable-${phase}-`)); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const result = await run(directory, phase); assert.equal(result.code, 0, result.output);
 });
 for(const mode of ['read-only','canvas','full']) processTest(`official provider sees Go-authorized ${mode} schema and frozen history`,async t=>{
- const directory=fs.mkdtempSync(path.join(os.tmpdir(),'beeftv-durable-permission-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'huabu-durable-permission-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
  const result=await run(directory,`permission-${mode}`);assert.equal(result.code,0,result.output);
  const saved=JSON.parse(fs.readFileSync(path.join(directory,'result.json'),'utf8'));
  assert.equal(saved.record.permissionMode,mode==='full'?'full-access':mode);
  assert.equal(saved.state.executions,mode==='full'?1:0);
 });
 processTest('crash recovery rejects authority changing frozen read-only to full-access without dispatch',async t=>{
- const directory=fs.mkdtempSync(path.join(os.tmpdir(),'beeftv-durable-mode-upgrade-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'huabu-durable-mode-upgrade-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
  const crash=await run(directory,'permission-crash');assertCheckpointKill(crash,directory,'permission-crash');
  const recovered=await run(directory,'permission-upgrade');assert.equal(recovered.code,0,recovered.output);
 });
@@ -144,7 +144,7 @@ function assertCheckpointKill(result, directory, phase) {
   else assert.equal(result.signal, 'SIGKILL', result.output);
 }
 processTest('hard kill after receipt commit replays one stable tool task and never duplicates business effects', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-crash-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-crash-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const crash = await run(directory, 'crash'); assertCheckpointKill(crash, directory, 'crash');
   const denied = await run(directory, 'denied'); assert.equal(denied.code, 0, denied.output);
   const resume = await run(directory, 'resume'); assert.equal(resume.code, 0, resume.output);
@@ -154,27 +154,27 @@ processTest('hard kill after receipt commit replays one stable tool task and nev
   assert(Object.keys(result.state.receipts).every((id) => /^durable:[a-f0-9-]{36}:\d+$/.test(id)));
 });
 processTest('disconnect only cancels a wait; same-session supplement and pinned skill survive', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-wait-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-wait-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const result = await run(directory, 'wait'); assert.equal(result.code, 0, result.output);
   const saved = JSON.parse(fs.readFileSync(path.join(directory, 'result.json'), 'utf8'));
   assert.deepEqual(saved.record.supplements, ['Use landscape']);
 });
 processTest('completion crash only reconstructs history after Go is closed; no model dispatch', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-complete-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-complete-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const crash = await run(directory, 'complete-crash'); assertCheckpointKill(crash, directory, 'complete-crash');
   const resume = await run(directory, 'closed-resume'); assert.equal(resume.code, 0, resume.output);
 });
 processTest('unknown future paid write is unsafe and never rerun after effect-before-result crash', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-unsafe-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-unsafe-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const crash = await run(directory, 'unsafe-crash'); assertCheckpointKill(crash, directory, 'unsafe-crash');
   const resume = await run(directory, 'unsafe-resume'); assert.equal(resume.code, 0, resume.output);
 });
 processTest('explicit stop aborts official work and records cancellation without canvas writes', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-stop-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-stop-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const stopped = await run(directory, 'stop'); assert.equal(stopped.code, 0, stopped.output);
 });
 processTest('supplement persists across hard kill and is placed before the recovered model request', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-supplement-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-supplement-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const crash = await run(directory, 'supplement-crash'); assertCheckpointKill(crash, directory, 'supplement-crash');
   const resumed = await run(directory, 'supplement-resume'); assert.equal(resumed.code, 0, resumed.output);
   const saved = JSON.parse(fs.readFileSync(path.join(directory, 'result.json'), 'utf8'));
@@ -182,12 +182,12 @@ processTest('supplement persists across hard kill and is placed before the recov
   assert.equal(saved.record.supplementInputs[0].message, 'Use landscape');
 });
 processTest('persisted stop before Go close survives crash without dispatching a closed placed submission', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-fence-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-fence-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const crash = await run(directory, 'fence-crash'); assertCheckpointKill(crash, directory, 'fence-crash');
   const resumed = await run(directory, 'fence-resume'); assert.equal(resumed.code, 0, resumed.output);
 });
 processTest('stopped recovery skips persisted but unadmitted supplemental input and preserves its own partial', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-admission-gap-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-admission-gap-')); t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const crash = await run(directory, 'persisted-supplement-stop-crash'); assertCheckpointKill(crash, directory, 'persisted-supplement-stop-crash');
   const resumed = await run(directory, 'persisted-supplement-stop-resume'); assert.equal(resumed.code, 0, resumed.output);
 });
@@ -200,7 +200,7 @@ processTest('actual default Durable host accepts attachment-only steer and block
   assert.equal(code, 0, output); assert(output.includes('"attachmentOnly":true'));
 });
 processTest('legacy JSONL handoff seeds a new Durable session with the old transcript as a plain-text reset note', async (t) => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-handoff-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-handoff-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const fixture = await modelFixture(directory, 'fixture', ['fixture']);
   try {

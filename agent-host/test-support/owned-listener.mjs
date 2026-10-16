@@ -4,14 +4,14 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
 
-const LISTEN_FD = Number(process.env.BEEFTV_AGENT_LISTEN_FD || 0);
-const PORT_RAW = String(process.env.BEEFTV_AGENT_PORT || '').trim();
-const INSTANCE_NONCE = process.env.BEEFTV_AGENT_INSTANCE_NONCE || '';
-const LIFETIME_STDIN = process.env.BEEFTV_AGENT_LIFETIME_STDIN === '1';
-const DATA_DIR = process.env.BEEFTV_AGENT_DATA_DIR || '';
-const MODEL = process.env.BEEFTV_AGENT_MODEL || '';
+const LISTEN_FD = Number(process.env.HUABU_AGENT_LISTEN_FD || 0);
+const PORT_RAW = String(process.env.HUABU_AGENT_PORT || '').trim();
+const INSTANCE_NONCE = process.env.HUABU_AGENT_INSTANCE_NONCE || '';
+const LIFETIME_STDIN = process.env.HUABU_AGENT_LIFETIME_STDIN === '1';
+const DATA_DIR = process.env.HUABU_AGENT_DATA_DIR || '';
+const MODEL = process.env.HUABU_AGENT_MODEL || '';
 if (!LISTEN_FD && !PORT_RAW) {
-  console.error('owned-listener: missing BEEFTV_AGENT_PORT or BEEFTV_AGENT_LISTEN_FD');
+  console.error('owned-listener: missing HUABU_AGENT_PORT or HUABU_AGENT_LISTEN_FD');
   process.exit(2);
 }
 
@@ -29,7 +29,7 @@ function timingSafeMatch(got, expected) {
 
 function instanceOK(req) {
   if (!INSTANCE_NONCE) return true;
-  return timingSafeMatch(req.headers['x-beeftv-instance-nonce'] || '', INSTANCE_NONCE);
+  return timingSafeMatch(req.headers['x-huabu-instance-nonce'] || '', INSTANCE_NONCE);
 }
 
 if (DATA_DIR) {

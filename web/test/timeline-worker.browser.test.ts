@@ -9,7 +9,7 @@ import { spawnSync } from "node:child_process";
 // Opt-in: requires local ffmpeg/ffprobe and Chromium. Production-style Vite assets,
 // real browser Worker/core/Canvas2D, real downloads. No encoder/task/API mocks.
 // Canvas persistence stops at its explicitly injected onCreateAssembledNode callback.
-const enabled = process.env.BEEFTV_BROWSER_WORKER_TEST === "1";
+const enabled = process.env.HUABU_BROWSER_WORKER_TEST === "1";
 let browser: Browser, server: ReturnType<typeof Bun.serve>, dir: string, base: string;
 const run = (args: string[]) => {
     const result = spawnSync("ffmpeg", ["-hide_banner", "-y", ...args], { cwd: dir, maxBuffer: 32 * 1024 * 1024 });
@@ -18,13 +18,13 @@ const run = (args: string[]) => {
 };
 beforeAll(async () => {
     if (!enabled) return;
-    dir = mkdtempSync(join(tmpdir(), "beeftv-browser-worker-"));
+    dir = mkdtempSync(join(tmpdir(), "huabu-browser-worker-"));
     for (const [index, color] of ["red", "green", "blue"].entries()) run(["-f", "lavfi", "-i", `color=${color}:s=320x180:r=30:d=2`, "-f", "lavfi", "-i", "sine=frequency=220:duration=2", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", `v${index}.mp4`]);
     for (const [name, frequency] of [["voice", 440], ["bgm", 880]] as const) run(["-f", "lavfi", "-i", `sine=frequency=${frequency}:duration=6`, `${name}.wav`]);
     writeFileSync(join(dir, "broken.mp4"), "deliberately invalid local media");
     const dist = join(dir, "dist");
     await build({ configFile: false, root: resolve(import.meta.dir, ".."), cacheDir: join(dir, "vite-cache"), publicDir: false, logLevel: "error",
-        define: { __BEEFTV_HEAVY_MEDIA_ENABLED__: "true", __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""' },
+        define: { __HUABU_HEAVY_MEDIA_ENABLED__: "true", __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""' },
         resolve: { alias: { "@": resolve(import.meta.dir, "../src") } },
         build: { outDir: dist, emptyOutDir: true, rolldownOptions: { input: resolve(import.meta.dir, "fixtures/timeline-worker-harness.html") } },
     });

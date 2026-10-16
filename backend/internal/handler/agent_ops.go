@@ -164,7 +164,7 @@ func resolveCaller(c *gin.Context, svc *app.Service, clients *agentops.ClientReg
 	if isAssistantHostRequest(c, svc) {
 		return agentops.Caller{Kind: agentops.CallerAssistant}, "assistant-host", nil
 	}
-	clientID := strings.TrimSpace(c.GetHeader("X-Beeftv-Client"))
+	clientID := strings.TrimSpace(c.GetHeader("X-Huabu-Client"))
 	if clientID != "" {
 		token := strings.TrimSpace(strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer "))
 		reg, found := clients.Lookup(clientID, token)
@@ -173,7 +173,7 @@ func resolveCaller(c *gin.Context, svc *app.Service, clients *agentops.ClientReg
 		}
 		return agentops.Caller{Kind: agentops.CallerExternal, ReadOnly: reg.Mode == agentops.ClientReadOnly}, reg.Label, nil
 	}
-	if agentops.OwnerTokenMatches(svc.DataDir(), strings.TrimSpace(c.GetHeader("X-Beeftv-Owner"))) {
+	if agentops.OwnerTokenMatches(svc.DataDir(), strings.TrimSpace(c.GetHeader("X-Huabu-Owner"))) {
 		return agentops.Caller{Kind: agentops.CallerManual}, "owner", nil
 	}
 	if trustedDesktopUI(c) {
@@ -205,7 +205,7 @@ func requireTrustedDesktopWritePrincipal(c *gin.Context, message string) bool {
 		fail(c, http.StatusForbidden, app.Forbidden("此连接仅支持读取"))
 		return false
 	}
-	if strings.TrimSpace(c.GetHeader("X-Beeftv-Client")) != "" {
+	if strings.TrimSpace(c.GetHeader("X-Huabu-Client")) != "" {
 		fail(c, http.StatusForbidden, app.Forbidden(message))
 		return false
 	}
@@ -294,7 +294,7 @@ func isLoopbackRequest(r *http.Request) bool {
 
 // allowedOrigins 允许显式配置的正式前端 Origin（例如 Wails 宿主页面）。
 func allowedOrigins() []string {
-	raw := strings.TrimSpace(os.Getenv("BEEFTV_ALLOWED_ORIGINS"))
+	raw := strings.TrimSpace(os.Getenv("HUABU_ALLOWED_ORIGINS"))
 	if raw == "" {
 		return nil
 	}

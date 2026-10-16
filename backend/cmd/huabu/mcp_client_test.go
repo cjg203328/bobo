@@ -17,16 +17,16 @@ import (
 	"huabu/backend/internal/operations"
 )
 
-// TestMCPClientLoop 用官方 MCP 客户端连接 `beeftv mcp serve`，验证握手、工具描述、
+// TestMCPClientLoop 用官方 MCP 客户端连接 `huabu mcp serve`，验证握手、工具描述、
 // 幂等 operationId、冲突错误、只读工具与断开。
 func TestMCPClientLoop(t *testing.T) {
-	bin := os.Getenv("BEEFTV_BIN")
+	bin := os.Getenv("HUABU_BIN")
 	if bin == "" {
-		t.Skip("BEEFTV_BIN 未设置，跳过 MCP 客户端验收")
+		t.Skip("HUABU_BIN 未设置，跳过 MCP 客户端验收")
 	}
-	base := strings.TrimRight(os.Getenv("BEEFTV_BASE_URL"), "/")
+	base := strings.TrimRight(os.Getenv("HUABU_BASE_URL"), "/")
 	if base == "" {
-		t.Fatal("BEEFTV_BASE_URL 未设置")
+		t.Fatal("HUABU_BASE_URL 未设置")
 	}
 	caseTag := fmt.Sprintf("%d", time.Now().UnixNano())
 	canvasID := "mcp-canvas-" + caseTag
@@ -38,7 +38,7 @@ func TestMCPClientLoop(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
-	client := mcp.NewClient(&mcp.Implementation{Name: "beeftv-acceptance-client", Version: "1.0.0"}, nil)
+	client := mcp.NewClient(&mcp.Implementation{Name: "huabu-acceptance-client", Version: "1.0.0"}, nil)
 	session, err := client.Connect(ctx, &mcp.CommandTransport{Command: exec.Command(bin, "mcp", "serve")}, nil)
 	if err != nil {
 		t.Fatalf("MCP 握手失败: %v", err)
@@ -204,8 +204,8 @@ func seedCanvas(base, canvasID string) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	if owner := strings.TrimSpace(os.Getenv("BEEFTV_OWNER_TOKEN")); owner != "" {
-		req.Header.Set("X-Beeftv-Owner", owner)
+	if owner := strings.TrimSpace(os.Getenv("HUABU_OWNER_TOKEN")); owner != "" {
+		req.Header.Set("X-Huabu-Owner", owner)
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

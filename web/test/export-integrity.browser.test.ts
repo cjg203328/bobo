@@ -10,14 +10,14 @@ let browser: Browser;
 let directory: string;
 
 beforeAll(async () => {
-    directory = mkdtempSync(join(tmpdir(), "beeftv-zip-browser-"));
+    directory = mkdtempSync(join(tmpdir(), "huabu-zip-browser-"));
     const dist = join(directory, "dist");
     // Use the application's bundler, including real lazy-editor assets. Bun.build
     // resolved this graph differently between local Bun 1.4 and CI Bun 1.3.9.
     await build({
         configFile: false, root: resolve(import.meta.dir, ".."), publicDir: false,
         cacheDir: join(directory, "cache"), logLevel: "error",
-        define: { __BEEFTV_HEAVY_MEDIA_ENABLED__: "true", __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""' },
+        define: { __HUABU_HEAVY_MEDIA_ENABLED__: "true", __APP_VERSION__: '"test"', __APP_CHANGELOG__: '""' },
         resolve: { alias: { "@": resolve(import.meta.dir, "../src") } },
         build: { outDir: dist, emptyOutDir: true, rolldownOptions: { input: resolve(import.meta.dir, "fixtures/export-integrity-harness.html") } },
     });

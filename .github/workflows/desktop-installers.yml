@@ -7,7 +7,7 @@ on:
       - 'scripts/smoke-webview-cache.mjs'
       - 'scripts/webview-cache-probe_windows.go'
       - 'scripts/installers/**'
-      - 'scripts/build-beeftv*'
+      - 'scripts/build-huabu*'
       - 'backend/internal/desktopupdate/**'
       - '.github/workflows/desktop-installers.yml'
       - '.github/workflows/release-desktop.yml'
@@ -58,7 +58,7 @@ jobs:
       - name: Select bundled Node runtime
         shell: bash
         run: |
-          node -e 'const fs=require("fs"),p=require("path"); const bin=p.dirname(process.execPath); fs.appendFileSync(process.env.GITHUB_ENV, `BEEFTV_NODE_RUNTIME=${process.platform==="win32"?bin:p.dirname(bin)}\n`);'
+          node -e 'const fs=require("fs"),p=require("path"); const bin=p.dirname(process.execPath); fs.appendFileSync(process.env.GITHUB_ENV, `HUABU_NODE_RUNTIME=${process.platform==="win32"?bin:p.dirname(bin)}\n`);'
       - name: Linux desktop dependencies
         if: runner.os == 'Linux'
         run: |
@@ -90,19 +90,19 @@ jobs:
       - name: Build Unix desktop
         if: runner.os != 'Windows'
         env:
-          BEEFTV_SKIP_LOCAL_VERIFY: '1'
-          BEEFTV_WAILS_PLATFORM: ${{ matrix.target }}
-          BEEFTV_UPDATER_PUBLIC_KEY: ${{ vars.BEEFTV_UPDATER_PUBLIC_KEY }}
+          HUABU_SKIP_LOCAL_VERIFY: '1'
+          HUABU_WAILS_PLATFORM: ${{ matrix.target }}
+          HUABU_UPDATER_PUBLIC_KEY: ${{ vars.HUABU_UPDATER_PUBLIC_KEY }}
         run: |
           sh plugin-packages/build-packages.sh
-          ./scripts/build-beeftv-release.sh
+          ./scripts/build-huabu-release.sh
       - name: Build Windows desktop
         if: runner.os == 'Windows'
         env:
           CGO_ENABLED: '1'
-          BEEFTV_UPDATER_PUBLIC_KEY: ${{ vars.BEEFTV_UPDATER_PUBLIC_KEY }}
+          HUABU_UPDATER_PUBLIC_KEY: ${{ vars.HUABU_UPDATER_PUBLIC_KEY }}
         shell: pwsh
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-beeftv-windows-release.ps1
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-huabu-windows-release.ps1
       - name: Package native installer
         shell: bash
         run: python scripts/package-desktop-installer.py --platform '${{ matrix.platform }}'
@@ -114,19 +114,19 @@ jobs:
           platform='${{ matrix.platform }}'
           payload='backend/cmd/desktop/build/bin'
           suffix='-setup.exe'
-          if [[ "$platform" == darwin-* ]]; then payload="$payload/BeefTV.app"; suffix='.dmg'; fi
-          if [[ "$platform" == linux-* ]]; then payload="$payload/BeefTV-linux"; suffix='.deb'; fi
-          command=(python scripts/smoke-desktop-installer.py --platform "$platform" --installer "dist/BeefTV-${version}-${platform}${suffix}" --payload "$payload")
+          if [[ "$platform" == darwin-* ]]; then payload="$payload/Huabu.app"; suffix='.dmg'; fi
+          if [[ "$platform" == linux-* ]]; then payload="$payload/Huabu-linux"; suffix='.deb'; fi
+          command=(python scripts/smoke-desktop-installer.py --platform "$platform" --installer "dist/Huabu-${version}-${platform}${suffix}" --payload "$payload")
           if [[ "$platform" == linux-* ]]; then xvfb-run -a dbus-run-session -- "${command[@]}"; else "${command[@]}"; fi
       - name: Verify DEB dependencies on clean Ubuntu
         if: runner.os == 'Linux'
         run: |
           docker run --rm -v "${PWD}/dist:/packages:ro" ubuntu:24.04 sh -ec '
             apt-get update
-            apt-get install -y /packages/BeefTV-*.deb
+            apt-get install -y /packages/Huabu-*.deb
             dpkg --audit
-            dpkg --verify beeftv
-            ldd /opt/beeftv/BeefTV-linux/BeefTV > /tmp/links
+            dpkg --verify huabu
+            ldd /opt/huabu/Huabu-linux/Huabu > /tmp/links
             cat /tmp/links
             ! grep -q "not found" /tmp/links
           '
@@ -135,6 +135,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: installer-check-${{ matrix.platform }}
-          path: dist/BeefTV-*
+          path: dist/Huabu-*
           retention-days: 7
           if-no-files-found: error

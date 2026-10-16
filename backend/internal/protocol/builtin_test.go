@@ -364,7 +364,7 @@ func TestAgnesVideo25UsesRequestedReferenceOperationForSingleImage(t *testing.T)
 
 func TestDeclarativeManifestMapsFieldsAndResponses(t *testing.T) {
 	manifest := []byte(`{
-			"apiVersion":"beeftv.plugin/v1",
+			"apiVersion":"huabu.plugin/v1",
 			"id":"example-video","version":"1.0.0","name":"Example Video","author":"Example","documentation":"# Example Video",
 		"contributes":{"providers":[{"id":"example-video","label":"Example Video","capabilities":["video"],"scopes":["admin.system-channel","user.custom-channel"],"create":{"method":"POST","path":"/v1/tasks","fields":{"model":"request.model","input.prompt":"request.prompt","input.seconds":"request.duration"}},"poll":{"method":"GET","path":"/v1/tasks/{{taskId}}"},"response":{"taskIdPaths":["id","data.id"],"statusPaths":["status","data.status"],"resultPaths":["result.video_url","data.result.video_url"],"resultKind":"video"}}]}
 	}`)
@@ -406,7 +406,7 @@ func TestDeclarativeManifestMapsFieldsAndResponses(t *testing.T) {
 
 func TestDeclarativeManifestSupportsMediaPathsTransformsAndErrors(t *testing.T) {
 	manifest := []byte(`{
-		"apiVersion":"beeftv.plugin/v1",
+		"apiVersion":"huabu.plugin/v1",
 		"id":"declarative-expression-test","version":"1.0.0","name":"Declarative Expression Test","author":"Test","documentation":"# Declarative Expression Test",
 		"contributes":{"providers":[{"id":"declarative-expression-test","label":"Declarative Expression Test","capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"resolution":"request.resolution|lower","ref_image_0":"request.images.0.url","ref_image_1":"request.images.1.url"}},"response":{"errorPaths":["code"],"messagePaths":["msg"]}}]}
 	}`)

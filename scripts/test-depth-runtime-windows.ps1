@@ -19,7 +19,7 @@ foreach ($required in @($python, (Join-Path $worker "depth_capture\__main__.py")
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "深度运行包缺少文件: $required" }
 }
 $env:PYTHONPATH = $worker
-$env:BEEFTV_VDA_SOURCE = $source
+$env:HUABU_VDA_SOURCE = $source
 $env:PATH = "$bin;$env:PATH"
 & $python -c "import torch, torchvision, cv2, numpy, depth_capture; print(torch.__version__); print(torch.version.cuda or 'cpu')"
 if ($LASTEXITCODE -ne 0) { throw "深度运行包 Python 依赖加载失败" }
@@ -29,7 +29,7 @@ Write-Output ($ffmpegVersion | Select-Object -First 1)
 $ffprobeVersion = & (Join-Path $bin "ffprobe.exe") -version
 if ($LASTEXITCODE -ne 0) { throw "FFprobe 无法启动" }
 Write-Output ($ffprobeVersion | Select-Object -First 1)
-$mediaCheck = Join-Path ([System.IO.Path]::GetTempPath()) ("beeftv-ffmpeg-check-" + [guid]::NewGuid().ToString("N") + ".mp4")
+$mediaCheck = Join-Path ([System.IO.Path]::GetTempPath()) ("huabu-ffmpeg-check-" + [guid]::NewGuid().ToString("N") + ".mp4")
 try {
     & (Join-Path $bin "ffmpeg.exe") -y -hide_banner -loglevel error -f lavfi -i "color=black:size=64x48:rate=5:duration=0.4" -pix_fmt yuv420p $mediaCheck
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $mediaCheck -PathType Leaf) -or (Get-Item -LiteralPath $mediaCheck).Length -le 0) {
@@ -47,7 +47,7 @@ if ($Variant -eq "cpu") {
 }
 if ($LASTEXITCODE -ne 0) { throw "运行包设备变体与 PyTorch 不一致" }
 if ($ModelRuntime) {
-    $work = Join-Path ([System.IO.Path]::GetTempPath()) ("beeftv-depth-probe-" + [guid]::NewGuid().ToString("N"))
+    $work = Join-Path ([System.IO.Path]::GetTempPath()) ("huabu-depth-probe-" + [guid]::NewGuid().ToString("N"))
     try {
         & (Join-Path $PSScriptRoot "probe-depth-runtime-windows.ps1") -Device $Variant -PythonPath $python -RuntimeDir $ModelRuntime -SourceDir $source -WorkDir $work -ToolDir $worker
         if ($LASTEXITCODE -ne 0) { throw "真实模型短片推理失败" }

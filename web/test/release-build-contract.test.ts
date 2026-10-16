@@ -37,7 +37,7 @@ describe("desktop release build contract", () => {
     test("keeps published deployment aligned with binaries present in public source", () => {
         const workflow = readFileSync(resolve(root, ".github/workflows/publish-images.yml"), "utf8");
         expect(workflow).not.toContain("cmd/host-updater");
-        expect(workflow).not.toContain("beeftv-host-updater");
+        expect(workflow).not.toContain("huabu-host-updater");
         expect(workflow).not.toContain("docker-compose.deploy.yml");
 
         for (const name of ["docker-compose.server.yml", "docker-compose.deploy.yml"]) {
@@ -52,7 +52,7 @@ describe("desktop release build contract", () => {
     });
 
     test("locks the release version and injects Go build metadata", () => {
-        const script = readFileSync(resolve(root, "scripts/build-beeftv-release.sh"), "utf8");
+        const script = readFileSync(resolve(root, "scripts/build-huabu-release.sh"), "utf8");
         const version = readFileSync(resolve(root, "VERSION"), "utf8").trim();
 
         expect(version).toMatch(/^v\d+\.\d+\.\d+/);
@@ -71,11 +71,11 @@ describe("desktop release build contract", () => {
     });
 
     test("keeps every source file required by the local release gate", () => {
-        const gate = readFileSync(resolve(root, "scripts/verify-beeftv-local-release.sh"), "utf8");
+        const gate = readFileSync(resolve(root, "scripts/verify-huabu-local-release.sh"), "utf8");
         const exporter = readFileSync(resolve(root, "scripts/public-release-export.sh"), "utf8");
 
-        expect(gate).toContain("web/scripts/beeftv-local-network-audit.mjs");
-        expect(existsSync(resolve(root, "web/scripts/beeftv-local-network-audit.mjs"))).toBe(true);
-        expect(exporter).toContain("--include='web/scripts/beeftv-local-network-audit.mjs'");
+        expect(gate).toContain("web/scripts/huabu-local-network-audit.mjs");
+        expect(existsSync(resolve(root, "web/scripts/huabu-local-network-audit.mjs"))).toBe(true);
+        expect(exporter).toContain("--include='web/scripts/huabu-local-network-audit.mjs'");
     });
 });

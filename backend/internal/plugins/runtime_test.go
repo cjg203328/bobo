@@ -81,7 +81,7 @@ func TestInstallRejectsMalformedPackages(t *testing.T) {
 	if _, err := runtime.Install([]byte("not-a-zip"), "broken.beeftv-plugin"); err == nil {
 		t.Fatal("non-zip package accepted")
 	}
-	if _, err := runtime.Install([]byte(`{"apiVersion":"beeftv.plugin/v1"}`), "legacy.json"); err == nil {
+	if _, err := runtime.Install([]byte(`{"apiVersion":"huabu.plugin/v1"}`), "legacy.json"); err == nil {
 		t.Fatal("bare JSON manifest accepted")
 	}
 	var buffer bytes.Buffer
@@ -274,7 +274,7 @@ func TestDisabledOfficialStateSurvivesRestart(t *testing.T) {
 }
 
 func TestRuntimeDropsRemovedOfficialProtocol(t *testing.T) {
-	staleManifest := json.RawMessage(`{"apiVersion":"beeftv.plugin/v2","id":"removed-official-protocol","version":"1.0.0","name":"Removed Official Protocol","author":"Test","documentation":"# Removed\n\n## BeefTV运行时合同","contributes":{"providers":[{"id":"removed-official-protocol","label":"Removed","capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","body":{"prompt":{"$ref":"request.prompt"}}},"response":{"status":"pending"}}]}}`)
+	staleManifest := json.RawMessage(`{"apiVersion":"huabu.plugin/v2","id":"removed-official-protocol","version":"1.0.0","name":"Removed Official Protocol","author":"Test","documentation":"# Removed\n\n## Huabu运行时合同","contributes":{"providers":[{"id":"removed-official-protocol","label":"Removed","capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","body":{"prompt":{"$ref":"request.prompt"}}},"response":{"status":"pending"}}]}}`)
 	registryData, err := json.Marshal([]RegistryRecord{{ID: "removed-official-protocol", Raw: staleManifest, Source: OriginOfficial}})
 	if err != nil {
 		t.Fatal(err)
@@ -429,11 +429,11 @@ func TestClonePluginViewJSONFailureDoesNotLeakAliases(t *testing.T) {
 }
 
 func testManifest(id, version string) []byte {
-	return []byte(fmt.Sprintf(`{"apiVersion":"beeftv.plugin/v1","id":%q,"version":%q,"name":%q,"author":"Test","documentation":"# %s","contributes":{"providers":[{"id":%q,"label":%q,"capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"prompt":"request.prompt"}},"response":{"statusPaths":["status"]}}]}}`, id, version, id, id, id, id))
+	return []byte(fmt.Sprintf(`{"apiVersion":"huabu.plugin/v1","id":%q,"version":%q,"name":%q,"author":"Test","documentation":"# %s","contributes":{"providers":[{"id":%q,"label":%q,"capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"prompt":"request.prompt"}},"response":{"statusPaths":["status"]}}]}}`, id, version, id, id, id, id))
 }
 
 func testManifestWithMutableMetadata(id, version string) []byte {
-	return []byte(fmt.Sprintf(`{"apiVersion":"beeftv.plugin/v1","id":%q,"version":%q,"name":%q,"author":"Test","documentation":"# %s","surfaces":["canvas","settings"],"permissions":["network"],"contributes":{"providers":[{"id":%q,"label":%q,"capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"prompt":"request.prompt"},"headers":{"X-Test":"one"},"query":{"mode":"fast"}},"response":{"statusPaths":["status"]}}],"workflows":[{"id":%q,"label":"WF","providerId":%q,"capability":"video","defaults":{"style":"film"}}],"canvasNodes":[{"id":%q,"label":"Node","defaultTitle":"Node","defaultSize":{"width":320,"height":200},"schema":{"type":"object"},"renderer":"declarative"}]}}`, id, version, id, id, id, id, id+"-wf", id, id+"-node"))
+	return []byte(fmt.Sprintf(`{"apiVersion":"huabu.plugin/v1","id":%q,"version":%q,"name":%q,"author":"Test","documentation":"# %s","surfaces":["canvas","settings"],"permissions":["network"],"contributes":{"providers":[{"id":%q,"label":%q,"capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"prompt":"request.prompt"},"headers":{"X-Test":"one"},"query":{"mode":"fast"}},"response":{"statusPaths":["status"]}}],"workflows":[{"id":%q,"label":"WF","providerId":%q,"capability":"video","defaults":{"style":"film"}}],"canvasNodes":[{"id":%q,"label":"Node","defaultTitle":"Node","defaultSize":{"width":320,"height":200},"schema":{"type":"object"},"renderer":"declarative"}]}}`, id, version, id, id, id, id, id+"-wf", id, id+"-node"))
 }
 
 func assertImmediatePlugin(t *testing.T, runtime *Runtime, pluginID, version, status string, want []byte) {

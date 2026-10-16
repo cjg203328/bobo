@@ -264,7 +264,7 @@ func runMedia(opCtx *Context, operation string, raw json.RawMessage) (any, error
 		case <-readDone:
 		}
 	}()
-	dir, err := os.MkdirTemp("", "beeftv-media-*")
+	dir, err := os.MkdirTemp("", "huabu-media-*")
 	if err != nil {
 		return nil, PreconditionFailed("media_storage_unavailable", "媒体检查临时空间不可用", nil)
 	}

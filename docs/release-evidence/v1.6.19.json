@@ -29,7 +29,7 @@
     "preservedData": true,
     "retainedIDs": {"tasks": true, "canvas_projects": true, "resources": true}
   },
-  "review": {"reviewer": "Independent Codex review_beeftv_video", "result": "approved"},
+  "review": {"reviewer": "Independent Codex review_huabu_video", "result": "approved"},
   "verification": {
     "localReleaseGate": "passed",
     "errorRegression": "passed",

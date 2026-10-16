@@ -293,7 +293,7 @@ func TestLegacyDiskImportThenStaleFileIsIgnored(t *testing.T) {
 	if _, err := svc.InstallUploaded("admin-1", v2, "legacy-import-v2.beeftv-plugin"); err != nil {
 		t.Fatal(err)
 	}
-	stale, err := json.Marshal([]RegistryRecord{{ID: "stale-only", Raw: json.RawMessage(`{"apiVersion":"beeftv.plugin/v1","id":"stale-only"}`), Source: OriginUploaded}})
+	stale, err := json.Marshal([]RegistryRecord{{ID: "stale-only", Raw: json.RawMessage(`{"apiVersion":"huabu.plugin/v1","id":"stale-only"}`), Source: OriginUploaded}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -642,7 +642,7 @@ func marshalRegistryForTest(t *testing.T, records []RegistryRecord) []byte {
 }
 
 func hostUnavailableManifest(id string) json.RawMessage {
-	return json.RawMessage(fmt.Sprintf(`{"apiVersion":"beeftv.plugin/v1","id":%q,"version":"1.0.0","name":%q,"author":"Test","documentation":"# %s","runtime":{"backend":"host:missing-engine"},"contributes":{"providers":[{"id":%q,"label":%q,"capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"prompt":"request.prompt"}},"response":{"statusPaths":["status"]}}]}}`, id, id, id, id, id))
+	return json.RawMessage(fmt.Sprintf(`{"apiVersion":"huabu.plugin/v1","id":%q,"version":"1.0.0","name":%q,"author":"Test","documentation":"# %s","runtime":{"backend":"host:missing-engine"},"contributes":{"providers":[{"id":%q,"label":%q,"capabilities":["video"],"scopes":["canvas"],"create":{"method":"POST","path":"/tasks","fields":{"prompt":"request.prompt"}},"response":{"statusPaths":["status"]}}]}}`, id, id, id, id, id))
 }
 
 func assertNoAuthorityRow(t *testing.T, repo *repository.Repository) {

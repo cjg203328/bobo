@@ -58,7 +58,7 @@
   "review": {
     "result": "approved",
     "independent": true,
-    "reviewer": "/root/review_beeftv_asr",
+    "reviewer": "/root/review_huabu_asr",
     "sourceDigest": "be7c3504841682446ad848d6ff13a29f2060eaa6da2d7b2f318d0dc11f683e15",
     "evidence": [
       "docs/release-evidence/v1.7.16-asr-review.md#代码与复审"

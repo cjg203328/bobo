@@ -6,7 +6,7 @@
 
 ## 对照结果
 
-| 服务或协议样本 | 创建与请求体 | 素材与关键字段 | 查询及结果 | BeefTV 对应项 |
+| 服务或协议样本 | 创建与请求体 | 素材与关键字段 | 查询及结果 | Huabu 对应项 |
 | --- | --- | --- | --- | --- |
 | [New API 的 Sora 格式](https://docs.newapi.pro/zh/docs/api/ai-model/videos/sora/createvideo) | `/v1/videos`，multipart | Sora 文件上传 profile；不同 New API 部署可扩展字段，须逐字段核对 | `/v1/videos/{id}`；状态对象 | `newapi` / OpenAI Videos；最多一张输入图，不作为所有视频模型的默认值 |
 | [WhatsToken 兼容视频](https://www.whatstoken.ai/docs/openai/doc0007)、[Seedance 示例](https://www.whatstoken.ai/docs/examples/doc0047) | `/v1/video/generations`，JSON | `images` 对象数组含 `url/role`；`videos/audios`；整数 `duration`、`ratio` | `/v1/video/generations/{id}`；`data[].url` | `video-generations-json`，明确选择 |

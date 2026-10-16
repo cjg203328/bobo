@@ -8,7 +8,7 @@ import (
 
 func TestEffectiveConfigRepairsHostedHyImageWithoutRewritingCustomContract(t *testing.T) {
 	dir := t.TempDir()
-	raw := []byte(`{"channels":[{"id":"beefapi","baseUrl":"https://beeftv.app/v1","models":["hy-image-v3"],"modelProfiles":[{"model":"hy-image-v3","capability":"text","protocol":"chat-completion"}]},{"id":"custom","baseUrl":"https://studio.example","models":["hy-image-v3"],"modelProfiles":[{"model":"hy-image-v3","capability":"text","protocol":"chat-completion"}]}]}`)
+	raw := []byte(`{"channels":[{"id":"beefapi","baseUrl":"https://huabu.app/v1","models":["hy-image-v3"],"modelProfiles":[{"model":"hy-image-v3","capability":"text","protocol":"chat-completion"}]},{"id":"custom","baseUrl":"https://studio.example","models":["hy-image-v3"],"modelProfiles":[{"model":"hy-image-v3","capability":"text","protocol":"chat-completion"}]}]}`)
 	if err := os.WriteFile(filepath.Join(dir, LocalProviderConfigFile), raw, 0600); err != nil {
 		t.Fatal(err)
 	}

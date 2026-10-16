@@ -64,7 +64,7 @@ jobs:
         if: matrix.variant == 'cuda'
         shell: pwsh
         run: |
-          $name = "beeftv-depth-runtime-v1-windows-amd64-cuda.zip"
+          $name = "huabu-depth-runtime-v1-windows-amd64-cuda.zip"
           $metadata = Get-Content -LiteralPath "./build/depth-runtime/$name.json" -Raw | ConvertFrom-Json
           if ($metadata.parts.Count -lt 2) { throw "CUDA 运行包没有生成 Release 分片" }
           $total = [long]0
@@ -79,12 +79,12 @@ jobs:
         if: matrix.variant == 'cpu'
         shell: pwsh
         run: |
-          $modelDir = Join-Path $env:RUNNER_TEMP "beeftv-depth-model\checkpoints"
+          $modelDir = Join-Path $env:RUNNER_TEMP "huabu-depth-model\checkpoints"
           New-Item -ItemType Directory -Path $modelDir -Force | Out-Null
           $model = Join-Path $modelDir "video_depth_anything_vits.pth"
           Invoke-WebRequest -Uri "https://github.com/glanderness/BeefTV/releases/download/v1.5.5/video_depth_anything_vits.pth" -OutFile $model
-          $zip = Resolve-Path ./build/depth-runtime/beeftv-depth-runtime-v1-windows-amd64-cpu.zip
-          $unpacked = Join-Path $env:RUNNER_TEMP "beeftv-depth-中文 path"
+          $zip = Resolve-Path ./build/depth-runtime/huabu-depth-runtime-v1-windows-amd64-cpu.zip
+          $unpacked = Join-Path $env:RUNNER_TEMP "huabu-depth-中文 path"
           Expand-Archive -LiteralPath $zip -DestinationPath $unpacked
           $env:PYTHONPATH = (Resolve-Path ./tools/depth-capture).Path
           $env:PATH = "$unpacked\bin;$env:PATH"

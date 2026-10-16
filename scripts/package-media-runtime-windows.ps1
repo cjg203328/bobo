@@ -10,7 +10,7 @@ $version = "8.0.1"
 $url = "https://github.com/GyanD/codexffmpeg/releases/download/8.0.1/ffmpeg-8.0.1-essentials_build.zip"
 $sha = "e2aaeaa0fdbc397d4794828086424d4aaa2102cef1fb6874f6ffd29c0b88b673"
 if (Test-Path -LiteralPath $Destination) { throw "Refusing to overwrite media runtime: $Destination" }
-$scratch = Join-Path ([IO.Path]::GetTempPath()) ("beeftv-media-" + [guid]::NewGuid().ToString("N"))
+$scratch = Join-Path ([IO.Path]::GetTempPath()) ("huabu-media-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $scratch | Out-Null
 try {
     if (-not $ArchivePath) {

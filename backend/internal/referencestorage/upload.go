@@ -54,7 +54,7 @@ func upload(ctx context.Context, config Config, path string, client *http.Client
 	if _, err = file.Seek(0, io.SeekStart); err != nil {
 		return "", err
 	}
-	key := "beeftv/references/" + digest
+	key := "huabu/references/" + digest
 	endpoint, err := url.JoinPath(config.Endpoint, config.Bucket, key)
 	if err != nil {
 		return "", err

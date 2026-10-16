@@ -7,14 +7,14 @@ import (
 )
 
 func TestParsePluginPackageRejectsBareManifest(t *testing.T) {
-	if _, err := ParsePluginPackage([]byte(`{"apiVersion":"beeftv.plugin/v1"}`)); err == nil {
+	if _, err := ParsePluginPackage([]byte(`{"apiVersion":"huabu.plugin/v1"}`)); err == nil {
 		t.Fatal("bare JSON manifest was accepted as a plugin package")
 	}
 }
 
 func TestParsePluginPackageValidatesWebEntry(t *testing.T) {
 	manifest := []byte(`{
-		"apiVersion":"beeftv.plugin/v1",
+		"apiVersion":"huabu.plugin/v1",
         "id":"ui-extension",
         "name":"UI Extension",
         "version":"1.0.0",
@@ -42,13 +42,13 @@ func TestParsePluginPackageValidatesWebEntry(t *testing.T) {
 	}
 }
 
-func TestPluginPackageUsesBeefTVFormat(t *testing.T) {
-	if PluginPackageFormat != "beeftv.plugin/package-v1" {
+func TestPluginPackageUsesHuabuFormat(t *testing.T) {
+	if PluginPackageFormat != "huabu.plugin/package-v1" {
 		t.Fatalf("package format = %q", PluginPackageFormat)
 	}
 }
 
-func TestPluginPackageUsesBeefTVFileExtension(t *testing.T) {
+func TestPluginPackageUsesHuabuFileExtension(t *testing.T) {
 	if PluginPackageExtension != ".beeftv-plugin" {
 		t.Fatalf("package extension = %q", PluginPackageExtension)
 	}

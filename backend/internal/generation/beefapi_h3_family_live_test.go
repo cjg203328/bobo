@@ -92,7 +92,7 @@ func TestBeefAPIH3FamilyProductionCanary(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 8*time.Minute)
 			defer cancel()
 			ctx = WithRuntime(ctx, Runtime{Receipts: recorder, Call: CallMeta{TaskID: "h3-family-20261013-" + tc.name, ProviderRequestID: resume}})
-			input := Input{Mode: "video", Prompt: "A small red paper ball rolls gently across a pale teal tabletop. Follow the reference ball and motion, one continuous shot, soft daylight, fixed camera, no text.", Config: Config{BaseURL: "https://beeftv.app/v1", APIKey: key, InterfaceType: "newapi-channel-2", Model: tc.model, VideoSeconds: tc.seconds, VQuality: tc.resolution, Size: "16:9"}, ReferenceImages: tc.images, ReferenceVideos: tc.videos, ReferenceAudios: tc.audios}
+			input := Input{Mode: "video", Prompt: "A small red paper ball rolls gently across a pale teal tabletop. Follow the reference ball and motion, one continuous shot, soft daylight, fixed camera, no text.", Config: Config{BaseURL: "https://huabu.app/v1", APIKey: key, InterfaceType: "newapi-channel-2", Model: tc.model, VideoSeconds: tc.seconds, VQuality: tc.resolution, Size: "16:9"}, ReferenceImages: tc.images, ReferenceVideos: tc.videos, ReferenceAudios: tc.audios}
 			result, err := RunVideoTaskWithPolicy(ctx, input, DefaultVideoPollPolicy())
 			if err != nil {
 				t.Fatal(err)

@@ -10,7 +10,7 @@
   "releaseComplete": false,
   "liveTestWaiver": {
     "approvedBy": "Ender",
-    "instruction": "beeftv本次豁免 直接上线",
+    "instruction": "huabu本次豁免 直接上线",
     "scope": "seedance-display-names-only",
     "evidence": [
       "docs/release-evidence/v1.7.10-targeted.md"

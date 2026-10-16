@@ -114,7 +114,7 @@ test('single-video exception requires native final-source delivery, one settled 
 });
 
 test('release entrypoint binds the exception to committed source and never carries it to the next version', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'beeftv-single-video-gate-'));
+  const dir = mkdtempSync(join(tmpdir(), 'huabu-single-video-gate-'));
   try {
     const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
     mkdirSync(join(dir, 'scripts'));

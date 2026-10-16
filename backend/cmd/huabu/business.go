@@ -138,17 +138,17 @@ func (c *client) callBusiness(ctx context.Context, tool businessTool, args busin
 	}
 	base := c.currentBaseURL()
 	if base == "" {
-		return nil, &cliError{code: exitTransportFailure, reason: "runtime_not_found", msg: "未发现运行中的 BeefTV 工作区，请先打开 BeefTV"}
+		return nil, &cliError{code: exitTransportFailure, reason: "runtime_not_found", msg: "未发现运行中的 Huabu 工作区，请先打开 Huabu"}
 	}
 	req, err := http.NewRequestWithContext(ctx, tool.Method, base+path, reader)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("X-Beeftv-Client", c.clientID)
+	req.Header.Set("X-Huabu-Client", c.clientID)
 	req.Header.Set("Authorization", "Bearer "+c.token)
 	if c.ownerToken != "" {
-		req.Header.Set("X-Beeftv-Owner", c.ownerToken)
+		req.Header.Set("X-Huabu-Owner", c.ownerToken)
 	}
 	if c.desktopToken != "" {
 		req.Header.Set("X-Desktop-Token", c.desktopToken)

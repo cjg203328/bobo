@@ -42,7 +42,7 @@ const provider = createServer(async (req, res) => {
   } catch (error) { log += String(error.stack); res.writeHead(500); res.end(String(error)); }
 });
 let base;
-const headers = { 'content-type': 'application/json', 'X-Beeftv-Agent-Token': config.hostToken };
+const headers = { 'content-type': 'application/json', 'X-Huabu-Agent-Token': config.hostToken };
 const api = async (route, body) => fetch(base + route, { method: body === undefined ? 'GET' : 'POST', headers,
   body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(20000) });
 async function backend(route, body) {
@@ -64,10 +64,10 @@ try {
   const modelPort = await listen(provider);
   const reservation = createServer(); const port = await listen(reservation); await new Promise((resolve) => reservation.close(resolve));
   base = `http://127.0.0.1:${port}`;
-  const env = { ...process.env, BEEFTV_AGENT_DATA_DIR: config.directory,
-    BEEFTV_AGENT_PORT: String(port), BEEFTV_AGENT_HOST_TOKEN: config.hostToken, BEEFTV_OPS_URL: config.backend,
-    BEEFTV_AGENT_API_KEY: 'fixture-only', BEEFTV_AGENT_API: 'openai-completions', BEEFTV_AGENT_MODEL: 'synthetic',
-    BEEFTV_AGENT_BASE_URL: `http://127.0.0.1:${modelPort}/v1`, BEEFTV_AGENT_TOTAL_REQUEST_BUDGET: '0' };
+  const env = { ...process.env, HUABU_AGENT_DATA_DIR: config.directory,
+    HUABU_AGENT_PORT: String(port), HUABU_AGENT_HOST_TOKEN: config.hostToken, HUABU_OPS_URL: config.backend,
+    HUABU_AGENT_API_KEY: 'fixture-only', HUABU_AGENT_API: 'openai-completions', HUABU_AGENT_MODEL: 'synthetic',
+    HUABU_AGENT_BASE_URL: `http://127.0.0.1:${modelPort}/v1`, HUABU_AGENT_TOTAL_REQUEST_BUDGET: '0' };
   async function start() {
     child = spawn(process.execPath, [path.join(config.root, 'agent-host/server.mjs')], { cwd: config.root, env, stdio: ['ignore', 'pipe', 'pipe'] });
     child.stdout.on('data', (chunk) => { log += chunk; }); child.stderr.on('data', (chunk) => { log += chunk; });

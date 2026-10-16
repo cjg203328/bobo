@@ -1,13 +1,13 @@
 # Changelog
 
-All notable public changes to BeefTV are documented in this file.
+All notable public changes to Huabu are documented in this file.
 
 ## Unreleased
 
 - Built-in BeefAPI can be connected from the desktop app without pasting a key.
 - Prepared the first audited public source snapshot.
 - Added reproducible local builds, automated quality checks, and multi-architecture container publishing.
-- Standardized public artifacts, runtime identifiers, documentation, and repository links on the BeefTV name.
+- Standardized public artifacts, runtime identifiers, documentation, and repository links on the Huabu name.
 
 ## v1.7.24
 
@@ -72,7 +72,7 @@ All notable public changes to BeefTV are documented in this file.
 
 ## v1.7.16
 
-- 音频和视频节点的字幕窗口支持云端自动转写，可读取已连接 BeefTV 账号的转写模型。
+- 音频和视频节点的字幕窗口支持云端自动转写，可读取已连接 Huabu 账号的转写模型。
 - 支持 hy-asr-3.0-preview，识别结果可编辑、保存到画布并导出 SRT；保留本地 whisper.cpp 转写。
 - 转写模型与配音、音乐生成模型分开显示，避免使用不匹配的接口。
 - 云端转写中断且结果不确定时不自动重复提交，避免重复计费。
@@ -103,11 +103,11 @@ All notable public changes to BeefTV are documented in this file.
 - 修复素材读取补齐资源后已成功，助手仍显示先前失败提示的问题。
 - 删除素材记录时保留画布和历史仍在使用的资源，避免影响已有作品。
 - 模型配置支持搜索选择，保留自定义服务和暂不可用的模型设置。
-- 改进 BeefTV MCP 的连接状态和管理入口、侧栏收起与社交入口，并提供应用内中文更新说明。
+- 改进 Huabu MCP 的连接状态和管理入口、侧栏收起与社交入口，并提供应用内中文更新说明。
 
 ## v1.7.13
 
-- 连接入口改为「连接 BeefTV」，新登录授权和钱包控制台使用 beeftv.app；保留已连接企业账号。
+- 连接入口改为「连接 Huabu」，新登录授权和钱包控制台使用 huabu.app；保留已连接企业账号。
 - 创作助手支持图片、视频和音频参考、运行中补充内容与固定版本技能，并使用持久会话恢复中断工作。
 - 助手可将已上传素材绑定到画布参考节点；技能选择器支持直接安装 ZIP 和 Markdown 技能。
 - 内置助手可选择只读、当前画布或完全访问；跨画布编辑可整轮撤销。
@@ -115,7 +115,7 @@ All notable public changes to BeefTV are documented in this file.
 - 助手可裁剪、排列素材，添加旁白和字幕，并在本地渲染视频预览。
 - 助手对话直接显示成片版本，可播放、下载，并在重开对话后恢复。
 - 模型回复失败时保留已完成操作，提供继续处理入口。
-- 外部 Agent 通过 MCP／CLI 使用完整业务工具，无需在 BeefTV 重复选择执行权限。
+- 外部 Agent 通过 MCP／CLI 使用完整业务工具，无需在 Huabu 重复选择执行权限。
 - 补齐节点移动、删除、移除连线和模型目录；修复失败更新留下安装缓存的问题。
 
 ## v1.7.12
@@ -354,7 +354,7 @@ Windows v1.6.20–v1.6.22 的旧更新器无法识别新版目录结构，请关
 ## v1.6.0
 
 - Add depth action capture to the canvas video-processing menu on Apple Silicon Macs, with an optional local runtime and separately cached Small model weights.
-- Download and verify depth components from the BeefTV release, with a Hugging Face fallback for model weights and visible task progress.
+- Download and verify depth components from the Huabu release, with a Hugging Face fallback for model weights and visible task progress.
 - Keep video first-frame posters visible until hover playback presents a decoded frame, preventing black flashes when playback starts or stops.
 - Preserve current generation, reference-media, desktop-update, and task-retry contracts while integrating the new workflow.
 
@@ -400,7 +400,7 @@ Windows v1.6.20–v1.6.22 的旧更新器无法识别新版目录结构，请关
 - Removed redundant model icons, secondary descriptions, and stale option backgrounds from model selection UI.
 - Restored native right-click paste behavior in canvas prompt editors and added regression coverage.
 - Added regression coverage for generation output delivery, model picker overflow, and local generation error handling.
-- Added a canonical local app update script to keep one installed BeefTV application instead of accumulating duplicate builds.
+- Added a canonical local app update script to keep one installed Huabu application instead of accumulating duplicate builds.
 
 ## v1.5.3
 
@@ -418,6 +418,6 @@ Windows v1.6.20–v1.6.22 的旧更新器无法识别新版目录结构，请关
 
 ## v1.5.1
 
-- Initial public BeefTV snapshot.
+- Initial public Huabu snapshot.
 - Local-first AI video workspace with image, video, audio, text, asset, canvas, and model-channel workflows.
 - BeefAPI remains a built-in local channel while its model catalog is discovered dynamically.

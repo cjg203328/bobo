@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 const root = path.resolve(process.argv[2] || '.');
-const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-budget-'));
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-budget-'));
 const token = 'synthetic-budget-token';
 let calls = 0, hold = false, base, child, log = '';
 let turnSeq = 0;
@@ -43,11 +43,11 @@ async function start(dir, limit) {
   base = `http://127.0.0.1:${port}`;
   log = '';
   child = spawn(process.execPath, [path.join(root, 'agent-host/server.mjs')], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], env: {
-    ...process.env, BEEFTV_AGENT_PORT: String(port), BEEFTV_AGENT_LISTEN_FD: '0', BEEFTV_AGENT_LIFETIME_STDIN: '0',
-    BEEFTV_AGENT_INSTANCE_NONCE: '', BEEFTV_AGENT_DATA_DIR: dir, BEEFTV_AGENT_HOST_TOKEN: token,
-    BEEFTV_AGENT_API_KEY: 'fake', BEEFTV_AGENT_MODEL: 'fake', BEEFTV_AGENT_API: 'openai-completions',
-    BEEFTV_AGENT_BASE_URL: `http://127.0.0.1:${provider.address().port}/v1`, BEEFTV_OPS_URL: `http://127.0.0.1:${ops.address().port}/api`,
-    BEEFTV_AGENT_TOTAL_REQUEST_BUDGET: String(limit), BEEFTV_AGENT_MAX_REQUESTS_PER_TURN: '1',
+    ...process.env, HUABU_AGENT_PORT: String(port), HUABU_AGENT_LISTEN_FD: '0', HUABU_AGENT_LIFETIME_STDIN: '0',
+    HUABU_AGENT_INSTANCE_NONCE: '', HUABU_AGENT_DATA_DIR: dir, HUABU_AGENT_HOST_TOKEN: token,
+    HUABU_AGENT_API_KEY: 'fake', HUABU_AGENT_MODEL: 'fake', HUABU_AGENT_API: 'openai-completions',
+    HUABU_AGENT_BASE_URL: `http://127.0.0.1:${provider.address().port}/v1`, HUABU_OPS_URL: `http://127.0.0.1:${ops.address().port}/api`,
+    HUABU_AGENT_TOTAL_REQUEST_BUDGET: String(limit), HUABU_AGENT_MAX_REQUESTS_PER_TURN: '1',
   }});
   child.stdout.on('data', data => { log += data; }); child.stderr.on('data', data => { log += data; });
   for (let i = 0; i < 150; i++) {
@@ -60,7 +60,7 @@ async function start(dir, limit) {
 async function chat(canvasId = 'test') {
   const turnId = `budget-${++turnSeq}`;
   turnCanvas.set(turnId, canvasId);
-  const res = await fetch(base + '/chat', { method: 'POST', headers: { 'content-type': 'application/json', 'X-Beeftv-Agent-Token': token }, body: JSON.stringify({ canvasId, message: 'Reply ok', turnId }), signal: AbortSignal.timeout(20000) });
+  const res = await fetch(base + '/chat', { method: 'POST', headers: { 'content-type': 'application/json', 'X-Huabu-Agent-Token': token }, body: JSON.stringify({ canvasId, message: 'Reply ok', turnId }), signal: AbortSignal.timeout(20000) });
   const text = await res.text(); assert.equal(res.status, 200, text);
   const end = text.trim().split('\n').map(JSON.parse).find(event => event.type === 'turn_end');
   assert(end, text); return end;

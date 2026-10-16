@@ -1,4 +1,4 @@
-// beeftv 是 BeefTV 的常规命令行入口：与内置 pi、MCP 共用同一套业务操作层，
+// huabu 是 Huabu 的常规命令行入口：与内置 pi、MCP 共用同一套业务操作层，
 // 连接同一个正在运行的本地工作区，不各自打开数据库或另起 worker。
 package main
 
@@ -29,12 +29,12 @@ const mcpStartupTimeout = 5 * time.Second
 
 // resolveBaseURL 决定连哪个工作区，并说明来源（诊断输出用，不含任何凭据）。
 //
-// 桌面应用监听的是动态端口，所以没有显式 BEEFTV_BASE_URL 时不去猜端口，而是读数据
+// 桌面应用监听的是动态端口，所以没有显式 HUABU_BASE_URL 时不去猜端口，而是读数据
 // 目录对应的运行时描述文件：那是正在运行的桌面后端自己写下的地址。文件里的进程已经退出
 // 就当它不存在，绝不拿一个过期端口去连别的进程。
 func resolveBaseURL() (string, string) {
-	if base := strings.TrimSpace(os.Getenv("BEEFTV_BASE_URL")); base != "" {
-		return base, "BEEFTV_BASE_URL"
+	if base := strings.TrimSpace(os.Getenv("HUABU_BASE_URL")); base != "" {
+		return base, "HUABU_BASE_URL"
 	}
 	if info, found := runtimeinfo.Discover(""); found {
 		return info.BaseURL, "运行中的桌面工作区"
@@ -117,14 +117,14 @@ func newClient() (*client, error) {
 		return nil, err
 	}
 	return &client{
-		fixedBaseURL: source == "BEEFTV_BASE_URL",
+		fixedBaseURL: source == "HUABU_BASE_URL",
 		baseURL:      strings.TrimRight(base, "/"),
-		clientID:     strings.TrimSpace(os.Getenv("BEEFTV_CLIENT_ID")),
-		token:        strings.TrimSpace(os.Getenv("BEEFTV_CLIENT_TOKEN")),
-		ownerToken:   strings.TrimSpace(os.Getenv("BEEFTV_OWNER_TOKEN")),
+		clientID:     strings.TrimSpace(os.Getenv("HUABU_CLIENT_ID")),
+		token:        strings.TrimSpace(os.Getenv("HUABU_CLIENT_TOKEN")),
+		ownerToken:   strings.TrimSpace(os.Getenv("HUABU_OWNER_TOKEN")),
 		// 桌面形态整个 API 由桌面启动令牌把关：CLI/MCP 要接同一个桌面工作区就必须出示它。
 		// 它只是通过守卫，不改变能力模式——能力仍由 owner/已登记客户端凭据决定。
-		desktopToken: strings.TrimSpace(os.Getenv("BEEFTV_DESKTOP_TOKEN")),
+		desktopToken: strings.TrimSpace(os.Getenv("HUABU_DESKTOP_TOKEN")),
 		// 凭据头是自定义敏感头，不能依赖标准库只保护 Authorization 的行为：一律不跟随重定向。
 		http: &http.Client{Timeout: 60 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -149,7 +149,7 @@ func (c *client) currentBaseURL() string {
 func (c *client) do(ctx context.Context, method, path string, body any) (json.RawMessage, error) {
 	base := c.currentBaseURL()
 	if base == "" {
-		return nil, &cliError{code: exitTransportFailure, reason: "runtime_not_found", msg: "未发现运行中的 BeefTV 工作区。请先打开 BeefTV；若使用自定义目录，请检查 BEEFTV_DATA_DIR；独立服务请显式设置 BEEFTV_BASE_URL"}
+		return nil, &cliError{code: exitTransportFailure, reason: "runtime_not_found", msg: "未发现运行中的 Huabu 工作区。请先打开 Huabu；若使用自定义目录，请检查 HUABU_DATA_DIR；独立服务请显式设置 HUABU_BASE_URL"}
 	}
 	var payload io.Reader
 	if body != nil {
@@ -165,11 +165,11 @@ func (c *client) do(ctx context.Context, method, path string, body any) (json.Ra
 	}
 	req.Header.Set("Content-Type", "application/json")
 	if c.clientID != "" {
-		req.Header.Set("X-Beeftv-Client", c.clientID)
+		req.Header.Set("X-Huabu-Client", c.clientID)
 		req.Header.Set("Authorization", "Bearer "+c.token)
 	}
 	if c.ownerToken != "" {
-		req.Header.Set("X-Beeftv-Owner", c.ownerToken)
+		req.Header.Set("X-Huabu-Owner", c.ownerToken)
 	}
 	if c.desktopToken != "" {
 		req.Header.Set("X-Desktop-Token", c.desktopToken)
@@ -295,7 +295,7 @@ func main() {
 				fmt.Println(string(encoded))
 			}
 		}
-		fmt.Fprintf(os.Stderr, "beeftv: %v\n", err)
+		fmt.Fprintf(os.Stderr, "huabu: %v\n", err)
 		os.Exit(code)
 	}
 	os.Exit(exitOK)
@@ -378,36 +378,36 @@ func run(args []string) error {
 }
 
 func usage() {
-	fmt.Fprint(os.Stderr, `beeftv — BeefTV 业务操作命令行（连接正在运行的本地工作区）
+	fmt.Fprint(os.Stderr, `huabu — Huabu 业务操作命令行（连接正在运行的本地工作区）
 
-  beeftv ops [--read-only] [--json]
-  beeftv ops call <operation> --params '<json>' [--operation-id <id>] [--json]
-  beeftv business discover
-  beeftv business call --tool <id> --params '<path/query/body json>'
-  beeftv business upload --file <path> [--target resource|skill|plugin] [--params '<json>']
-  beeftv canvas get --canvas <id> [--json]
-  beeftv canvas search [--query <q>] [--page N] [--page-size N] [--json]
-  beeftv canvas node update --canvas <id> --node <id> --expected-revision N [--title T] [--prompt P] [--content C] --op-id <id>
-  beeftv canvas nodes create --canvas <id> --expected-revision N --node <title:type[:prompt]>... --op-id <id>
-  beeftv canvas edge create --canvas <id> --from <nodeId> --to <nodeId> --expected-revision N --op-id <id>
-  beeftv asset list [--query <q>] [--kind <kind>] [--favorite] [--recent] [--project <name>] [--generated] [--json]
-  beeftv asset get --asset <id> [--json]
-  beeftv task get --task <id> [--json]
-  beeftv client register --label <label> [--kind codex|claude|cursor|other] [--mode read-only|read-write]
-  beeftv mcp serve [--read-only]
+  huabu ops [--read-only] [--json]
+  huabu ops call <operation> --params '<json>' [--operation-id <id>] [--json]
+  huabu business discover
+  huabu business call --tool <id> --params '<path/query/body json>'
+  huabu business upload --file <path> [--target resource|skill|plugin] [--params '<json>']
+  huabu canvas get --canvas <id> [--json]
+  huabu canvas search [--query <q>] [--page N] [--page-size N] [--json]
+  huabu canvas node update --canvas <id> --node <id> --expected-revision N [--title T] [--prompt P] [--content C] --op-id <id>
+  huabu canvas nodes create --canvas <id> --expected-revision N --node <title:type[:prompt]>... --op-id <id>
+  huabu canvas edge create --canvas <id> --from <nodeId> --to <nodeId> --expected-revision N --op-id <id>
+  huabu asset list [--query <q>] [--kind <kind>] [--favorite] [--recent] [--project <name>] [--generated] [--json]
+  huabu asset get --asset <id> [--json]
+  huabu task get --task <id> [--json]
+  huabu client register --label <label> [--kind codex|claude|cursor|other] [--mode read-only|read-write]
+  huabu mcp serve [--read-only]
 
-连接哪个工作区：不设 BEEFTV_BASE_URL 时自动连正在运行的 BeefTV 桌面应用，端口是动态的。
-BEEFTV_DATA_DIR 可以指向非默认数据目录。Windows 从用户目录下 .beeftv/runtime 读取对应
-工作区的运行信息，其他平台读取数据目录里的 runtime.json。升级后请重新打开 BeefTV。
+连接哪个工作区：不设 HUABU_BASE_URL 时自动连正在运行的 Huabu 桌面应用，端口是动态的。
+HUABU_DATA_DIR 可以指向非默认数据目录。Windows 从用户目录下 .huabu/runtime 读取对应
+工作区的运行信息，其他平台读取数据目录里的 runtime.json。升级后请重新打开 Huabu。
 
-凭据：在 BeefTV 的设置里新建一个客户端，把它给出的 BEEFTV_CLIENT_ID 与 BEEFTV_CLIENT_TOKEN
+凭据：在 Huabu 的设置里新建一个客户端，把它给出的 HUABU_CLIENT_ID 与 HUABU_CLIENT_TOKEN
 填进环境变量即可，不需要桌面令牌。新连接默认开放全部业务工具，操作审批由外部 Agent 管理。
 历史只读凭据继续保持只读；CLI 仍支持显式签发只读凭据。
 
 写操作必须带幂等键（CLI 的 --op-id，MCP 工具参数里的 operationId）：重试同一操作要复用同一个值。
 
-环境变量：BEEFTV_BASE_URL、BEEFTV_DATA_DIR、BEEFTV_CLIENT_ID、BEEFTV_CLIENT_TOKEN、
-BEEFTV_OWNER_TOKEN（owner 可信通道）、BEEFTV_DESKTOP_TOKEN（桌面自身调用）
+环境变量：HUABU_BASE_URL、HUABU_DATA_DIR、HUABU_CLIENT_ID、HUABU_CLIENT_TOKEN、
+HUABU_OWNER_TOKEN（owner 可信通道）、HUABU_DESKTOP_TOKEN（桌面自身调用）
 退出码：0 成功；2 用法；3 未找到；4 冲突；5 前置条件；6 只读/未授权；7 不支持；8 参数；9 连接失败；1 内部
 `)
 }
@@ -694,12 +694,12 @@ func runMCP(c *client, args []string) error {
 	timedOut := errors.Is(startupCtx.Err(), context.DeadlineExceeded)
 	cancel()
 	if timedOut {
-		return &cliError{code: exitTransportFailure, reason: "mcp_startup_timeout", msg: "连接 BeefTV 工作区超过 5 秒，请确认 BeefTV 已启动且工作区可以访问"}
+		return &cliError{code: exitTransportFailure, reason: "mcp_startup_timeout", msg: "连接 Huabu 工作区超过 5 秒，请确认 Huabu 已启动且工作区可以访问"}
 	}
 	if err != nil {
 		return err
 	}
-	server := mcp.NewServer(&mcp.Implementation{Name: "beeftv", Version: "1.0.0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: "huabu", Version: "1.0.0"}, nil)
 	registeredTools := len(ops)
 	business, businessErr := c.businessTools(ctx)
 	if businessErr != nil {
@@ -754,7 +754,7 @@ func runMCP(c *client, args []string) error {
 			})
 	}
 	_, baseSource := resolveBaseURL()
-	fmt.Fprintf(os.Stderr, "beeftv mcp serve: %d 个工具，base=%s（%s），client=%s\n", registeredTools, c.currentBaseURL(), baseSource, orNone(c.clientID))
+	fmt.Fprintf(os.Stderr, "huabu mcp serve: %d 个工具，base=%s（%s），client=%s\n", registeredTools, c.currentBaseURL(), baseSource, orNone(c.clientID))
 	return server.Run(ctx, &mcp.StdioTransport{})
 }
 

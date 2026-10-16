@@ -65,7 +65,7 @@ func TestBrandUpgradePreservesEncryptedIssuerAndRedactsUI(t *testing.T) {
 			if _, err := svc.Disconnect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			if requested != origin+"/v1/beeftv/connection" {
+			if requested != origin+"/v1/huabu/connection" {
 				t.Fatalf("revoke issuer = %s", requested)
 			}
 			// The empty device response intentionally stops before polling.
@@ -86,7 +86,7 @@ func TestSavedOriginsRejectCrossOriginAndRestoreLegacyPending(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	for _, origin := range []string{"https://beeftv.app.evil.test", "http://beeftv.app", "https://beeftv.app:8443", "https://evil.test", "https://user@beeftv.app"} {
+	for _, origin := range []string{"https://huabu.app.evil.test", "http://huabu.app", "https://huabu.app:8443", "https://evil.test", "https://user@huabu.app"} {
 		if _, err := savedOrigin(persistedState{ProviderBaseURL: origin}, ProductionOrigin); err == nil {
 			t.Fatalf("trusted saved origin %s", origin)
 		}

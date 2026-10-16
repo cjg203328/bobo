@@ -61,14 +61,14 @@ func TestArchiveFromZipRejectsTraversalAndMultipleSkills(t *testing.T) {
 }
 
 func TestParseGitHubSkillURL(t *testing.T) {
-	spec, err := parseGitHubSkillURL("https://github.com/example/beeftv-skills/tree/main/skills/canvas-context", "", "")
+	spec, err := parseGitHubSkillURL("https://github.com/example/huabu-skills/tree/main/skills/canvas-context", "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if spec.Owner != "example" || spec.Repo != "beeftv-skills" || spec.Ref != "main" || spec.Subdir != "skills/canvas-context" {
+	if spec.Owner != "example" || spec.Repo != "huabu-skills" || spec.Ref != "main" || spec.Subdir != "skills/canvas-context" {
 		t.Fatalf("spec = %#v", spec)
 	}
-	if _, err := parseGitHubSkillURL("https://github.com/example/beeftv-skills/blob/main/SKILL.md", "", ""); err == nil {
+	if _, err := parseGitHubSkillURL("https://github.com/example/huabu-skills/blob/main/SKILL.md", "", ""); err == nil {
 		t.Fatal("expected blob URL to be rejected")
 	}
 }

@@ -7,7 +7,7 @@
   "upgrade": {
     "preservedData": true,
     "generationVerified": true,
-    "backup": "beeftv-before-copy-fix-20261001.db",
+    "backup": "huabu-before-copy-fix-20261001.db",
     "counts": {
       "canvas_projects": {
         "before": 7,

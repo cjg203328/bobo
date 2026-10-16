@@ -17,13 +17,13 @@ export async function modelFixture(directory, selected, available, onRequest = (
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const runtime = await ModelRuntime.create({ authPath: path.join(directory, 'auth.json'), modelsPath: null, refreshOnCreate: false });
-  runtime.registerProvider('beeftv', { api: 'openai-completions', apiKey: 'synthetic', baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
+  runtime.registerProvider('huabu', { api: 'openai-completions', apiKey: 'synthetic', baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
     models: available.map(id => ({ id, name: id, reasoning: false, input: ['text'], contextWindow: 200000, maxTokens: 100,
       cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } })) });
-  const models = createModels(); models.setProvider(runtime.getProvider('beeftv'));
+  const models = createModels(); models.setProvider(runtime.getProvider('huabu'));
   const completed = [];
   const store = createDurableSessionStore({ sessionRoot: path.join(directory, 'sessions'), workspaceRoot: path.join(directory, 'workspace'),
-    getModels: () => models, getModelRef: () => ({ provider: 'beeftv', modelId: selected }), buildTools: () => [],
+    getModels: () => models, getModelRef: () => ({ provider: 'huabu', modelId: selected }), buildTools: () => [],
     authorizeTurn: async () => ({ open: true, canvasId: 'canvas', permissionMode: 'canvas' }),
     completeTurn: async data => completed.push(data.turnId), settings: { retry: { maxRetries: 0 } } });
   return { store, requests, payloads, completed, async close() { await store.disposeAll(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); } };

@@ -11,7 +11,7 @@ import { createOperationBridge } from './operation-bridge.mjs';
 import { createDurableSessionStore } from './durable-session-owner.mjs';
 
 test('official Durable provider receives complete parseable 23-node view and original field chunk', { timeout: 30000 }, async () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-canvas-view-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-canvas-view-'));
   const longPrompt = 'original prompt '.repeat(4000);
   let canvas = { nodes: Array.from({ length: 23 }, (_, i) => ({ id: `node-${i}`, type: i === 0 ? 'image' : 'video',
     title: `synthetic shot ${i}`, metadata: { prompt: i === 22 ? longPrompt : `prompt ${i}`, model: 'configured-model',
@@ -19,8 +19,8 @@ test('official Durable provider receives complete parseable 23-node view and ori
       taskFailureDiagnostics: { request: 'diagnostic blob '.repeat(10000) },
       ...(i === 0 ? { svg: '<svg>' + 'synthetic'.repeat(50000) + '</svg>' } : {}) } })),
     connections: [{ id: 'edge', source: 'node-0', target: 'node-22' }], revision: 399 };
-  if (process.env.BEEFTV_CANVAS_VIEW_TEST_FIXTURE) {
-    canvas = JSON.parse(fs.readFileSync(process.env.BEEFTV_CANVAS_VIEW_TEST_FIXTURE, 'utf8'));
+  if (process.env.HUABU_CANVAS_VIEW_TEST_FIXTURE) {
+    canvas = JSON.parse(fs.readFileSync(process.env.HUABU_CANVAS_VIEW_TEST_FIXTURE, 'utf8'));
     assert.equal(canvas.nodes.length, 23);
     canvas.revision = 399;
     for (let i = 0; i < canvas.nodes.length; i++) {
@@ -39,7 +39,7 @@ test('official Durable provider receives complete parseable 23-node view and ori
       summary: 'Read canvas', params: { type: 'object', properties: { canvasId: { type: 'string' } } } }] } })); return; }
     if (req.url === '/ops/canvas.get') {
       const body = JSON.parse(raw); assert.deepEqual(body.params, { canvasId: 'canvas' });
-      assert.equal(req.headers['x-beeftv-agent-turn'], 'canvas-view-turn');
+      assert.equal(req.headers['x-huabu-agent-turn'], 'canvas-view-turn');
       reads++; res.end(JSON.stringify({ code: 0, data: { result: { canvasId: 'canvas', canvas } } })); return;
     }
     const payload = JSON.parse(raw); requests++;

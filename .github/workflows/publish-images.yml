@@ -20,9 +20,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: beeftv-web
+          - image: huabu-web
             dockerfile: Dockerfile
-          - image: beeftv-backend
+          - image: huabu-backend
             dockerfile: backend/Dockerfile
 
     steps:
@@ -108,7 +108,7 @@ jobs:
             found && /^## / { exit }
             found { print }
           ' CHANGELOG.md > dist/RELEASE_NOTES.md
-          test -s dist/RELEASE_NOTES.md || printf 'BeefTV %s\n' "$version" > dist/RELEASE_NOTES.md
+          test -s dist/RELEASE_NOTES.md || printf 'Huabu %s\n' "$version" > dist/RELEASE_NOTES.md
 
       - name: Create GitHub Release
         env:

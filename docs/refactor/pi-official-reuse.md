@@ -1,6 +1,6 @@
 # 官方 Pi SDK 复用矩阵（钉选 1.2.0）
 
-本页记录 BeefTV 内置助手宿主对官方 Pi 1.2.0 的复用。执行运行时只有 `@earendil-works/pi-durable` 一套：新会话走 Durable，已有 JSONL 会话只保留只读历史，不再在其上执行新回合。在旧会话里发新消息会为该画布新建一条 Durable 会话，并用旧会话最后的 user/assistant 文本作为交接说明开头。实现以本仓库 `agent-host/` 与钉选包内声明、示例、文档为准；`pi.dev` 最新文档可能对应更高版本。
+本页记录 Huabu 内置助手宿主对官方 Pi 1.2.0 的复用。执行运行时只有 `@earendil-works/pi-durable` 一套：新会话走 Durable，已有 JSONL 会话只保留只读历史，不再在其上执行新回合。在旧会话里发新消息会为该画布新建一条 Durable 会话，并用旧会话最后的 user/assistant 文本作为交接说明开头。实现以本仓库 `agent-host/` 与钉选包内声明、示例、文档为准；`pi.dev` 最新文档可能对应更高版本。
 
 本地钉选版本：`pi-durable`、`pi-coding-agent`、`pi-ai` 与 chord 1.2.0。配套 agent-core、codemode、mcp、tui、telemetry 通过 overrides 同钉 1.2.0，避免上游范围依赖自动选择未经验证的版本。锁文件由 Bun 生成；没有修改官方包或另建模型执行循环。Durable 接入验证见 [持久宿主验收](durable-host-verification-20261008.md)。
 
@@ -34,7 +34,7 @@
 
 | 官方能力 | 决定 | 说明 |
 | --- | --- | --- |
-| `SessionManager` JSONL v3 | 只读 | 旧会话历史与画布轮次（`beeftv.canvas.turn` / `.started` custom entry）按官方 JSONL 读取；新回合不再写入。新会话的 transcript 在 Durable SQLite。 |
+| `SessionManager` JSONL v3 | 只读 | 旧会话历史与画布轮次（`huabu.canvas.turn` / `.started` custom entry）按官方 JSONL 读取；新回合不再写入。新会话的 transcript 在 Durable SQLite。 |
 | `createAgentSession` | 不采用 | 旧 JSONL 会话执行运行时已退役；新会话由 Durable Harness 装配。 |
 | `AgentSession.prompt` / `abort` / `subscribe` / `dispose` | 不采用 | 旧运行时的 create / prompt / replace / abort 执行路径已删除。 |
 | `AgentSessionRuntime` | 不采用 | 画布级装配与替换由 Durable Harness 负责。 |
@@ -44,7 +44,7 @@
 | `root.reset(handoff)` | 采用 | 旧会话退役交接：把旧会话文本写成新上下文开头的官方 reset 条目。 |
 | `root.submit` / `submission.wait` / `root.abort` | 采用 | 回合提交、终态结算与停止；`whenBusy: "steer"` 用于运行中补充。 |
 | pi-coding-agent 技能（`formatSkillsForPrompt` / `/skill:name` 展开） | 照样实现 | Durable 没有技能组件。目录按 `<available_skills>` 的格式写成常驻系统提示段，正文按官方 `<skill name=…>` 块写进用户消息或 `skill_load` 工具结果；目录函数要求本机文件路径，不直接复用。 |
-| `thinkingLevel`（根会话） | 采用 | 默认 `low`（约 2048 个思考 token），可用 `BEEFTV_AGENT_THINKING` 改为 off、minimal、low、medium 或 high；已有对话在下一轮开始时跟上。只对 Anthropic 协议的模型打开思考，思考和回答共用 `BEEFTV_AGENT_MAX_TOKENS`（默认 16384）。 |
+| `thinkingLevel`（根会话） | 采用 | 默认 `low`（约 2048 个思考 token），可用 `HUABU_AGENT_THINKING` 改为 off、minimal、low、medium 或 high；已有对话在下一轮开始时跟上。只对 Anthropic 协议的模型打开思考，思考和回答共用 `HUABU_AGENT_MAX_TOKENS`（默认 16384）。 |
 | `GenerationTask.beforeRequest` hook | 采用 | 准备请求前重读 Go 授权、历史素材归属与补充输入，并在实际 HTTP dispatch 前转换已验证的媒体结果。 |
 | pi 的字节级空闲超时（undici `bodyTimeout` / `httpIdleTimeoutMs`） | 不采用 | 只按“收到任意字节”重置，SSE 心跳会把它续上；且不在 Durable 路径安装。宿主保留按实际文本/工具进展计时的空闲上限，见 `model-stream-idle.mjs`。 |
 | `compaction_*` / `auto_retry_*` | 不映射到面板 | Durable 的压缩与重试在官方任务内部完成；宿主 NDJSON 只发 `text_delta` 与工具 `lifecycle` 行。 |
@@ -76,7 +76,7 @@
 
 ## 已验证（钉选 1.2.0，本地替身，无付费模型）
 
-- `session-owner.test.mjs`：旧 JSONL v3 历史（用户消息、BeefTV 轮次）仍可读取；`handoffNote` 只取最近 20 条、总长截断到约 8000 字符；`readHandoffNote` 含旧会话文本，找不到会话时返回空说明。
+- `session-owner.test.mjs`：旧 JSONL v3 历史（用户消息、Huabu 轮次）仍可读取；`handoffNote` 只取最近 20 条、总长截断到约 8000 字符；`readHandoffNote` 含旧会话文本，找不到会话时返回空说明。
 - `session-identity.test.mjs`：同一 toolCallId 在两条会话不撞 operationId；旧 JSONL 会话仍能按 id 找回。
 - `session-lifecycle-host.test.mjs`：真实宿主 HTTP 新建/并发替换、忙碌 409、指针目录失败、SIGTERM 释放；旧 JSONL 会话发新消息会新建 Durable 会话，模型请求带上交接说明，后续回合走新会话（本地替身模型）。
 - `durable-session-owner-cases.mjs`：官方 Durable SQLite 崩溃/重放/steering/stop/history；`handoffSession` 用 `root.reset` 写入交接说明，模型请求带上旧会话文本。

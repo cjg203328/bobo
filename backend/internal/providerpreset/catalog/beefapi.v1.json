@@ -1,7 +1,7 @@
 {
   "id": "beefapi",
-  "displayName": "BeefTV",
-  "baseUrl": "https://beeftv.app",
+  "displayName": "Huabu",
+  "baseUrl": "https://huabu.app",
   "catalogProtocol": "openai",
   "presetVersion": 1,
   "pinned": true,

@@ -1,6 +1,6 @@
-# BeefTV: MiniMax H3 Max Turbo
+# Huabu: MiniMax H3 Max Turbo
 
-2026-10-13 implementation scope: the managed BeefTV catalog registers exactly `minimax-h3-max-turbo` as a video model using the BeefAPI gateway. fal credentials stay at the gateway. Custom providers with the same name keep their selected protocol.
+2026-10-13 implementation scope: the managed Huabu catalog registers exactly `minimax-h3-max-turbo` as a video model using the BeefAPI gateway. fal credentials stay at the gateway. Custom providers with the same name keep their selected protocol.
 
 The server catalog supplies whole-second duration (1–15, default 5), resolutions (768p default, 480p, 1080p), ratios and CNY second prices. Native sound has no mute switch; there is no watermark switch or reference-video input. One or two images are keyframes, not subject references. An explicit last frame may be sent without a first frame. One optional audio input pins the soundtrack; video and audio must each be at least two seconds. Model refresh persists the same configuration for desktop and frontend consumers.
 
@@ -12,4 +12,4 @@ On 2026-10-13, Ender's CNY 20 budget funded four real fal generations through a 
 
 `TestBeefAPIH3RealMediaDeliverySurvivesRestart` subsequently consumed only those existing files. It exercised local service ingestion, real SQLite schema, materialized assets, original-node binding, saved-canvas/SQLite reopening, byte-identical owned-resource playback reads, and idempotent recovery. All four cases passed without inference or credentials. Opt in with `FAL_H3_REAL_MEDIA_DIR`; this test is skipped in ordinary runs.
 
-Evidence is in `/Volumes/ExternalWork/beeftv/artifacts/h3-max-turbo-20261013/`. A fifth 3-second 768p task subsequently passed the installed native v1.7.18 CLI through the deployed gateway, authenticated content proxy, enterprise CNY settlement (0.73239), saved canvas, native playback and process restart with byte-identical resource readback. No sixth inference was submitted. See [the native production record](release-evidence/v1.7.18-review.md) for task IDs, source binding, cost uncertainty and CI. Public desktop release gates remain separate.
+Evidence is in `/Volumes/ExternalWork/huabu/artifacts/h3-max-turbo-20261013/`. A fifth 3-second 768p task subsequently passed the installed native v1.7.18 CLI through the deployed gateway, authenticated content proxy, enterprise CNY settlement (0.73239), saved canvas, native playback and process restart with byte-identical resource readback. No sixth inference was submitted. See [the native production record](release-evidence/v1.7.18-review.md) for task IDs, source binding, cost uncertainty and CI. Public desktop release gates remain separate.

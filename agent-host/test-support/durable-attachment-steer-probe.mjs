@@ -7,7 +7,7 @@ import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 const root = path.resolve(process.argv[2] || '.');
-const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-durable-http-steer-'));
+const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-durable-http-steer-'));
 const hostToken = 'fixture-http-steer';
 const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jfWQAAAAASUVORK5CYII=';
 let child, log = '', writes = 0, modelCalls = 0, base, releaseOld, releaseImage, imageArrived, releaseLatest;
@@ -16,7 +16,7 @@ const listen = server => new Promise(resolve => server.listen(0, '127.0.0.1', ()
 const read = async req => { let raw = ''; for await (const chunk of req) raw += chunk; return JSON.parse(raw || '{}'); };
 const closed = new Set();
 const ops = createServer(async (req, res) => {
-  assert.equal(req.headers['x-beeftv-agent-token'], hostToken);
+  assert.equal(req.headers['x-huabu-agent-token'], hostToken);
   res.setHeader('content-type', 'application/json');
   const turn = req.url.match(/\/assistant\/runtime\/turns\/([^/]+)(\/complete)?$/);
   if (turn) { if (turn[2]) closed.add(turn[1]); res.end(JSON.stringify({ code: 0, data: { turnId: turn[1], canvasId: 'canvas', open: !closed.has(turn[1]), revision: 1 } })); return; }
@@ -37,7 +37,7 @@ const ops = createServer(async (req, res) => {
 const provider = createServer(async (req, res) => {
   const body = await read(req); modelCalls++;
   if (modelCalls === 1) await new Promise(resolve => { releaseOld = resolve; });
-  else { assert(JSON.stringify(body.messages).includes('image_url')); assert(JSON.stringify(body.messages).includes('BEEFTV_INPUT:attachment-only')); }
+  else { assert(JSON.stringify(body.messages).includes('image_url')); assert(JSON.stringify(body.messages).includes('HUABU_INPUT:attachment-only')); }
   if (modelCalls === 3) await new Promise(resolve => { releaseLatest = resolve; });
   res.writeHead(200, { 'content-type': 'text/event-stream' });
   const isTool = modelCalls === 1 || modelCalls === 3;
@@ -46,13 +46,13 @@ const provider = createServer(async (req, res) => {
   frame(delta); frame({}, isTool ? 'tool_calls' : 'stop'); res.end('data: [DONE]\n\n');
 });
 const until = async check => { const end = Date.now() + 15000; while (!(await check())) { if (Date.now() > end) throw Error('HTTP fixture timeout: ' + log); await delay(20); } };
-const request = (route, body) => fetch(base + route, { method: body === undefined ? 'GET' : 'POST', headers: { 'content-type': 'application/json', 'X-Beeftv-Agent-Token': hostToken }, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(20000) });
+const request = (route, body) => fetch(base + route, { method: body === undefined ? 'GET' : 'POST', headers: { 'content-type': 'application/json', 'X-Huabu-Agent-Token': hostToken }, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(20000) });
 try {
   const opsPort = await listen(ops), providerPort = await listen(provider);
   const reservation = createServer(), hostPort = await listen(reservation); await new Promise(resolve => reservation.close(resolve));
   base = `http://127.0.0.1:${hostPort}`;
-  const env = { ...process.env, BEEFTV_AGENT_DATA_DIR: directory, BEEFTV_AGENT_PORT: String(hostPort), BEEFTV_OPS_URL: `http://127.0.0.1:${opsPort}/api`, BEEFTV_AGENT_HOST_TOKEN: hostToken,
-    BEEFTV_AGENT_API_KEY: 'fixture-only', BEEFTV_AGENT_API: 'openai-completions', BEEFTV_AGENT_MODEL: 'fixture', BEEFTV_AGENT_BASE_URL: `http://127.0.0.1:${providerPort}/v1`, BEEFTV_AGENT_TOTAL_REQUEST_BUDGET: '0' };
+  const env = { ...process.env, HUABU_AGENT_DATA_DIR: directory, HUABU_AGENT_PORT: String(hostPort), HUABU_OPS_URL: `http://127.0.0.1:${opsPort}/api`, HUABU_AGENT_HOST_TOKEN: hostToken,
+    HUABU_AGENT_API_KEY: 'fixture-only', HUABU_AGENT_API: 'openai-completions', HUABU_AGENT_MODEL: 'fixture', HUABU_AGENT_BASE_URL: `http://127.0.0.1:${providerPort}/v1`, HUABU_AGENT_TOTAL_REQUEST_BUDGET: '0' };
   child = spawn(process.execPath, [path.join(root, 'agent-host/server.mjs')], { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
   child.stdout.on('data', chunk => { log += chunk; }); child.stderr.on('data', chunk => { log += chunk; });
   await until(async () => { try { return (await request('/health')).ok; } catch { return false; } });

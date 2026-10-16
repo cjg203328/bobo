@@ -17,7 +17,7 @@
 
 ## 方案选择
 
-采用“按平台分包、Windows 按设备选择 CUDA/CPU”的方案：Windows CPU 包是所有 Windows x64 设备的保底能力，CUDA 包只供通过能力探测的 NVIDIA 设备使用。两种包固定相同的 Video Depth Anything Small 源码 commit、权重、BeefTV Worker 协议及输出合同。权重单独共用缓存，避免双份下载。主应用不内置 Python/PyTorch。
+采用“按平台分包、Windows 按设备选择 CUDA/CPU”的方案：Windows CPU 包是所有 Windows x64 设备的保底能力，CUDA 包只供通过能力探测的 NVIDIA 设备使用。两种包固定相同的 Video Depth Anything Small 源码 commit、权重、Huabu Worker 协议及输出合同。权重单独共用缓存，避免双份下载。主应用不内置 Python/PyTorch。
 
 不采用“只提供 CUDA 包”，因为它排除非 NVIDIA 用户；也不在本期引入 DirectML、ONNX 或多厂商 GPU 后端，因为这些需要独立模型算子与输出一致性验证，不能替代可工作的 CPU 保底。
 
@@ -27,7 +27,7 @@ Windows x64 的任务开始后，先完成输入校验，再用轻量系统探�
 
 1. CUDA 探测通过：选择 Windows CUDA 包，运行任务并记录 `device=cuda`。
 2. 无 CUDA 或设备初始化/模型算子探测失败：选择 Windows CPU 包，向用户明确显示“将使用 CPU，处理可能较慢”，记录 `device=cpu` 与回退原因。
-3. CUDA 推理运行中若出现明确的设备故障，清理该次未完成输出后，只自动重试一次 CPU。重试沿用同一 BeefTV 任务和结果节点，阶段文案说明已切换。不得产生两个资源、两个结果节点或无限重试。
+3. CUDA 推理运行中若出现明确的设备故障，清理该次未完成输出后，只自动重试一次 CPU。重试沿用同一 Huabu 任务和结果节点，阶段文案说明已切换。不得产生两个资源、两个结果节点或无限重试。
 4. 输入损坏、权重校验失败、下载失败、空间不足、取消及其他非设备故障不触发 CPU 回退，而是给出原始原因和可操作建议。
 
 CPU 提示应在实际运行 CPU 推理前可见，不能在用户等候很久后才出现。已验证的本机 CUDA 能力可按 Runtime/驱动版本缓存；检测失败、驱动变化或 Runtime 更新后重新探测。缓存不是跳过 Runtime 完整性校验的理由。
@@ -38,7 +38,7 @@ CPU 提示应在实际运行 CPU 推理前可见，不能在用户等候很久�
 
 CUDA ZIP 的 CI 实测体积为 3,736,173,977 字节，超过 [GitHub Release 单附件小于 2 GiB 的上限](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)。构建器须将超限包切成小于 2 GiB 的有序分片；签名清单分别记录每片 URL、大小、SHA-256，以及重组后完整 ZIP 的大小、SHA-256、文件数和解压体积。客户端逐片校验、断点恢复、重组后再次校验完整哈希，然后按现有安装路径解压；CPU 与 Mac 单文件包不受影响。CI 必须验证分片尺寸/哈希，且不能将未分片的 CUDA ZIP 作为一个 Release 附件上传。
 
-Windows 包在 Windows 构建环境中生成，包含可重定位的 Python、固定依赖、Video Depth Anything Small 固定源码、BeefTV Worker，以及可执行的 FFmpeg/ffprobe。安装器按平台和 variant 定位 Windows Python `.exe`，使用版本化独立目录、临时解压、自检后切换，并处理 Windows 文件占用和中断恢复。CPU 包不依赖 NVIDIA 驱动；CUDA 包随固定 PyTorch CUDA 构建携带其所需组件，但仍要求适配的系统驱动。首次使用的下载量、磁盘需求和进度在界面可见。
+Windows 包在 Windows 构建环境中生成，包含可重定位的 Python、固定依赖、Video Depth Anything Small 固定源码、Huabu Worker，以及可执行的 FFmpeg/ffprobe。安装器按平台和 variant 定位 Windows Python `.exe`，使用版本化独立目录、临时解压、自检后切换，并处理 Windows 文件占用和中断恢复。CPU 包不依赖 NVIDIA 驱动；CUDA 包随固定 PyTorch CUDA 构建携带其所需组件，但仍要求适配的系统驱动。首次使用的下载量、磁盘需求和进度在界面可见。
 
 模型权重继续单独缓存并共用。运行包和权重仍遵守现有许可证、固定来源与发布声明。Windows 进程取消须终止 Python 和 FFmpeg 子进程树，清理任务专属临时文件；不得误删源视频或已完成素材。
 

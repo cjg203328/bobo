@@ -9,18 +9,18 @@ import (
 )
 
 const (
-	ProductionOrigin = "https://beeftv.app"
+	ProductionOrigin = "https://huabu.app"
 	LegacyOrigin     = "https://enterprise.beefapi.com"
 	PreviewLocalHost = "enterprise.localhost"
-	ClientID         = "beeftv-enterprise-v1"
+	ClientID         = "huabu-enterprise-v1"
 	ClientScope      = "inference"
 	CredentialRef    = "beefapi-enterprise"
 	ChannelID        = "beefapi"
-	TestOriginEnv    = "BEEFTV_ENTERPRISE_TEST_ORIGIN"
+	TestOriginEnv    = "HUABU_ENTERPRISE_TEST_ORIGIN"
 	WalletPath       = "/console/topup"
 )
 
-// CanonicalOrigin defaults to BeefTV and only accepts the legacy enterprise
+// CanonicalOrigin defaults to Huabu and only accepts the legacy enterprise
 // origin or an explicit loopback test origin.
 func CanonicalOrigin(explicit string) (string, error) {
 	candidate := strings.TrimRight(strings.TrimSpace(explicit), "/")
@@ -146,5 +146,5 @@ func IsEnterpriseBaseURL(baseURL string) bool {
 		return false
 	}
 	host := strings.ToLower(parsed.Hostname())
-	return parsed.Scheme == "https" && parsed.User == nil && (parsed.Port() == "" || parsed.Port() == "443") && (host == "enterprise.beefapi.com" || host == "beeftv.app")
+	return parsed.Scheme == "https" && parsed.User == nil && (parsed.Port() == "" || parsed.Port() == "443") && (host == "enterprise.beefapi.com" || host == "huabu.app")
 }

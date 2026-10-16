@@ -72,7 +72,7 @@ rsync -a \
     --exclude='web/.reference-*' \
     --exclude='web/.canvas-probe-*' \
     --exclude='web/test/.agent-reliability-*' \
-    --include='web/scripts/beeftv-local-network-audit.mjs' \
+    --include='web/scripts/huabu-local-network-audit.mjs' \
     --exclude='web/scripts/*audit*' \
     --exclude='web/scripts/*probe*' \
     --exclude='web/scripts/*smoke*' \
@@ -95,4 +95,4 @@ rsync -a \
     --exclude='*.bak' \
     "$source_directory/" "$destination_directory/"
 
-printf 'exported BeefTV public source to %s\n' "$destination_directory"
+printf 'exported Huabu public source to %s\n' "$destination_directory"

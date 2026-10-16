@@ -21,7 +21,7 @@ beforeAll(async () => {
     // Use the same PostCSS plugin as Vite, compiling current source rather than stale dist assets.
     const cssPath = import.meta.dir + "/../src/styles/globals.css";
     const css = (await postcss([tailwind({ base: import.meta.dir + "/.." })]).process(readFileSync(cssPath, "utf8"), { from: cssPath })).css
-        + readFileSync(import.meta.dir + "/../src/styles/beeftv-local-overrides.css", "utf8")
+        + readFileSync(import.meta.dir + "/../src/styles/huabu-local-overrides.css", "utf8")
         + readFileSync(import.meta.dir + "/../src/styles/workspace-product.css", "utf8");
     server = Bun.serve({ port: 0, fetch(request) {
         const url = new URL(request.url);
@@ -110,9 +110,9 @@ test("keyframe explanation fits light desktop and dark 390px panels", async () =
             await assertLocked(page);
             expect(await page.getByText("视频比例由首帧图片决定。需要其他比例时，请先裁切或扩图，再生成视频。", { exact: true }).evaluate((element) => getComputedStyle(element).fontSize)).toBe("12px");
             expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-            if (process.env.BEEFTV_UI_EVIDENCE_DIR) {
-                mkdirSync(process.env.BEEFTV_UI_EVIDENCE_DIR, { recursive: true });
-                await page.locator(".canvas-image-settings-popover").screenshot({ path: `${process.env.BEEFTV_UI_EVIDENCE_DIR}/h3-aspect-${dark ? "dark-390" : "light-desktop"}.png` });
+            if (process.env.HUABU_UI_EVIDENCE_DIR) {
+                mkdirSync(process.env.HUABU_UI_EVIDENCE_DIR, { recursive: true });
+                await page.locator(".canvas-image-settings-popover").screenshot({ path: `${process.env.HUABU_UI_EVIDENCE_DIR}/h3-aspect-${dark ? "dark-390" : "light-desktop"}.png` });
             }
             expect(errors).toEqual([]);
         } finally { await page.close(); }

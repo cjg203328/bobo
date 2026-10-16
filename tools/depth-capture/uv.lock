@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "beeftv-depth-capture"
+name = "huabu-depth-capture"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

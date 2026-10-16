@@ -20,7 +20,7 @@ import urllib.request
 from urllib.parse import urlsplit
 
 PLATFORMS = {"darwin-arm64", "darwin-amd64", "windows-amd64", "linux-amd64"}
-PREFIX = "beeftv"
+PREFIX = "huabu"
 LATEST = f"{PREFIX}/desktop-update.json"
 IMMUTABLE = "public, max-age=31536000, immutable"
 REVALIDATE = "no-store, max-age=0"
@@ -59,7 +59,7 @@ def fingerprint(path):
 def signed_payload(path, verifier):
     if Path(path).stat().st_size > MAX_MANIFEST:
         raise PublishError("Manifest is too large")
-    # The Go verifier reads BEEFTV_UPDATER_PUBLIC_KEY itself; no key in argv/logs.
+    # The Go verifier reads HUABU_UPDATER_PUBLIC_KEY itself; no key in argv/logs.
     result = run([str(verifier), "verify", "--envelope", str(path)])
     if result.returncode:
         raise PublishError("Manifest signature or schema verification failed")
@@ -111,7 +111,7 @@ class PublicHTTP:
         digest = hashlib.sha256()
         size = 0
         try:
-            request = urllib.request.Request(url, headers={"Cache-Control": "no-cache", "User-Agent": f"BeefTV-Desktop-Updater/{version}"})
+            request = urllib.request.Request(url, headers={"Cache-Control": "no-cache", "User-Agent": f"Huabu-Desktop-Updater/{version}"})
             with self.opener(request, timeout=60) as response:
                 if response.status != 200:
                     raise PublishError("Public object did not return HTTP 200")
@@ -135,7 +135,7 @@ def require_github_release(payload, manifest, public):
             or not release.get("published_at") or release.get("tag_name") != payload["version"]
             or release.get("target_commitish") != payload["commit"]):
         raise PublishError("GitHub release is not published for this exact commit")
-    expected = {f"BeefTV-{payload['version']}-{platform}.zip" for platform in PLATFORMS}
+    expected = {f"Huabu-{payload['version']}-{platform}.zip" for platform in PLATFORMS}
     expected.add("desktop-update.json")
     uploaded = {asset.get("name") for asset in release.get("assets", []) if asset.get("state") == "uploaded"}
     if not expected.issubset(uploaded):
@@ -157,7 +157,7 @@ class Publisher:
         if set(payload["platforms"]) != PLATFORMS:
             raise PublishError("Manifest must contain exactly all four desktop platforms")
         for platform, asset in payload["platforms"].items():
-            name = f"BeefTV-{payload['version']}-{platform}.zip"
+            name = f"Huabu-{payload['version']}-{platform}.zip"
             if asset["url"] != f"{self.public_base}/{payload['version']}/{name}":
                 raise PublishError("Manifest asset URL does not match immutable public version path")
             if type(asset["size"]) is not int or not 0 < asset["size"] <= 2 << 30:
@@ -168,7 +168,7 @@ class Publisher:
 
     def immutable_put(self, key, source):
         expected = fingerprint(source)
-        with tempfile.TemporaryDirectory(prefix="beeftv-r2-check-") as directory:
+        with tempfile.TemporaryDirectory(prefix="huabu-r2-check-") as directory:
             previous = Path(directory) / "object"
             etag = self.store.get(key, previous)
             if etag is None:
@@ -189,7 +189,7 @@ class Publisher:
                     "windows-amd64": "-setup.exe", "linux-amd64": ".deb"}
         sources = []
         for platform, suffix in suffixes.items():
-            name = f"BeefTV-{payload['version']}-{platform}{suffix}"
+            name = f"Huabu-{payload['version']}-{platform}{suffix}"
             source = Path(assets_dir) / name
             if not source.is_file() or source.stat().st_size == 0:
                 raise PublishError(f"Installer missing: {name}")
@@ -205,7 +205,7 @@ class Publisher:
         payload = self.load(manifest)
         sources = []
         for platform, asset in payload["platforms"].items():
-            name = f"BeefTV-{payload['version']}-{platform}.zip"
+            name = f"Huabu-{payload['version']}-{platform}.zip"
             source = Path(assets_dir) / name
             if not source.is_file() or fingerprint(source) != (asset["size"], asset["sha256"]):
                 raise PublishError(f"Local archive missing or size/hash mismatch: {name}")
@@ -224,7 +224,7 @@ class Publisher:
             self.check_installers(payload, self.installer_sources(payload, installer_dir))
         self.release_check(payload, manifest, self.public)
         self.public_check(payload, manifest)
-        with tempfile.TemporaryDirectory(prefix="beeftv-r2-latest-") as directory:
+        with tempfile.TemporaryDirectory(prefix="huabu-r2-latest-") as directory:
             previous = Path(directory) / "previous.json"
             etag = self.store.get(LATEST, previous)
             if etag is not None:
@@ -256,8 +256,8 @@ def main():
     parser.add_argument("--with-installers", action="store_true")
     parser.add_argument("--verifier", type=Path, required=True, help="Binary built from backend/cmd/update-release")
     parser.add_argument("--endpoint-url", required=True)
-    parser.add_argument("--bucket", default="beeftv-releases")
-    parser.add_argument("--public-base", default="https://updates.beefapi.com/beeftv")
+    parser.add_argument("--bucket", default="huabu-releases")
+    parser.add_argument("--public-base", default="https://updates.beefapi.com/huabu")
     args = parser.parse_args()
     try:
         if not re.fullmatch(r"https://[a-f0-9]{32}\.r2\.cloudflarestorage\.com/?", args.endpoint_url):
@@ -268,7 +268,7 @@ def main():
                 raise PublishError("Release endpoint and public base must be plain HTTPS URLs")
         publisher = Publisher(S3(args.endpoint_url, args.bucket), PublicHTTP(), args.verifier.resolve(), args.public_base)
         # Snapshot the verified envelope so a changed local file cannot be activated.
-        with tempfile.TemporaryDirectory(prefix="beeftv-r2-manifest-") as directory:
+        with tempfile.TemporaryDirectory(prefix="huabu-r2-manifest-") as directory:
             manifest = Path(directory) / "desktop-update.json"
             if args.manifest.stat().st_size > MAX_MANIFEST:
                 raise PublishError("Manifest is too large")

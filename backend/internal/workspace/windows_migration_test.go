@@ -12,7 +12,7 @@ import (
 )
 
 func TestWindowsCrossVolumeSQLiteAndEncryptedConfigSurviveRestart(t *testing.T) {
-	volume := os.Getenv("BEEFTV_TEST_SECOND_VOLUME")
+	volume := os.Getenv("HUABU_TEST_SECOND_VOLUME")
 	if volume == "" {
 		t.Skip("native second volume not requested")
 	}
@@ -21,7 +21,7 @@ func TestWindowsCrossVolumeSQLiteAndEncryptedConfigSurviveRestart(t *testing.T) 
 		t.Skip("Python SQLite fixture unavailable")
 	}
 	source := t.TempDir()
-	target, err := os.MkdirTemp(volume, "BeefTV-workspace-test-")
+	target, err := os.MkdirTemp(volume, "Huabu-workspace-test-")
 	if err != nil {
 		t.Fatal(err)
 	}

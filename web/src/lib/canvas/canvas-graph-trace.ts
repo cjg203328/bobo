@@ -1,6 +1,6 @@
 import type { CanvasProject } from "@/stores/canvas/use-canvas-store";
 
-export const CANVAS_GRAPH_TRACE_KEY = "beeftv:canvas-graph-trace:v1";
+export const CANVAS_GRAPH_TRACE_KEY = "huabu:canvas-graph-trace:v1";
 type Graph = Partial<Pick<CanvasProject, "id" | "revision" | "nodes" | "connections">>;
 
 function summary(graph: Graph | null | undefined) {

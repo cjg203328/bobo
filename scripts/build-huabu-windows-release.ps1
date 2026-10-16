@@ -1,15 +1,15 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Native Windows amd64 release entrypoint for the BeefTV Wails desktop app.
+    Native Windows amd64 release entrypoint for the Huabu Wails desktop app.
 
 .DESCRIPTION
-    Builds the same desktop source as scripts/build-beeftv-release.sh, packages
-    official *.beeftv-plugin archives next to BeefTV.exe, and fails loudly when
+    Builds the same desktop source as scripts/build-huabu-release.sh, packages
+    official *.beeftv-plugin archives next to Huabu.exe, and fails loudly when
     CGO/go-sqlite3 compiler prerequisites are missing.
 
     This script does not install compilers, Bun, Go, Git, WebView2, or NSIS.
-    It does not run scripts/verify-beeftv-local-release.sh (that gate still owns
+    It does not run scripts/verify-huabu-local-release.sh (that gate still owns
     local contract checks). Native compile and launch acceptance stay on Windows.
 
     Official docs used for tool assumptions:
@@ -21,7 +21,7 @@
     - Go 1.25+ Windows CGO DWARF 5 / binutils 2.37+: https://go.dev/wiki/MinimumRequirements#cgo
 
 .OUTPUTS
-    backend\cmd\desktop\build\bin\BeefTV.exe
+    backend\cmd\desktop\build\bin\Huabu.exe
     backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 #>
 [CmdletBinding()]
@@ -34,14 +34,14 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $false
 
 if ($env:OS -ne "Windows_NT") {
-    throw "scripts/build-beeftv-windows-release.ps1 is the native Windows entrypoint. On macOS/Linux use scripts/build-beeftv-release.sh. Cross-compiling from another OS is not native acceptance."
+    throw "scripts/build-huabu-windows-release.ps1 is the native Windows entrypoint. On macOS/Linux use scripts/build-huabu-release.sh. Cross-compiling from another OS is not native acceptance."
 }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $desktopDir = Join-Path $repoRoot "backend\cmd\desktop"
 $pluginSourceDir = Join-Path $repoRoot "plugin-packages"
 $binDir = Join-Path $desktopDir "build\bin"
-$exePath = Join-Path $binDir "BeefTV.exe"
+$exePath = Join-Path $binDir "Huabu.exe"
 $pluginResourceDir = Join-Path $binDir "plugin-packages"
 $versionFile = Join-Path $repoRoot "VERSION"
 $wailsModule = "github.com/wailsapp/wails/v2/cmd/wails@v2.16.0"
@@ -168,7 +168,7 @@ function Test-PluginZipEntries([string]$ZipPath) {
         }
         foreach ($name in $names) {
             if ($name.Contains("\")) {
-                throw "Plugin package $ZipPath entry '$name' uses backslash paths. BeefTV rejects those archives; zip entries must use forward slashes."
+                throw "Plugin package $ZipPath entry '$name' uses backslash paths. Huabu rejects those archives; zip entries must use forward slashes."
             }
         }
     }
@@ -279,15 +279,15 @@ if ($versionValue -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$') {
 $failures = New-Object System.Collections.Generic.List[string]
 
 $goPath = Get-CommandPath "go"
-if (-not $goPath -and $env:BEEFTV_GO_DIR) {
-    $bundledGo = Join-Path $env:BEEFTV_GO_DIR "bin\go.exe"
+if (-not $goPath -and $env:HUABU_GO_DIR) {
+    $bundledGo = Join-Path $env:HUABU_GO_DIR "bin\go.exe"
     if (Test-Path -LiteralPath $bundledGo -PathType Leaf) {
         $env:PATH = "$(Split-Path -Parent $bundledGo);$env:PATH"
         $goPath = $bundledGo
     }
 }
 if (-not $goPath) {
-    $failures.Add("Go is required on PATH, or set BEEFTV_GO_DIR to a toolchain directory that contains bin\go.exe")
+    $failures.Add("Go is required on PATH, or set HUABU_GO_DIR to a toolchain directory that contains bin\go.exe")
 }
 
 $bunPath = Get-CommandPath "bun"
@@ -370,12 +370,12 @@ if ([string]::IsNullOrWhiteSpace($env:CANVAS_BUILD_TIME)) {
 }
 $env:CANVAS_BUILD_VERSION = $versionValue
 $ldflags = "-X infinite-canvas/backend/internal/buildinfo.Version=$versionValue -X infinite-canvas/backend/internal/buildinfo.Commit=$commitValue -X infinite-canvas/backend/internal/buildinfo.BuildTime=$($env:CANVAS_BUILD_TIME)"
-if (-not [string]::IsNullOrWhiteSpace($env:BEEFTV_UPDATER_PUBLIC_KEY)) {
+if (-not [string]::IsNullOrWhiteSpace($env:HUABU_UPDATER_PUBLIC_KEY)) {
     Write-Step "Injecting desktop updater FeedURL and PublicKey ldflags"
     $previousLocation = Get-Location
     Set-Location (Join-Path $repoRoot "backend")
     try {
-        $ldflagsResult = Invoke-NativeExecutable -FilePath "go" -ArgumentList @("run", "./cmd/update-release", "print-ldflags") -CaptureOutput -FailureMessage "update-release print-ldflags failed. Set BEEFTV_UPDATER_PUBLIC_KEY to the base64 32-byte Ed25519 public key that matches GitHub variable BEEFTV_UPDATER_PUBLIC_KEY."
+        $ldflagsResult = Invoke-NativeExecutable -FilePath "go" -ArgumentList @("run", "./cmd/update-release", "print-ldflags") -CaptureOutput -FailureMessage "update-release print-ldflags failed. Set HUABU_UPDATER_PUBLIC_KEY to the base64 32-byte Ed25519 public key that matches GitHub variable HUABU_UPDATER_PUBLIC_KEY."
         $updaterLdflags = ([string]$ldflagsResult.Output).Trim()
         if ([string]::IsNullOrWhiteSpace($updaterLdflags)) {
             throw "update-release print-ldflags produced no output"
@@ -386,11 +386,11 @@ if (-not [string]::IsNullOrWhiteSpace($env:BEEFTV_UPDATER_PUBLIC_KEY)) {
         Set-Location $previousLocation
     }
 }
-if (-not [string]::IsNullOrWhiteSpace($env:BEEFTV_EXTRA_LDFLAGS)) {
-    $ldflags = "$ldflags $($env:BEEFTV_EXTRA_LDFLAGS.Trim())"
+if (-not [string]::IsNullOrWhiteSpace($env:HUABU_EXTRA_LDFLAGS)) {
+    $ldflags = "$ldflags $($env:HUABU_EXTRA_LDFLAGS.Trim())"
 }
 
-Write-Step "Building BeefTV $versionValue ($commitValue) for windows/amd64"
+Write-Step "Building Huabu $versionValue ($commitValue) for windows/amd64"
 $appIconSource = Join-Path $repoRoot "assets\app-icon.png"
 $buildDir = Join-Path $desktopDir "build"
 New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
@@ -440,30 +440,30 @@ Invoke-NativeExecutable -FilePath "bun" -ArgumentList @((Join-Path $repoRoot "sc
 # Keep media inside the sidecar tree accepted by already released updaters.
 & (Join-Path $repoRoot "scripts\package-media-runtime-windows.ps1") -Destination (Join-Path $binDir "agent-host\media-runtime")
 
-# The beeftv CLI ships with the app. External agents (Codex, Claude Code,
+# The huabu CLI ships with the app. External agents (Codex, Claude Code,
 # Cursor) connect through it with their own client credential, so the installed
 # app must carry it; it is not expected on the user PATH.
 #
-# It goes in a cli subdirectory, not directly next to BeefTV.exe: Windows file
-# names are case-insensitive, so beeftv.exe beside BeefTV.exe is the same name.
+# It goes in a cli subdirectory, not directly next to Huabu.exe: Windows file
+# names are case-insensitive, so huabu.exe beside Huabu.exe is the same name.
 $cliDir = Join-Path $binDir "cli"
 New-Item -ItemType Directory -Force -Path $cliDir | Out-Null
-$cliPath = Join-Path $cliDir "beeftv.exe"
+$cliPath = Join-Path $cliDir "huabu.exe"
 Push-Location (Join-Path $repoRoot "backend")
 try {
-    [void](Invoke-NativeExecutable -FilePath "go" -ArgumentList @("build", "-trimpath", "-ldflags", $ldflags, "-o", $cliPath, "./cmd/beeftv") -FailureMessage "beeftv CLI build failed")
+    [void](Invoke-NativeExecutable -FilePath "go" -ArgumentList @("build", "-trimpath", "-ldflags", $ldflags, "-o", $cliPath, "./cmd/huabu") -FailureMessage "huabu CLI build failed")
 }
 finally {
     Pop-Location
 }
 if (-not (Test-Path -LiteralPath $cliPath -PathType Leaf)) {
-    throw "beeftv CLI was not built next to $exePath"
+    throw "huabu CLI was not built next to $exePath"
 }
 
 Write-Host "Release executable: $exePath"
 Write-Host "Bundled agent CLI: $cliPath"
 Write-Host "Official plugins: $pluginResourceDir ($($copied.Count) packages)"
-Write-Host "Launch data directory (unless CANVAS_DESKTOP_DATA_DIR is set): %AppData%\BeefTV"
+Write-Host "Launch data directory (unless CANVAS_DESKTOP_DATA_DIR is set): %AppData%\Huabu"
 Write-Host "Official plugins are loaded from the executable directory, not from the process working directory."
 Write-Host "WebView2 is required at runtime; Windows 11 usually already has it. Missing runtimes use Wails -webview2 download. See https://wails.io/docs/guides/windows"
-Write-Host "This machine still has to launch BeefTV.exe before the Windows build is accepted. NSIS installer output is not produced."
+Write-Host "This machine still has to launch Huabu.exe before the Windows build is accepted. NSIS installer output is not produced."

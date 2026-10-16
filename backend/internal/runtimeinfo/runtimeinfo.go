@@ -1,7 +1,7 @@
 // Package runtimeinfo 描述「正在运行的本机工作区」这一事实：地址、进程、版本。
 //
 // 桌面后端监听的是动态端口，外部客户端没法猜。桌面运行时在开始监听后把地址写进
-// 描述文件（0600），干净退出时删掉；CLI 在没有显式 BEEFTV_BASE_URL 时读它。
+// 描述文件（0600），干净退出时删掉；CLI 在没有显式 HUABU_BASE_URL 时读它。
 // Windows 使用用户目录下、AppData 之外的唯一位置，避免 MSIX 的 AppData 影子文件。
 // 其他平台保留数据目录里的 runtime.json。已退出进程的描述文件视为过期。
 //
@@ -135,12 +135,12 @@ func Discover(dataDir string) (Info, bool) {
 }
 
 // DefaultDataDir 与桌面应用的 defaultDataDir（backend/cmd/desktop/main.go）保持同一套规则：
-// CANVAS_DESKTOP_DATA_DIR 覆盖优先，否则用户配置目录下的 BeefTV
-// （macOS ~/Library/Application Support/BeefTV，Windows %AppData%\BeefTV）。
+// CANVAS_DESKTOP_DATA_DIR 覆盖优先，否则用户配置目录下的 Huabu
+// （macOS ~/Library/Application Support/Huabu，Windows %AppData%\Huabu）。
 // 使用与桌面相同的已选存储目录指针，不依赖桌面 main 包。
-// BEEFTV_DATA_DIR 是 CLI 侧的显式指定，用来连非默认目录的工作区。
+// HUABU_DATA_DIR 是 CLI 侧的显式指定，用来连非默认目录的工作区。
 func DefaultDataDir() (string, error) {
-	for _, name := range []string{"BEEFTV_DATA_DIR", "CANVAS_DESKTOP_DATA_DIR"} {
+	for _, name := range []string{"HUABU_DATA_DIR", "CANVAS_DESKTOP_DATA_DIR"} {
 		if override := strings.TrimSpace(os.Getenv(name)); override != "" {
 			return override, nil
 		}
@@ -149,5 +149,5 @@ func DefaultDataDir() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("定位用户应用数据目录: %w", err)
 	}
-	return desktopstorage.Resolve(filepath.Join(root, "BeefTV"))
+	return desktopstorage.Resolve(filepath.Join(root, "Huabu"))
 }

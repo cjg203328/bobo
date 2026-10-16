@@ -29,7 +29,7 @@ func newDesktopHarness(t *testing.T) *desktopHarness {
 	if err != nil {
 		t.Fatal(err)
 	}
-	name := "beeftv"
+	name := "huabu"
 	if runtime.GOOS == "windows" {
 		name += ".exe"
 	}
@@ -85,10 +85,10 @@ func (h *desktopHarness) call(options requestOptions) *httptest.ResponseRecorder
 		request.Header.Set("X-Desktop-Token", options.launchToken)
 	}
 	if options.uiBootstrap != "" {
-		request.Header.Set("X-Beeftv-UI-Bootstrap", options.uiBootstrap)
+		request.Header.Set("X-Huabu-UI-Bootstrap", options.uiBootstrap)
 	}
 	if options.clientID != "" {
-		request.Header.Set("X-Beeftv-Client", options.clientID)
+		request.Header.Set("X-Huabu-Client", options.clientID)
 		request.Header.Set("Authorization", "Bearer "+options.clientToken)
 	}
 	for name, value := range options.extraHeaders {
@@ -352,12 +352,12 @@ func TestAgentClientSetupShapes(t *testing.T) {
 			if err := json.Unmarshal([]byte(value), &config); err != nil {
 				t.Fatal(err)
 			}
-			entry := config.Servers["beeftv"]
+			entry := config.Servers["huabu"]
 			if !filepath.IsAbs(entry.Command) || filepath.Base(filepath.Dir(entry.Command)) != "cli" {
 				t.Fatalf("unsafe CLI command: %q", entry.Command)
 			}
-			if entry.Env["BEEFTV_DATA_DIR"] != harness.dataDir {
-				t.Fatalf("wrong workspace directory: %q", entry.Env["BEEFTV_DATA_DIR"])
+			if entry.Env["HUABU_DATA_DIR"] != harness.dataDir {
+				t.Fatalf("wrong workspace directory: %q", entry.Env["HUABU_DATA_DIR"])
 			}
 		}
 		if title, _ := setup["title"].(string); title == "" {

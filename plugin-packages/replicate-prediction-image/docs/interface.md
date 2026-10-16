@@ -84,18 +84,18 @@
 
 这是运行时/工作流协议，模型字段由 endpoint、version 或 workflow schema 决定。插件不伪造固定模型字段；providerOptions.input/workflow/prompt 是完整请求对象，并由 conformance fixture 锁定实际接入版本。
 
-<!-- BEEFTV_PLUGIN_MANIFEST_START -->
+<!-- HUABU_PLUGIN_MANIFEST_START -->
 ## Manifest 完整接口定义
 
 以下 JSON 与插件包内实际 `manifest.json` 逐字段一致，覆盖插件身份、权限、配置、鉴权、参数、校验、创建、Agent、查询、取消、结果下载、响应和 Agent 响应映射。`documentation` 字段的值就是当前完整文档；为避免文档在自身内部无限递归，JSON 中仅用等义占位文本表示正文。
 
 ```json
 {
-  "apiVersion": "beeftv.plugin/v2",
+  "apiVersion": "huabu.plugin/v2",
   "id": "replicate-prediction-image",
   "name": "Replicate Predictions Image",
   "version": "2.0.0",
-  "author": "BeefTV Contributors",
+  "author": "Huabu Contributors",
   "description": "Replicate Predictions Image 独立请求协议插件。",
   "documentation": "<当前插件的完整 documentation，由 README.md 与 docs/interface.md 拼接而成；为避免 JSON 递归，此处不重复展开正文。>",
   "permissions": [
@@ -347,4 +347,4 @@
   }
 }
 ```
-<!-- BEEFTV_PLUGIN_MANIFEST_END -->
+<!-- HUABU_PLUGIN_MANIFEST_END -->

@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 将 BeefTV 导演节点的空态、封面、悬停打开、独立场景描述与关闭后封面更新，对齐已观察的 LibTV 画布流程，并逐步验证。
+**Goal:** 将 Huabu 导演节点的空态、封面、悬停打开、独立场景描述与关闭后封面更新，对齐已观察的 LibTV 画布流程，并逐步验证。
 
 **Architecture:** 保留现有 `workflowKind: "shot"`、模板创建、`DirectorScene` 保存和显式 `applyDirectorOutput`。导演节点增加独立持久化封面字段，关闭工作台时在视口卸载前截图；场景保存确认后仅更新原节点封面，不走通用视频生成或额外输出节点路径。
 
-**Tech Stack:** React/TypeScript、Bun test、Three.js 视口、现有 BeefTV 本地资源服务、Playwright。
+**Tech Stack:** React/TypeScript、Bun test、Three.js 视口、现有 Huabu 本地资源服务、Playwright。
 
 **Spec:** `docs/superpowers/specs/2026-09-29-libtv-director-canvas-stage-design.md`
 

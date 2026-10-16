@@ -16,7 +16,7 @@ func PrepareWAV(ctx context.Context, reader io.Reader, mime string) (string, fun
 	if _, err := exec.LookPath("ffmpeg"); err != nil {
 		return "", nil, fmt.Errorf("音频预处理依赖未安装（需要 ffmpeg）")
 	}
-	tmpDir, err := os.MkdirTemp("", "beeftv-whisper-*")
+	tmpDir, err := os.MkdirTemp("", "huabu-whisper-*")
 	if err != nil {
 		return "", nil, fmt.Errorf("创建临时目录失败: %w", err)
 	}

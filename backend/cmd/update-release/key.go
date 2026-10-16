@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	privateKeyEnv = "BEEFTV_UPDATER_PRIVATE_KEY"
-	publicKeyEnv  = "BEEFTV_UPDATER_PUBLIC_KEY"
+	privateKeyEnv = "HUABU_UPDATER_PRIVATE_KEY"
+	publicKeyEnv  = "HUABU_UPDATER_PUBLIC_KEY"
 )
 
 func cmdGenKey(args []string, stdout, stderr io.Writer) error {

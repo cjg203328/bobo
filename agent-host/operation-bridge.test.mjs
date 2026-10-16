@@ -92,8 +92,8 @@ describe('操作桥', () => {
       for await (const chunk of req) body += chunk;
       seen.push({
         url: req.url,
-        token: req.headers['x-beeftv-agent-token'],
-        turn: req.headers['x-beeftv-agent-turn'],
+        token: req.headers['x-huabu-agent-token'],
+        turn: req.headers['x-huabu-agent-turn'],
         body: body ? JSON.parse(body) : {},
       });
       if (req.url === '/ops') {

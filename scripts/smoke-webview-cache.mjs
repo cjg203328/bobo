@@ -12,7 +12,7 @@ while (Date.now() < deadline) {
   } catch (error) { inspection = String(error.cause || error); }
   await new Promise(resolve => setTimeout(resolve, 500));
 }
-if (!target?.webSocketDebuggerUrl) throw new Error('Actual BeefTV WebView did not start: ' + inspection);
+if (!target?.webSocketDebuggerUrl) throw new Error('Actual Huabu WebView did not start: ' + inspection);
 const socket = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((resolve, reject) => {
   socket.addEventListener('open', resolve, { once: true });
@@ -37,7 +37,7 @@ function evaluate(expression) {
 }
 const expression = `(async () => {
   const db = await new Promise((resolve, reject) => {
-    const request = indexedDB.open('beeftv-installer-acceptance', 1);
+    const request = indexedDB.open('huabu-installer-acceptance', 1);
     request.onupgradeneeded = () => request.result.createObjectStore('drafts');
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);

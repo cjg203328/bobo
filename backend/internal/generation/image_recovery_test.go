@@ -52,16 +52,16 @@ func TestDoBinaryRecoverableImageMissingOwnerSendsZeroHTTP(t *testing.T) {
 	}
 }
 
-func TestBeefTVImageSubmissionKeepsRecoveryOwner(t *testing.T) {
+func TestHuabuImageSubmissionKeepsRecoveryOwner(t *testing.T) {
 	ctx, cancel := context.WithCancel(WithImageReplayProtocol(context.Background(), ImageReplayProtocol))
 	cancel()
 	for _, path := range []string{"/v1/images/generations", "/v1/images/edits"} {
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://beeftv.app"+path, strings.NewReader(`{}`))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://huabu.app"+path, strings.NewReader(`{}`))
 		if err != nil {
 			t.Fatal(err)
 		}
 		if _, _, err = DoBinary(req); !errors.Is(err, ErrImageOwnerMissing) {
-			t.Fatalf("BeefTV %s bypassed recovery owner: %v", path, err)
+			t.Fatalf("Huabu %s bypassed recovery owner: %v", path, err)
 		}
 	}
 }

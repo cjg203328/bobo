@@ -19,13 +19,13 @@ beforeAll(async () => {
     const js = await build.outputs.find((output) => output.path.endsWith(".js"))!.text();
     const cssPath = import.meta.dir + "/../src/styles/globals.css";
     const css = (await postcss([tailwind({ base: import.meta.dir + "/.." })]).process(readFileSync(cssPath, "utf8"), { from: cssPath })).css
-        + readFileSync(import.meta.dir + "/../src/styles/beeftv-local-overrides.css", "utf8")
+        + readFileSync(import.meta.dir + "/../src/styles/huabu-local-overrides.css", "utf8")
         + readFileSync(import.meta.dir + "/../src/styles/workspace-product.css", "utf8")
         + await build.outputs.find((output) => output.path.endsWith(".css"))!.text();
     const providers = [
         { id: "newapi", name: "OpenAI Videos / Sora", create: "POST /v1/videos", poll: "GET /v1/videos/{task_id}", contentType: "multipart/form-data" },
         { id: "video-generations-json", name: "视频生成 JSON · ratio / duration", create: "POST /v1/video/generations", poll: "GET /v1/video/generations/{task_id}", contentType: "application/json" },
-    ].map((provider) => ({ ...provider, version: "1.0.0", vendor: "BeefTV", categories: ["video"], scopes: ["user.custom-channel"], enabled: true }));
+    ].map((provider) => ({ ...provider, version: "1.0.0", vendor: "Huabu", categories: ["video"], scopes: ["user.custom-channel"], enabled: true }));
     server = Bun.serve({ port: 0, fetch(request) {
         const url = new URL(request.url);
         if (url.pathname === "/harness.js") return new Response(js, { headers: { "Content-Type": "application/javascript" } });
@@ -83,7 +83,7 @@ for (const [width, dark] of [[1280, false], [390, true]] as const) {
             expect(box.x).toBeGreaterThanOrEqual(0);
             expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
             expect(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
-            const output = process.env.BEEFTV_TEST_SCREENSHOT_DIR;
+            const output = process.env.HUABU_TEST_SCREENSHOT_DIR;
             if (output) { mkdirSync(output, { recursive: true }); await page.screenshot({ path: `${output}/external-video-${width}.png`, fullPage: true, animations: "disabled" }); }
             await page.getByRole("button", { name: /^完\s*成$/ }).click();
             await page.getByRole("button", { name: "保存并使用", exact: true }).click();

@@ -36,12 +36,12 @@ async function skillFixture(directory, { thinkingLevel, script = () => null, gat
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const runtime = await ModelRuntime.create({ authPath: path.join(directory, 'auth.json'), modelsPath: null, refreshOnCreate: false });
-  runtime.registerProvider('beeftv', { api: 'openai-completions', apiKey: 'synthetic', baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
+  runtime.registerProvider('huabu', { api: 'openai-completions', apiKey: 'synthetic', baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
     models: [{ id: 'thinker', name: 'thinker', reasoning: true, input: ['text'], contextWindow: 200000, maxTokens: 16384,
       compat: { supportsReasoningEffort: true }, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }] });
-  const models = createModels(); models.setProvider(runtime.getProvider('beeftv'));
+  const models = createModels(); models.setProvider(runtime.getProvider('huabu'));
   const store = createDurableSessionStore({ sessionRoot: path.join(directory, 'sessions'), workspaceRoot: path.join(directory, 'workspace'),
-    getModels: () => models, getModelRef: () => ({ provider: 'beeftv', modelId: 'thinker' }), buildTools: () => [],
+    getModels: () => models, getModelRef: () => ({ provider: 'huabu', modelId: 'thinker' }), buildTools: () => [],
     authorizeTurn: async () => ({ open: true, canvasId: 'canvas', permissionMode: 'canvas' }), settings: { retry: { maxRetries: 0 } },
     ...(thinkingLevel ? { thinkingLevel } : {}),
     skills: {
@@ -56,7 +56,7 @@ const text = (message) => typeof message.content === 'string' ? message.content 
 const userText = (payload) => payload.messages.filter((m) => m.role === 'user').map(text).join('\n');
 const systemText = (payload) => payload.messages.filter((m) => m.role === 'system' || m.role === 'developer').map(text).join('\n');
 const count = (haystack, needle) => haystack.split(needle).length - 1;
-const temp = (name) => fs.mkdtempSync(path.join(os.tmpdir(), `beeftv-skills-${name}-`));
+const temp = (name) => fs.mkdtempSync(path.join(os.tmpdir(), `huabu-skills-${name}-`));
 
 test('a selected skill lives in the transcript for later turns, survives restart, and is not duplicated', { timeout: 60000 }, async () => {
   const directory = temp('transcript');
@@ -170,14 +170,14 @@ test('skill_load loads an advertised skill into the transcript and records it', 
 
 test('thinking level defaults to low, honours the env, and reaches existing conversations on their next turn', { timeout: 60000 }, async () => {
   assert.equal(agentThinkingLevel({}), 'low');
-  assert.equal(agentThinkingLevel({ BEEFTV_AGENT_THINKING: 'HIGH' }), 'high');
-  assert.equal(agentThinkingLevel({ BEEFTV_AGENT_THINKING: 'off' }), 'off');
-  assert.equal(agentThinkingLevel({ BEEFTV_AGENT_THINKING: 'xhigh' }), 'low');
+  assert.equal(agentThinkingLevel({ HUABU_AGENT_THINKING: 'HIGH' }), 'high');
+  assert.equal(agentThinkingLevel({ HUABU_AGENT_THINKING: 'off' }), 'off');
+  assert.equal(agentThinkingLevel({ HUABU_AGENT_THINKING: 'xhigh' }), 'low');
   const directory = temp('thinking');
   let fixture;
-  const previous = process.env.BEEFTV_AGENT_THINKING;
+  const previous = process.env.HUABU_AGENT_THINKING;
   try {
-    delete process.env.BEEFTV_AGENT_THINKING;
+    delete process.env.HUABU_AGENT_THINKING;
     fixture = await skillFixture(directory);
     const entry = await fixture.store.createSession('canvas');
     const first = await fixture.store.submit(entry, { turnId: 'turn-1', content: '你好', userText: '你好' });
@@ -190,14 +190,14 @@ test('thinking level defaults to low, honours the env, and reaches existing conv
     assert.equal((await fixture.store.wait(off, second)).error, null);
     assert.equal(fixture.payloads.at(-1).reasoning_effort, undefined);
     await fixture.close();
-    process.env.BEEFTV_AGENT_THINKING = 'medium';
+    process.env.HUABU_AGENT_THINKING = 'medium';
     fixture = await skillFixture(directory);
     const medium = await fixture.store.ensureSession('canvas', entry.sessionId);
     const third = await fixture.store.submit(medium, { turnId: 'turn-3', content: '继续', userText: '继续' });
     assert.equal((await fixture.store.wait(medium, third)).error, null);
     assert.equal(fixture.payloads.at(-1).reasoning_effort, 'medium');
   } finally {
-    if (previous === undefined) delete process.env.BEEFTV_AGENT_THINKING; else process.env.BEEFTV_AGENT_THINKING = previous;
+    if (previous === undefined) delete process.env.HUABU_AGENT_THINKING; else process.env.HUABU_AGENT_THINKING = previous;
     await fixture?.close(); fs.rmSync(directory, { recursive: true, force: true });
   }
 });

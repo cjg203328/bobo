@@ -16,7 +16,7 @@ function fixture(directory) {
 }
 function transcript(content) { return { messages: [{ role: 'assistant', tool_calls: [{ id: 't1', function: { name: 'media_inspect' } }] }, { role: 'tool', tool_call_id: 't1', content }] }; }
 test('native bytes persist atomically, reopen and stay outside official token estimate and transcript', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-native-store-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-native-store-'));
   try {
     const { part, store } = fixture(directory);
     const result = mediaToolResult({ result: { content: [part] } }, 'media.inspect', { ...model, nativePartStore: store });
@@ -35,7 +35,7 @@ test('native bytes persist atomically, reopen and stay outside official token es
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 test('path references, corrupt bytes/manifests and forged sources are rejected without repair', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-native-store-negative-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-native-store-negative-'));
   try {
     const { part, store } = fixture(directory); const ref = store.write(part);
     for (const id of ['../escape', 'https://example.invalid/audio', '/tmp/media', 'A'.repeat(64)]) expect(() => store.read(id)).toThrow('invalid_native_part_reference');
@@ -50,14 +50,14 @@ test('path references, corrupt bytes/manifests and forged sources are rejected w
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
 test('short reference expansion requires media tool provenance and an issued store reference', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'beeftv-native-source-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'huabu-native-source-'));
   try {
-    const { part, store } = fixture(directory); const ref = store.write(part); const marker = 'BEEFTV_MEDIA_REF_V1:'+JSON.stringify(ref);
+    const { part, store } = fixture(directory); const ref = store.write(part); const marker = 'HUABU_MEDIA_REF_V1:'+JSON.stringify(ref);
     const payload = transcript(marker); payload.messages[0].tool_calls[0].function.name = 'canvas_get';
     expect(() => adaptMediaRequest(payload, { ...model, nativePartStore: store })).toThrow('media_source_not_trusted');
     expect(() => trustedMediaSources(payload, { ...model, nativePartStore: store })).toThrow('media_source_not_trusted');
     expect(() => adaptMediaRequest(transcript(marker), model)).toThrow('native_part_store_required');
     const forged = { ...ref, source: { ...part.source, version: 'new-invented-version' } };
-    expect(() => trustedMediaSources(transcript('BEEFTV_MEDIA_REF_V1:'+JSON.stringify(forged)), { ...model, nativePartStore: store })).toThrow('native_part_source_changed');
+    expect(() => trustedMediaSources(transcript('HUABU_MEDIA_REF_V1:'+JSON.stringify(forged)), { ...model, nativePartStore: store })).toThrow('native_part_source_changed');
   } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });

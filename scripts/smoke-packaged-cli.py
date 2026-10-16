@@ -17,10 +17,10 @@ import zipfile
 
 
 def smoke(archive, platform):
-    relative = ("cli/beeftv.exe" if platform == "windows-amd64" else
-                "BeefTV-linux/cli/beeftv" if platform == "linux-amd64" else
-                "BeefTV.app/Contents/MacOS/cli/beeftv")
-    with tempfile.TemporaryDirectory(prefix="beeftv-package-smoke-") as directory:
+    relative = ("cli/huabu.exe" if platform == "windows-amd64" else
+                "Huabu-linux/cli/huabu" if platform == "linux-amd64" else
+                "Huabu.app/Contents/MacOS/cli/huabu")
+    with tempfile.TemporaryDirectory(prefix="huabu-package-smoke-") as directory:
         root = Path(directory)
         cli = root / relative
         # Extract only the shipped executable; never start the desktop or open user data.
@@ -70,10 +70,10 @@ def smoke(archive, platform):
         worker = threading.Thread(target=server.serve_forever, daemon=True)
         worker.start()
         env = {key: value for key, value in os.environ.items()
-               if not key.startswith("BEEFTV_") and not key.startswith("CANVAS_")}
-        env.update(BEEFTV_BASE_URL=f"http://127.0.0.1:{server.server_port}/api",
-                   BEEFTV_DATA_DIR=str(root / "data"), BEEFTV_CLIENT_ID="release-smoke",
-                   BEEFTV_CLIENT_TOKEN=token)
+               if not key.startswith("HUABU_") and not key.startswith("CANVAS_")}
+        env.update(HUABU_BASE_URL=f"http://127.0.0.1:{server.server_port}/api",
+                   HUABU_DATA_DIR=str(root / "data"), HUABU_CLIENT_ID="release-smoke",
+                   HUABU_CLIENT_TOKEN=token)
         process = None
         try:
             with (root / "stderr.log").open("w+") as stderr:
@@ -110,8 +110,8 @@ def smoke(archive, platform):
                     "protocolVersion": "2024-11-05", "capabilities": {},
                     "clientInfo": {"name": "release-smoke", "version": "1.0"}}})
                 initialized = receive(1)
-                if initialized.get("serverInfo", {}).get("name") != "beeftv":
-                    raise RuntimeError("initialize did not identify beeftv")
+                if initialized.get("serverInfo", {}).get("name") != "huabu":
+                    raise RuntimeError("initialize did not identify huabu")
                 send({"method": "notifications/initialized"})
                 send({"id": 2, "method": "tools/list", "params": {}})
                 tools = receive(2).get("tools", [])
@@ -125,7 +125,7 @@ def smoke(archive, platform):
                     for invalid in ({}, {**headers, "Authorization": "Bearer invalid"},
                                     {**headers, "X-Beeftv-Owner": "owner"},
                                     {**headers, "X-Desktop-Token": "desktop"}):
-                        request = urllib.request.Request(env["BEEFTV_BASE_URL"][:-4] + route,
+                        request = urllib.request.Request(env["HUABU_BASE_URL"][:-4] + route,
                                                          headers=invalid)
                         try:
                             urllib.request.urlopen(request, timeout=5).close()
@@ -134,7 +134,7 @@ def smoke(archive, platform):
                                 raise RuntimeError("unexpected credential rejection") from error
                         else:
                             raise RuntimeError("mock catalog accepted invalid credentials")
-                request = urllib.request.Request(env["BEEFTV_BASE_URL"] + "/unknown", headers=headers)
+                request = urllib.request.Request(env["HUABU_BASE_URL"] + "/unknown", headers=headers)
                 try:
                     urllib.request.urlopen(request, timeout=5).close()
                 except urllib.error.HTTPError as error:

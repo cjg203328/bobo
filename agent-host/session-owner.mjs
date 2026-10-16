@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import { SessionManager } from '@earendil-works/pi-coding-agent';
 import { projectTurnHistory, sessionTitle } from './canvas-turn.mjs';
 
-export const TURN_ENTRY_TYPE = 'beeftv.canvas.turn';
+export const TURN_ENTRY_TYPE = 'huabu.canvas.turn';
 export const HANDOFF_MESSAGE_LIMIT = 20;
 export const HANDOFF_CHAR_LIMIT = 8000;
 export const HANDOFF_HEADER = '以下是同一画布此前对话的交接记录，请在此基础上继续，不要提及本说明。';
