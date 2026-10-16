@@ -84,6 +84,57 @@ cd Huabu
 
 详细环境要求、Windows 构建与本地开发方式见 [`QUICKSTART.md`](QUICKSTART.md) 和[桌面发布文档](docs/desktop-release.md)。首次启动后，添加自己的模型渠道即可开始创作。
 
+## 本地开发端口与数据目录
+
+### 当前端口（以脚本与 Compose 为准）
+
+| 服务 | 端口 | 定义位置 |
+| --- | --- | --- |
+| Web 前端（Vite dev / preview） | `3000` | `web/package.json` |
+| 后端 API（Gin） | `8080` | `backend/cmd/server/main.go`、`backend/internal/bootstrap/config.go` |
+| Nginx（Compose 内置 Web） | `3000` | `nginx.conf` |
+| 前端代理目标（本地开发） | `http://127.0.0.1:8080` | `web/vite.config.ts` |
+
+### 端口规划（尚未执行）
+
+画布目录下多个项目默认都占用 `3000`，为便于并行启动，Huabu 规划端口如下：
+
+| 服务 | 规划端口 | 区间依据 |
+| --- | --- | --- |
+| Web 前端 | `1010` | 前端 `1001–2000` |
+| 后端 API | `2010` | 后端 `2001–3000` |
+
+同目录其他项目的已占用端口，规划时需一并规避：
+
+| 项目 | 占用端口 |
+| --- | --- |
+| BeefTV | `3000`（Web）、`8080`（API） |
+| VOZEB-PRO | `3000`（主应用）、`3001`（文档站）、`5432`（PostgreSQL） |
+| Toonflow-app | `3000`（Bun 服务） |
+| AI-Canvas-tauri | `1420`（Vite dev） |
+
+切换到规划端口需要同步修改以下位置，改完按第 8 节验证：
+
+- `web/package.json`：`dev`、`dev:slim`、`start` 三处 `--port`
+- `web/vite.config.ts`：`apiProxyTarget` 默认值
+- `backend/cmd/server/main.go`、`backend/internal/bootstrap/config.go`：`CANVAS_BACKEND_ADDR`
+- `scripts/start-local.ps1`：端口占用检查与访问提示
+- `nginx.conf`：`listen`
+- `docker-compose.yml`、`docker-compose.dev.yml`、`docker-compose.local.yml`：`ports` 与 `CANVAS_CORS_ORIGINS`
+
+### 数据目录与启动
+
+后端默认使用 SQLite，无需单独的数据库账号与密码；启动脚本见 `scripts/start-local.ps1`。
+
+| 项 | 值 |
+| --- | --- |
+| 数据库 | SQLite（GORM 管理，无账号密码） |
+| 开发数据目录 | `.local/project-workbench-debug`（`CANVAS_BACKEND_DATA_DIR`，已被 Git 忽略） |
+| 本地缓存目录 | `.local/cache` |
+| 常用环境变量 | `CANVAS_BACKEND_ADDR`、`CANVAS_BACKEND_DATA_DIR`、`CANVAS_CORS_ORIGINS`、`VITE_API_PROXY_TARGET`、`CANVAS_WEB_HOST_PORT`、`CANVAS_BACKEND_HOST_PORT` |
+
+宿主机开发命令与 Compose 使用方式见 `AGENTS.md` 第 7 节；环境变量完整说明见 [`QUICKSTART.md`](QUICKSTART.md) 与 `docs/`。
+
 ## 贡献与许可
 
 欢迎提交 Issue 和 Pull Request。开发流程与测试要求见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
