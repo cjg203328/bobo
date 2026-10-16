@@ -53,7 +53,7 @@ def package(version, platform, payload, output):
             (control / 'control').write_text(
                 f'Package: huabu\nVersion: {version[1:]}\nArchitecture: amd64\n'
                 'Maintainer: Huabu Contributors <58928515+glanderness@users.noreply.github.com>\n'
-                'Homepage: https://github.com/glanderness/BeefTV\nSection: graphics\nPriority: optional\n'
+                'Homepage: https://huabu.app\nSection: graphics\nPriority: optional\n'
                 'Depends: libgtk-3-0t64, libwebkit2gtk-4.1-0, gstreamer1.0-plugins-good, '
                 'gstreamer1.0-plugins-bad, gstreamer1.0-libav, ffmpeg, fonts-noto-cjk\n'
                 'Description: Huabu creative workspace (Ubuntu 24.04)\n')

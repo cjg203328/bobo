@@ -57,7 +57,7 @@ jobs:
       - name: Download known final package
         shell: pwsh
         run: |
-          curl.exe -fLsS --retry 2 https://github.com/glanderness/BeefTV/releases/download/v1.7.2/Huabu-v1.7.2-windows-amd64.zip -o candidate.zip
+          curl.exe -fLsS --retry 2 https://github.com/glanderness/BeefTV/releases/download/v1.7.2/BeefTV-v1.7.2-windows-amd64.zip -o candidate.zip
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ((Get-FileHash candidate.zip -Algorithm SHA256).Hash.ToLower() -ne 'bb2cb4e152c7b2eb1d54adb7553c69d59aef755b242d2cbf0c14e7472a8b4f65') { throw 'Candidate hash mismatch' }
       - name: Real released helpers, backend startup, SQLite and rollback

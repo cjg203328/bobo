@@ -29,7 +29,7 @@ def digest(path):
 def download_fixture(fixture, directory):
     version = fixture['version']
     archive = directory / (version + '.zip')
-    url = f'https://github.com/glanderness/BeefTV/releases/download/{version}/Huabu-{version}-windows-amd64.zip'
+    url = f'https://github.com/glanderness/BeefTV/releases/download/{version}/BeefTV-{version}-windows-amd64.zip'
     subprocess.run(['curl.exe', '-fLsS', '--retry', '2', '--max-time', '180', url, '-o', str(archive)], check=True)
     if digest(archive) != fixture['sha256']:
         raise RuntimeError('Published fixture hash mismatch: ' + version)

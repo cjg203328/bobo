@@ -49,3 +49,13 @@ services and do not imply affiliation or endorsement.
 
 See THIRD_PARTY_NOTICES.md for the audited dependency and bundled-asset
 inventory distributed with the public source snapshot.
+
+Huabu (fork attribution)
+------------------------
+
+This repository is the Huabu fork of the above project. Huabu is distributed
+under the same MIT License (see LICENSE), and the upstream copyright and
+permission notices of the base project, including its derived Infinite Canvas
+material, remain preserved in LICENSE and in this NOTICE unchanged. Huabu
+applies the rebranded product identity (Huabu) and continues development from
+the BeefTV v1.7.24 snapshot.

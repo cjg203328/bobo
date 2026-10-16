@@ -1,6 +1,6 @@
 services:
   backend:
-    image: beeftv-backend:server
+    image: huabu-backend:server
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -8,7 +8,7 @@ services:
         GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
 
   web:
-    image: beeftv-web:server
+    image: huabu-web:server
     build:
       context: .
       dockerfile: Dockerfile
