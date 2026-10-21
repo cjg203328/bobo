@@ -7,6 +7,8 @@ describe("波波 AI 画默认品牌", () => {
         expect(DEFAULT_PUBLIC_APPEARANCE.brandName).toBe("波波 AI 画");
         expect(DEFAULT_PUBLIC_APPEARANCE.brandSlug).toBe("bobo-ai-canvas");
         expect(DEFAULT_PUBLIC_APPEARANCE.logoUrl).toBe("/bobo-mark.svg");
+        expect(DEFAULT_PUBLIC_APPEARANCE.authVideoUrl).toBe("/bobo-hero.mp4");
+        expect(DEFAULT_PUBLIC_APPEARANCE.authVideoPosterUrl).toBe("/bobo-hero-poster.jpg");
         expect(DEFAULT_PUBLIC_APPEARANCE.seoTitle).toBe("波波 AI 画");
         expect(brandStudioLabel(DEFAULT_PUBLIC_APPEARANCE)).toBe("BOBO AI CANVAS");
     });

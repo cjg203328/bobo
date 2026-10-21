@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/readme/huabu-wordmark.svg" width="640" alt="Huabu — High-performance, lightweight, AI-native video workspace">
+  <img src="assets/readme/bobo-wordmark.svg" width="640" alt="波波 AI 画布 — Agent 驱动的视觉创作工作台">
 </p>
 
-<p align="center"><strong>High-performance · Lightweight · AI Native</strong></p>
+<p align="center"><strong>Agent Native · Canvas First · Image &amp; Video Creation</strong></p>
 
 <p align="center">
   面向 AI 时代的视频创作工作台。<br>
@@ -10,18 +10,18 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/glanderness/BeefTV/stargazers"><img src="https://img.shields.io/github/stars/glanderness/BeefTV?style=flat-square&amp;logo=github&amp;label=Stars&amp;labelColor=303030&amp;color=E86C36" alt="Huabu GitHub Stars"></a>
-  <a href="https://github.com/glanderness/BeefTV/releases/latest"><img src="https://img.shields.io/github/v/release/glanderness/BeefTV?style=flat-square&amp;label=Release&amp;labelColor=303030&amp;color=525252" alt="Huabu 最新版本"></a>
+  <a href="https://github.com/cjg203328/bobo/stargazers"><img src="https://img.shields.io/github/stars/cjg203328/bobo?style=flat-square&amp;logo=github&amp;label=Stars&amp;labelColor=303030&amp;color=18786F" alt="波波 AI 画布 GitHub Stars"></a>
+  <a href="https://github.com/cjg203328/bobo/releases/latest"><img src="https://img.shields.io/github/v/release/cjg203328/bobo?style=flat-square&amp;label=Release&amp;labelColor=303030&amp;color=525252" alt="波波 AI 画布最新版本"></a>
   <a href="QUICKSTART.md#下载与首次打开"><img src="https://img.shields.io/badge/Desktop-macOS%20%7C%20Windows-525252?style=flat-square&amp;labelColor=303030" alt="桌面版支持 macOS 和 Windows"></a>
   <a href="QUICKSTART.md"><img src="https://img.shields.io/badge/Workspace-Local--first-525252?style=flat-square&amp;labelColor=303030" alt="本地优先工作区"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-525252?style=flat-square&amp;labelColor=303030" alt="MIT 许可证"></a>
 </p>
 
 <p align="center">
-  <a href="https://huabu.app/"><img src="assets/readme/button-website.svg" width="180" alt="访问 Huabu 官网"></a>
-  <a href="https://github.com/glanderness/BeefTV/releases/latest"><img src="assets/readme/button-download.svg" width="175" alt="下载 Huabu 桌面版"></a>
-  <a href="https://huabu.app/assets/huabu-wecom-qr.png"><img src="assets/readme/button-community.svg" width="185" alt="扫码加入 Huabu 社群"></a>
-  <a href="https://x.com/beefnoode"><img src="assets/readme/button-x.svg" width="180" alt="在 X 关注 @beefnoode"></a>
+  <a href="https://github.com/cjg203328/bobo"><img src="assets/readme/button-website.svg" width="180" alt="打开波波 AI 画布项目主页"></a>
+  <a href="https://github.com/cjg203328/bobo/releases/latest"><img src="assets/readme/button-download.svg" width="175" alt="下载波波 AI 画布"></a>
+  <a href="docs/product/bobo-ai-canvas-prd.md"><img src="assets/readme/button-community.svg" width="185" alt="查看波波 AI 画布产品文档"></a>
+  <a href="https://github.com/cjg203328/bobo/issues"><img src="assets/readme/button-github.svg" width="180" alt="在 GitHub 参与波波 AI 画布"></a>
 </p>
 
 <p align="center">
@@ -33,11 +33,14 @@
 
 ## 产品演示
 
-https://github.com/user-attachments/assets/94fe6a39-6933-44b3-a9a9-dbc28b2d284c
+<video controls muted loop playsinline poster="assets/readme/bobo-demo-poster.jpg" width="100%">
+  <source src="assets/readme/bobo-demo.mp4" type="video/mp4">
+  你的浏览器不支持视频播放，请下载产品演示视频查看。
+</video>
 
-[下载产品演示视频](assets/readme/huabu-demo.mp4)
+[下载产品演示视频](assets/readme/bobo-demo.mp4)
 
-## Why Huabu
+## 为什么是波波 AI 画布
 
 | High Performance | Lightweight | AI Native |
 | --- | --- | --- |
@@ -50,7 +53,7 @@ https://github.com/user-attachments/assets/94fe6a39-6933-44b3-a9a9-dbc28b2d284c
 - **加工**：继续裁切、标注、局部重绘、拆分、引用和组合结果。
 - **迭代**：保留过程、复用素材，让一次生成变成可持续演进的工作流。
 
-Huabu 同时提供项目库、个人资产库、异步任务、模型渠道与创作工具。完整范围见[功能清单](docs/content/docs/overview/features.mdx)。
+波波 AI 画布同时提供项目库、个人资产库、异步任务、模型渠道与创作工具。完整范围见[功能清单](docs/content/docs/overview/features.mdx)。
 
 ## 工作方式
 
@@ -77,8 +80,8 @@ AI Native 自由画布
 下载桌面版及 Mac 首次打开说明见 [快速开始](QUICKSTART.md#下载与首次打开)。
 
 ```bash
-git clone https://github.com/glanderness/BeefTV.git
-cd Huabu
+git clone https://github.com/cjg203328/bobo.git
+cd bobo-ai-canvas
 ./scripts/build-huabu-release.sh
 ```
 
@@ -97,7 +100,7 @@ cd Huabu
 
 ### 端口规划（已执行）
 
-画布目录下多个项目默认都占用 `3000`，为便于并行启动，Huabu 已切换到独立端口：
+画布目录下多个项目默认都占用 `3000`，为便于并行启动，波波 AI 画布使用独立端口：
 
 | 服务 | 实际端口 | 区间依据 |
 | --- | --- | --- |
@@ -108,7 +111,6 @@ cd Huabu
 
 | 项目 | 占用端口 |
 | --- | --- |
-| BeefTV | `3000`（Web）、`8080`（API） |
 | VOZEB-PRO | `3000`（主应用）、`3001`（文档站）、`5432`（PostgreSQL） |
 | Toonflow-app | `3000`（Bun 服务） |
 | AI-Canvas-tauri | `1420`（Vite dev） |
@@ -146,10 +148,10 @@ cd Huabu
 
 ## ⭐ Star History
 
-<a href="https://www.star-history.com/?repos=glanderness%2FHuabu&amp;type=date&amp;legend=bottom-right">
+<a href="https://www.star-history.com/?repos=cjg203328%2Fbobo&amp;type=date&amp;legend=bottom-right">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=glanderness/BeefTV&amp;type=date&amp;theme=dark&amp;legend=bottom-right" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=glanderness/BeefTV&amp;type=date&amp;legend=bottom-right" />
-    <img alt="Huabu GitHub Star History" src="https://api.star-history.com/chart?repos=glanderness/BeefTV&amp;type=date&amp;legend=bottom-right" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=cjg203328/bobo&amp;type=date&amp;theme=dark&amp;legend=bottom-right" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=cjg203328/bobo&amp;type=date&amp;legend=bottom-right" />
+    <img alt="波波 AI 画布 GitHub Star History" src="https://api.star-history.com/chart?repos=cjg203328/bobo&amp;type=date&amp;legend=bottom-right" />
   </picture>
 </a>

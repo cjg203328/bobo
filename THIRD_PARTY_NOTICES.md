@@ -57,17 +57,11 @@ and cgo bindings distributed under their package license.
 
 ## Images and demonstration media
 
-The files under `web/public/welcome/spring`, `welcome/charge`, and
-`welcome/wing-it` are modified previews from Blender Studio open movies and
-are used under CC BY 4.0. Exact creators, source pages, modifications, and
-license links are preserved in `web/public/welcome/credits.html`.
+波波 AI 画布的品牌图标、工作区截图、文件夹封面、灯光缩略图、短剧风格缩略图
+和产品演示视频均为项目维护的界面素材，按本仓库 MIT 许可证分发。它们不代表
+任何模型供应商的输出质量或背书。
 
-Huabu logos, workspace screenshots, folder covers, lighting thumbnails, and
-short-drama style thumbnails in `web/public` are project-maintained interface
-assets distributed with Huabu under the repository MIT license. They are not
-representations of output quality from any model provider.
-
-`docs/public/images/canvas-version-history.png` is a Huabu documentation
+`docs/public/images/canvas-version-history.png` is a 波波 AI 画布 documentation
 screenshot distributed under the repository MIT license.
 
 ## Protocol packages and trademarks
