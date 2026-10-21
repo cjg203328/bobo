@@ -93,24 +93,22 @@ function collectSourceFiles(directory: string): string[] {
 }
 
 describe("旧内置 Agent 页面入口退场", () => {
-    test("首页不再提供 Agent 能力入口，手工创作入口仍然指向真实画布路径", () => {
+    test("首页以任务为入口打开波波创作 Agent，同时保留空白画布", () => {
         const markup = renderToStaticMarkup(
             <MemoryRouter>
-                <HomeDashboard projects={[]} loading={false} error={false} onRetry={() => {}} />
+                <HomeDashboard modules={[]} projects={[]} loading={false} error={false} onRetry={() => {}} />
             </MemoryRouter>,
         );
-        expect(markup).not.toContain("Huabu Agent");
-        expect(markup).not.toContain('data-mode="agent"');
-        expect(markup).toContain("新建画布创作");
-        for (const [label, href] of [
-            ["自由画布", "/canvas?mode=new"],
-            ["视频生成", "/canvas?mode=new&amp;add=video"],
-            ["图片生成", "/canvas?mode=new&amp;add=image"],
-            ["音频生成", "/canvas?mode=new&amp;add=audio"],
-        ] as const) {
-            expect(markup).toContain(label);
-            expect(markup).toContain(href);
-        }
+        expect(markup).toContain("波波 AI 画");
+        expect(markup).toContain("波波创作 Agent");
+        expect(markup).toContain('>描述创作任务</label>');
+        expect(markup).toContain("开始创作");
+        expect(markup).toContain("空白画布");
+        expect(markup).toContain("直接生图");
+        expect(markup).toContain("直接生视频");
+        expect(markup).toContain("商品宣传套图");
+        expect(markup).toContain("社媒图文内容");
+        expect(markup).toContain("短视频素材方案");
     });
 
     test("创作页模式切换只剩图片/视频/文本，不再渲染 Agent 模式", () => {

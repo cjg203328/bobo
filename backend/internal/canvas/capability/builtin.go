@@ -21,6 +21,19 @@ func BuiltinRegistry() *Registry {
 			},
 		},
 		{
+			Type: "note", Version: "1", Label: "笔记", DefaultWidth: 260, DefaultHeight: 200,
+			Purpose:     "记录画布上的短摘要、批注和创意便签。",
+			GoodFor:     []string{"创意便签", "场景批注", "生成参考文字"},
+			NotIdealFor: []string{"长篇文档", "结构化分镜"},
+			Tradeoffs:   []string{"便于浏览和组织画布，可提供文字输入，自身不发起生成"},
+			InputKind:   "text", Connection: ConnectionPolicy{CanSource: true}, CanUpdate: true,
+			SummaryFields: []string{"content"}, DetailFields: []string{"content"},
+			PatchFields: editableNodeFields("metadata.content", "笔记正文", "便签正文"),
+			CreateMetadata: func(content string) map[string]any {
+				return map[string]any{"content": content, "status": "idle", "note": map[string]any{"tone": "amber"}}
+			},
+		},
+		{
 			Type: "markdown", Version: "1", Label: "Markdown", DefaultWidth: 420, DefaultHeight: 320,
 			Purpose:     "承载面向人阅读的方案、脚本草稿和格式化文档。",
 			GoodFor:     []string{"创意方案", "脚本草稿", "交付文档", "需要排版的长文本"},

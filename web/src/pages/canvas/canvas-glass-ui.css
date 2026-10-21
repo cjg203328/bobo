@@ -1,0 +1,99 @@
+@layer base {
+[data-huabu-canvas-glass="true"] {
+    --canvas-glass-surface: rgba(250, 252, 255, 0.68);
+    --canvas-glass-border: rgba(255, 255, 255, 0.76);
+    --canvas-glass-shadow: 0 16px 42px rgba(20, 31, 44, 0.16);
+    --canvas-glass-highlight: rgba(255, 255, 255, 0.76);
+    --canvas-glass-control-hover: rgba(29, 43, 54, 0.075);
+}
+
+[data-huabu-canvas-glass="true"][data-canvas-theme="dark"] {
+    --canvas-glass-surface: rgba(27, 31, 36, 0.7);
+    --canvas-glass-border: rgba(255, 255, 255, 0.14);
+    --canvas-glass-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+    --canvas-glass-highlight: rgba(255, 255, 255, 0.12);
+    --canvas-glass-control-hover: rgba(255, 255, 255, 0.11);
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-topbar-cluster,
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-main-toolbar .libtv-main-dock,
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-asset-tray-panel,
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-asset-tray-dock,
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-zoom-menu,
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-mode-menu {
+    border: 1px solid var(--canvas-glass-border) !important;
+    background: var(--canvas-glass-surface) !important;
+    box-shadow: var(--canvas-glass-shadow), inset 0 1px var(--canvas-glass-highlight) !important;
+    -webkit-backdrop-filter: blur(26px) saturate(175%) !important;
+    backdrop-filter: blur(26px) saturate(175%) !important;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-topbar-cluster {
+    border-radius: 18px;
+    padding: 4px 7px;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-main-toolbar .libtv-main-dock {
+    border-radius: 19px !important;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-topbar-action:hover:not(:disabled),
+#canvas-main[data-huabu-canvas-glass="true"] .libtv-main-dock .aceternity-dock-command:hover:not(:disabled),
+#canvas-main[data-huabu-canvas-glass="true"] .libtv-main-dock .aceternity-dock-command.is-active {
+    background: var(--canvas-glass-control-hover) !important;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .libtv-main-dock .aceternity-dock-command.is-prominent {
+    background: #b6eee3 !important;
+    color: #153b37 !important;
+    box-shadow: 0 4px 14px rgba(31, 137, 119, 0.22), inset 0 1px rgba(255, 255, 255, 0.7);
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .libtv-main-dock .aceternity-dock-command.is-prominent > span:first-child svg {
+    color: #153b37 !important;
+    stroke: #153b37 !important;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-asset-tray-panel {
+    border-radius: 20px !important;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-asset-tray-dock {
+    border-radius: 18px !important;
+}
+
+#canvas-main[data-huabu-canvas-glass="true"] .canvas-note-glass-surface {
+    background: color-mix(in srgb, var(--canvas-note-accent) 14%, rgba(255, 255, 255, 0.54)) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.72), inset 0 0 0 1px color-mix(in srgb, var(--canvas-note-accent) 24%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    backdrop-filter: blur(18px) saturate(145%);
+}
+
+#canvas-main[data-huabu-canvas-glass="true"][data-canvas-theme="dark"] .canvas-note-glass-surface {
+    background: color-mix(in srgb, var(--canvas-note-accent) 16%, rgba(60, 65, 72, 0.54)) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.16), inset 0 0 0 1px color-mix(in srgb, var(--canvas-note-accent) 28%, transparent);
+}
+
+@media (max-width: 720px) {
+    #canvas-main[data-huabu-canvas-glass="true"] .canvas-topbar-cluster {
+        border-radius: 16px;
+        padding: 3px 5px;
+    }
+
+    #canvas-main[data-huabu-canvas-glass="true"] .canvas-main-toolbar .libtv-main-dock {
+        max-width: calc(100vw - 20px);
+        border-radius: 17px !important;
+    }
+
+    #canvas-main[data-huabu-canvas-glass="true"] .canvas-asset-tray-panel {
+        max-width: calc(100vw - 24px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #canvas-main[data-huabu-canvas-glass="true"] .canvas-topbar-action,
+    #canvas-main[data-huabu-canvas-glass="true"] .libtv-main-dock .aceternity-dock-command {
+        transition-duration: 0.01ms !important;
+    }
+}
+}

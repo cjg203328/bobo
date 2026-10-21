@@ -24,6 +24,7 @@ import { useCanvasThemeStore } from "@/stores/canvas/use-canvas-theme-store";
 import { projectSyncProgress, useSyncProgressStore } from "@/stores/use-sync-progress-store";
 import { readCanvasSyncDrafts } from "@/services/canvas-sync-drafts";
 import { useUserStore } from "@/stores/use-user-store";
+import { registerDesktopUpdatePreparation } from "@/services/desktop-update-preparation";
 import { isLocalWorkspaceMode } from "@/services/workspace-mode";
 import type { CanvasAssistantSession, CanvasConnection, CanvasNodeData, ViewportTransform } from "@/types/canvas";
 import type { CanvasHistorySnapshot } from "./use-canvas-history";
@@ -464,6 +465,11 @@ export function useCanvasProjectLifecycle({
         await flushCanvasStorePersistence();
         if (localMode) await syncLocalCanvasProjectToBackend(projectId);
     }, [activeChatId, backgroundMode, canvasAppearance, chatSessions, connectionsRef, localMode, nodesRef, projectId, projectLoaded, showImageInfo, updateProject, viewportRef]);
+
+    useEffect(() => {
+        if (!projectLoaded) return;
+        return registerDesktopUpdatePreparation(persistLocalEdits);
+    }, [persistLocalEdits, projectLoaded]);
 
     const reloadLatestCanvasProject = useCallback(async () => {
         await persistLocalEdits();

@@ -14,6 +14,7 @@ import { sameCanvasDocument } from "@/lib/canvas/canvas-content";
 import { canvasUnconfirmedReason, canvasUnconfirmedDiagnostic, type CanvasUnconfirmedState } from "@/lib/canvas/canvas-unconfirmed-edits";
 import { rebaseCanvasDocumentThreeWay, settleInFlightGenerationOverlay } from "@/lib/canvas/canvas-document-rebase";
 import { traceCanvasGraph } from "@/lib/canvas/canvas-graph-trace";
+import { useSyncProgressStore } from "@/stores/use-sync-progress-store";
 
 export type { CapturedUserScope } from "@/lib/user-scope-guard";
 
@@ -399,14 +400,56 @@ export async function createLocalCanvasProject(title: string, projectId?: string
 function syncLocalCanvasProject(id: string, expected: CapturedUserScope): Promise<void> {
     const scope = expected.userScope;
     const key = saveKey(scope, id);
+    // An explicit save consumes the scheduled snapshot. Edits after dispatch
+    // can schedule another save, but the old timer must not block window close.
+    const scheduled = backendSaveTimers.get(key);
+    if (scheduled) clearTimeout(scheduled);
+    backendSaveTimers.delete(key);
     const previous = backendSaveTails.get(key) || Promise.resolve();
     const next = previous.catch(() => undefined).then(async () => {
         if (canvasDeleting.has(key)) throw new CanvasBackendSubmitPausedError("画布正在删除，未提交");
         assertDispatchGuard(expected);
-        await commitLiveCanvasDocument(id, expected);
+        if (!canvasSubmitBlocked(id, scope)) {
+            useSyncProgressStore.getState().setProjectProgress(id, { phase: "saving", message: "正在保存到本机数据库" }, scope);
+        }
+        try {
+            await commitLiveCanvasDocument(id, expected);
+        } catch (error) {
+            if (matchesDispatchGuard(expected) && !canvasDeleting.has(key) && !isCanvasSubmitControlError(error) && !canvasSubmitBlocked(id, scope)) {
+                let draftCount: number | undefined;
+                try {
+                    const project = openLocalCanvasProject(id);
+                    if (project) {
+                        const { preserveCanvasSyncDraft } = await import("@/services/canvas-sync-drafts");
+                        draftCount = await preserveCanvasSyncDraft(project, scope);
+                    }
+                } catch (draftError) {
+                    console.error("画布失败草稿保留失败", { id, error: draftError });
+                }
+                if (matchesDispatchGuard(expected) && !canvasSubmitBlocked(id, scope)) {
+                    useSyncProgressStore.getState().setProjectProgress(id, {
+                        phase: "error", draftCount,
+                        message: draftCount ? "保存失败，已保留本地草稿。请重试保存。" : "保存失败，草稿尚未确认落盘。请保留页面并重试。",
+                    }, scope);
+                }
+            }
+            throw error;
+        }
     });
     const tail = next.finally(() => {
-        if (backendSaveTails.get(key) === tail) backendSaveTails.delete(key);
+        if (backendSaveTails.get(key) !== tail) return;
+        backendSaveTails.delete(key);
+        if (!matchesDispatchGuard(expected) || canvasDeleting.has(key) || canvasSubmitBlocked(id, scope)) return;
+        const progress = useSyncProgressStore.getState().syncingProjects[key];
+        if (progress?.phase === "error") return;
+        const live = openLocalCanvasProject(id);
+        const confirmed = canvasDocumentBase(id, scope)?.snapshot;
+        if (!live) return;
+        const pending = backendSaveTimers.has(key) || !confirmed || !sameCanvasDocument(live, confirmed);
+        useSyncProgressStore.getState().setProjectProgress(id, {
+            phase: pending ? "pending" : "done",
+            message: pending ? "修改待保存到本机数据库" : "画布已保存到本机数据库",
+        }, scope);
     });
     backendSaveTails.set(key, tail);
     return tail;
@@ -730,6 +773,8 @@ export function scheduleLocalCanvasBackendSync(id: string) {
     const expected = captureUserScope();
     const key = saveKey(expected.userScope, id);
     if (canvasDeleting.has(key)) return;
+    if (canvasSubmitBlocked(id, expected.userScope)) return;
+    useSyncProgressStore.getState().setProjectProgress(id, { phase: "pending", message: "修改待保存到本机数据库" }, expected.userScope);
     const existing = backendSaveTimers.get(key);
     if (existing) clearTimeout(existing);
     backendSaveTimers.set(key, setTimeout(() => {

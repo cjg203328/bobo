@@ -46,7 +46,7 @@ func run(ctx context.Context) error {
 		DataDir:          dataDir,
 		DatabaseDriver:   env("CANVAS_DATABASE_DRIVER", "sqlite"),
 		DatabaseURL:      os.Getenv("DATABASE_URL"),
-		ListenAddr:       env("CANVAS_BACKEND_ADDR", ":8080"),
+		ListenAddr:       env("CANVAS_BACKEND_ADDR", ":2010"),
 		AutoMigrate:      autoMigrate,
 		ShutdownTimeout:  workerTimeout,
 		RouterMiddleware: []gin.HandlerFunc{corsMiddleware},
@@ -58,7 +58,7 @@ func run(ctx context.Context) error {
 		_ = runtime.Close(context.Background())
 		return err
 	}
-	log.Printf("backend listening on %s", env("CANVAS_BACKEND_ADDR", ":8080"))
+	log.Printf("backend listening on %s", env("CANVAS_BACKEND_ADDR", ":2010"))
 
 	var serveFailure error
 	select {

@@ -1,11 +1,12 @@
 import { Button, Select, Tooltip } from "antd";
-import { ArrowUp, Square, X, Paperclip, Sparkles } from "lucide-react";
+import { ArrowUp, Clapperboard, ImagePlus, Square, X, Paperclip, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { CanvasResourceMentionTextarea } from "@/components/canvas/canvas-resource-mention-textarea";
 import type { CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
 import type { AssistantPermissionMode } from "@/services/api/agent-assistant";
 import { CanvasAssistantModelPicker } from "./canvas-assistant-model-picker";
+import type { AssistantCreationKind } from "./canvas-assistant-copy";
 
 const LINE_HEIGHT = 21;
 const MIN_LINES = 3;
@@ -31,6 +32,7 @@ type Props = {
     onFiles?: (files: File[]) => void;
     onOpenSkills?: () => void;
     onOpenReferences?: () => void;
+    onQuickCreate?: (kind: AssistantCreationKind) => void;
     inputContent?: React.ReactNode;
     permissionMode?: AssistantPermissionMode;
     permissionLocked?: boolean;
@@ -57,6 +59,7 @@ export function CanvasAssistantComposer({
     onFiles,
     onOpenSkills,
     onOpenReferences,
+    onQuickCreate,
     inputContent,
     permissionMode = "canvas",
     permissionLocked,
@@ -102,6 +105,14 @@ export function CanvasAssistantComposer({
             {disabled && disabledReason ? <span className="canvas-assistant-meta">{disabledReason}</span> : null}
 
             <div className="canvas-assistant-composer-tools">
+                {onQuickCreate ? <>
+                    <Tooltip title="填写图片创作提示词">
+                        <Button className="canvas-assistant-creation-action" type="text" size="small" aria-label="AI 生图" disabled={disabled || streaming || inputBusy} icon={<ImagePlus size={15} />} onClick={() => onQuickCreate("image")}>AI 生图</Button>
+                    </Tooltip>
+                    <Tooltip title="填写视频创作提示词">
+                        <Button className="canvas-assistant-creation-action" type="text" size="small" aria-label="AI 生视频" disabled={disabled || streaming || inputBusy} icon={<Clapperboard size={15} />} onClick={() => onQuickCreate("video")}>AI 生视频</Button>
+                    </Tooltip>
+                </> : null}
                 {onFiles ? <Tooltip title="添加参考素材"><Button type="text" size="small" aria-label="添加参考素材" disabled={disabled || inputBusy} icon={<Paperclip size={15} />} onClick={() => fileInput.current?.click()} /></Tooltip> : null}
                 {onOpenSkills ? <Tooltip title="选择技能"><Button type="text" size="small" aria-label="选择技能" disabled={disabled} icon={<Sparkles size={15} />} onClick={onOpenSkills} /></Tooltip> : null}
                 {onOpenReferences ? <Button type="text" size="small" disabled={disabled} onClick={onOpenReferences}>画布素材</Button> : null}

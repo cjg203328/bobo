@@ -243,6 +243,15 @@ export async function persistWorkspaceBeforeDesktopInstall() {
     const results = await Promise.allSettled([flushCanvasStorePersistence(), flushAssetStorePersistence(), flushModelConfig()]);
     const failed = results.find(result => result.status === "rejected");
     if (failed?.status === "rejected") throw failed.reason;
+    const { isLocalWorkspaceMode } = await import("@/services/workspace-mode");
+    if (isLocalWorkspaceMode()) {
+        const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
+        const { hasUnconfirmedCanvasEdits, syncLocalCanvasProjectToBackend } = await import("@/services/local-workspace-repository");
+        for (const project of useCanvasStore.getState().projects) {
+            if (hasUnconfirmedCanvasEdits(project.id)) await syncLocalCanvasProjectToBackend(project.id);
+        }
+        await flushCanvasStorePersistence();
+    }
     const modelConfig = getModelConfigPersistenceState();
     if (modelConfig.status === "saving") throw new DesktopUpdateSaveInProgressError();
     if (modelConfig.dirty || modelConfig.status === "error") throw new Error("模型配置尚未保存完成，请重试保存，或选择仍然更新。");

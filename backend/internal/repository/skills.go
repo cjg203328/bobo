@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const legacyBeefTVShowcaseSource = 3
+
 type SkillListFilter struct {
 	UserID string
 	Scope  string
@@ -36,9 +38,9 @@ func (r *Repository) Skills(filter SkillListFilter) ([]model.Skill, int64, error
 		query = query.Where("skills.owner_id = ?", filter.UserID)
 	case "favorites":
 		query = query.Joins("JOIN user_skill_states ON user_skill_states.skill_id = skills.id AND user_skill_states.user_id = ? AND user_skill_states.liked = ?", filter.UserID, true).
-			Where("skills.owner_id = ? OR skills.is_private = ?", filter.UserID, false)
+			Where("skills.source <> ? AND (skills.owner_id = ? OR skills.is_private = ?)", legacyBeefTVShowcaseSource, filter.UserID, false)
 	default:
-		query = query.Where("skills.is_private = ?", false)
+		query = query.Where("skills.is_private = ? AND skills.source <> ?", false, legacyBeefTVShowcaseSource)
 	}
 	if filter.Search != "" {
 		pattern := "%" + strings.ToLower(filter.Search) + "%"

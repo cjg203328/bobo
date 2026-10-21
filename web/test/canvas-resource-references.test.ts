@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { autoMentionCanvasResourceReferences, findCanvasResourceAutoLinkMatch, type CanvasResourceReference, applyCanvasConnectionPromptSync, buildAssetMentionReferences, buildCanvasNodeMentionReferenceMap, buildNodeMentionReferences, buildOrderedCanvasResourceReferences, canvasResourceMentionToken, collectUpstreamVideoNodes, imageGenerationReferenceConnections, reorderCanvasResourceConnections, replaceCanvasMentionToken, replaceCanvasReferenceMentions } from "../src/lib/canvas/canvas-resource-references";
 import { bindCanvasNodeResourceAsset, bindMissingCanvasResourceAssets, canvasNodeToAsset, canvasNodesMissingResourceAssetBinding } from "../src/lib/canvas/canvas-node-asset";
-import { buildNodeGenerationInputs } from "../src/components/canvas/canvas-node-generation";
+import { buildNodeGenerationContext, buildNodeGenerationInputs } from "../src/components/canvas/canvas-node-generation";
 import { CanvasNodeType, type CanvasConnection, type CanvasNodeData } from "../src/types/canvas";
 
 const smartReferences: CanvasResourceReference[] = [
@@ -130,6 +130,21 @@ describe("collectUpstreamVideoNodes", () => {
 });
 
 describe("canvas resource mention slots", () => {
+    test("笔记正文可作为文字引用并进入下游生成提示词", () => {
+        const note: CanvasNodeData = { ...textNode("note"), type: CanvasNodeType.Note, metadata: { content: "雨夜街道\n保留人物红色围巾", note: { tone: "amber" } } };
+        const target = imageNode("target");
+        const nodes = [note, target];
+        const connections = [connection(note.id, target.id)];
+        const reference = buildOrderedCanvasResourceReferences([note])[0];
+        expect(reference?.kind).toBe("text");
+        expect(reference?.text).toBe(note.metadata!.content);
+        const inputs = buildNodeGenerationInputs(target.id, nodes, connections);
+        expect(inputs.find(input => input.nodeId === note.id)?.text).toBe(note.metadata!.content);
+        const context = buildNodeGenerationContext(target.id, nodes, connections, "电影镜头", []);
+        expect(context.textCount).toBe(1);
+        expect(context.prompt).toContain(note.metadata!.content!);
+    });
+
     test("finds resource-backed media nodes that must be linked before syncing a canvas snapshot", () => {
         const source = videoNode("legacy-video");
         source.metadata = { content: "https://cdn.example.com/video.mp4", storageKey: "resource:video-resource" };

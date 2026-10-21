@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation, useParams } from "react-router";
 
 import { createWorkspaceRouter } from "@/lib/app-routing";
 import { FullScreenLoader, WorkspaceRouteLoader } from "@/components/ui/aceternity/full-screen-loader";
-import { loadAgentsPage, loadAssetsPage, loadCanvasPage, loadCanvasProjectPage, loadCreatePage, loadHomePage, loadProjectDetailPage } from "@/lib/workspace-route-modules";
+import { loadAgentsPage, loadAssetsPage, loadCanvasPage, loadCanvasProjectPage, loadCreatePage, loadHomePage, loadProjectDetailPage, loadSkillsPage, loadSkillsReferencePage, loadTasksPage } from "@/lib/workspace-route-modules";
 import { CanvasRefreshShell } from "@/pages/canvas/canvas-refresh-shell";
 import RouteErrorPage from "@/pages/route-error";
 import { isLocalWorkspaceMode } from "@/services/workspace-mode";
@@ -19,6 +19,9 @@ const PluginsPage = lazy(() => import("@/pages/plugins"));
 const EagleLibraryPage = lazy(() => import("@/pages/plugins/eagle"));
 const ProjectDetailPage = lazy(loadProjectDetailPage);
 const SettingsPage = lazy(() => import("@/pages/settings"));
+const SkillsPage = lazy(loadSkillsPage);
+const SkillsReferencePage = lazy(loadSkillsReferencePage);
+const TasksPage = lazy(loadTasksPage);
 const TestVoiceRecording = lazy(() => import("@/pages/test-voice-recording"));
 const UserLayout = lazy(() => import("@/layouts/user-layout"));
 const RequireFeature = lazy(() => import("@/components/workspace/require-feature").then((module) => ({ default: module.RequireFeature })));
@@ -77,15 +80,13 @@ export const router = createWorkspaceRouter([
         children: [
             { path: "/", element: deferred(<HomePage />) },
             { path: "/create", element: deferred(<CreatePage />) },
-            {
-                path: "/tasks",
-                // 任务页暂不开放，保留路由以避免旧链接进入半成品界面。
-                element: <Navigate to="/" replace />,
-            },
+            { path: "/tasks", element: <RequireFeature feature="taskCenterEnabled">{deferred(<TasksPage />)}</RequireFeature> },
             { path: "/assets", element: deferred(<AssetsPage />) },
-            { path: "/skills", element: <Navigate to="/" replace /> },
-            { path: "/skill", element: <Navigate to="/" replace /> },
-            { path: "/skills/reference", element: <Navigate to="/" replace /> },
+            // 技能库在本地优先工作区可用：技能广场 / 我的技能 / 我创建的 / 我的收藏。
+            // 上游按“公共工作区未完成”隐藏该页；本地运行时无公共工作区分支，故恢复入口。
+            { path: "/skills", element: deferred(<SkillsPage />) },
+            { path: "/skills/reference", element: deferred(<SkillsReferencePage />) },
+            { path: "/skill", element: <Navigate to="/skills" replace /> },
             {
                 path: "/plugins",
                 element: <RequireFeature feature="pluginCenterEnabled">{deferred(<PluginsPage />)}</RequireFeature>,

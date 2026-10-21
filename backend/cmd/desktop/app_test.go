@@ -170,7 +170,7 @@ func TestDesktopAppBoundMethodsStayTiny(t *testing.T) {
 		names = append(names, typ.Method(i).Name)
 	}
 	sort.Strings(names)
-	if !reflect.DeepEqual(names, []string{"CheckForUpdate", "ChooseStorageDirectory", "CleanupPreviousStorage", "ConfirmUpdateStartup", "DownloadUpdate", "InstallUpdate", "MigrateStorage", "OpenHuabuGitHub", "OpenHuabuWebsite", "OpenHuabuX", "OpenUpdateLogDirectory", "ReferenceStorageSettings", "RuntimeConfig", "SaveOwnedArtifact", "SaveOwnedMedia", "SaveReferenceStorage", "StorageSettings", "UpdateStatus", "UploadReferenceMedia"}) {
+	if !reflect.DeepEqual(names, []string{"CheckForUpdate", "ChooseStorageDirectory", "CleanupPreviousStorage", "CloseSaveReady", "CompleteCloseSave", "ConfirmUpdateStartup", "DownloadUpdate", "InstallUpdate", "MigrateStorage", "OpenHuabuGitHub", "OpenHuabuWebsite", "OpenHuabuX", "OpenUpdateLogDirectory", "ReferenceStorageSettings", "RuntimeConfig", "SaveOwnedArtifact", "SaveOwnedMedia", "SaveReferenceStorage", "StorageSettings", "UpdateStatus", "UploadReferenceMedia"}) {
 		t.Fatalf("bound methods = %v", names)
 	}
 }

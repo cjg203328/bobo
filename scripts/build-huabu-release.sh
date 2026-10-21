@@ -48,7 +48,7 @@ BUILD_TIME_VALUE="${CANVAS_BUILD_TIME:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 export CANVAS_BUILD_VERSION="$VERSION_VALUE"
 export GOTOOLCHAIN="${GOTOOLCHAIN:-local}"
 
-LDFLAGS="-X infinite-canvas/backend/internal/buildinfo.Version=$VERSION_VALUE -X infinite-canvas/backend/internal/buildinfo.Commit=$COMMIT_VALUE -X infinite-canvas/backend/internal/buildinfo.BuildTime=$BUILD_TIME_VALUE"
+LDFLAGS="-X huabu/backend/internal/buildinfo.Version=$VERSION_VALUE -X huabu/backend/internal/buildinfo.Commit=$COMMIT_VALUE -X huabu/backend/internal/buildinfo.BuildTime=$BUILD_TIME_VALUE"
 if [[ -n "${HUABU_UPDATER_PUBLIC_KEY:-}" ]]; then
   UPDATER_LDFLAGS="$(
     cd "$ROOT_DIR/backend"

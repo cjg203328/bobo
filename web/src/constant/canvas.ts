@@ -32,6 +32,9 @@ export const NODE_DEFAULT_SIZE = {
     [CanvasNodeType.MediaConversion]: { width: 480, height: 460, title: "转换" },
     [CanvasNodeType.BatchTable]: { width: 1280, height: 560, title: "批量创作表" },
     [CanvasNodeType.Director]: { width: 640, height: 640, title: "导演台" },
+    // 笔记节点比文本节点窄一些：它是画布上的便签，不承载正文阅读，240 宽刚好放
+    // 下一段摘要又不至于抢占画布空间。
+    [CanvasNodeType.Note]: { width: 260, height: 200, title: "笔记" },
 } satisfies Record<CanvasNodeType, { width: number; height: number; title: string }>;
 
 export const NODE_SPECS = {
@@ -127,6 +130,10 @@ export const NODE_SPECS = {
     [CanvasNodeType.Director]: {
         ...NODE_DEFAULT_SIZE[CanvasNodeType.Director],
         metadata: { status: "idle", workflowKind: "shot" },
+    },
+    [CanvasNodeType.Note]: {
+        ...NODE_DEFAULT_SIZE[CanvasNodeType.Note],
+        metadata: { content: "", status: "idle", note: { tone: "amber" } },
     },
 } satisfies Record<CanvasNodeType, CanvasNodeSpec>;
 

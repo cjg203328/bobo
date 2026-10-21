@@ -574,13 +574,13 @@
     .app-user-workspace .product-collection-card:hover { transform: none; }
 }
 
-/* Huabu workspace shell — desktop geometry follows the LibTV home reference. */
+/* Huabu workspace shell. */
 .app-user-workspace.app-product-workspace {
-    --workspace-reference-sidebar: 334px;
+    --workspace-reference-sidebar: 252px;
     --workspace-reference-collapsed: 74px;
     --workspace-reference-topbar: 89px;
     --workspace-reference-page-bg: var(--user-page-bg);
-    --user-accent: #57575b;
+    --user-accent: #18786f;
     background: var(--user-page-bg);
     color-scheme: inherit;
 }
@@ -589,24 +589,24 @@
 .app-user-workspace.app-product-workspace .app-workspace-sidebar,
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-nav { background: var(--user-surface-muted) !important; }
 .app-user-workspace.app-product-workspace .app-workspace-sidebar { border-right: 1px solid var(--user-border); }
-.app-user-workspace.app-product-workspace .app-workspace-sidebar-brand-row { min-height: 89px; padding: 20px 20px 8px 24px; }
+.app-user-workspace.app-product-workspace .app-workspace-sidebar-brand-row { min-height: 74px; padding: 13px 14px 8px 18px; }
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-brand-button { min-height: 52px; padding: 0 8px; color: var(--user-ink); }
 .app-user-workspace.app-product-workspace .app-workspace-brand-mark { width: 36px; height: 36px; border: 0; border-radius: 10px; color: var(--user-ink) !important; background: var(--user-ink); }
 .app-user-workspace.app-product-workspace .app-workspace-brand-mark svg { color:var(--user-page-bg); }
-.app-user-workspace.app-product-workspace .app-workspace-brand-wordmark { color: var(--user-ink); font-size: 20px; font-style: italic; font-weight: 780; letter-spacing: -.055em; }
+.app-user-workspace.app-product-workspace .app-workspace-brand-wordmark { color: var(--user-ink); font-size: 18px; font-style: normal; font-weight: 680; letter-spacing: 0; }
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-collapse-button { color: var(--user-ink-soft); }
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-collapse-button:hover { background:var(--user-surface-hover);color:var(--user-ink); }
-.app-user-workspace.app-product-workspace .app-workspace-sidebar-scroll-area { gap: 16px; padding: 10px 18px 18px; }
-.app-user-workspace.app-product-workspace .app-workspace-nav-group { gap: 5px; }
-.app-user-workspace.app-product-workspace .app-workspace-nav-group + .app-workspace-nav-group { padding-top: 8px; border-top: 1px solid var(--user-border); }
-.app-user-workspace.app-product-workspace .app-workspace-nav-link { min-height: 50px; padding: 0 16px; border-radius: 10px; color: var(--user-ink-muted); font-size: 16px; }
-.app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="new"] { min-height: 52px; margin-bottom: 2px; background: var(--user-action-bg); color: var(--user-action-foreground); font-weight: 650; }
+.app-user-workspace.app-product-workspace .app-workspace-sidebar-scroll-area { gap: 14px; padding: 10px 14px 16px; }
+.app-user-workspace.app-product-workspace .app-workspace-nav-group { gap: 3px; }
+.app-user-workspace.app-product-workspace .app-workspace-nav-group + .app-workspace-nav-group { padding-top: 12px; border-top: 1px solid var(--user-border); }
+.app-user-workspace.app-product-workspace .app-workspace-nav-link { min-height: 42px; padding: 0 10px; border-radius: 8px; color: var(--user-ink-muted); font-size: 14px; }
+.app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="new"] { min-height: 46px; margin-bottom: 2px; background: var(--user-action-bg); color: var(--user-action-foreground); font-weight: 650; }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="new"]:hover { background: var(--user-action-bg-hover); }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="create"] { color:var(--user-ink-muted); }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link.is-active { background: var(--user-surface-hover); color: var(--user-ink); }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link:hover:not(.is-active):not([data-nav-id="new"]) { background:var(--user-surface-hover);color:var(--user-ink); }
-.app-user-workspace.app-product-workspace .app-workspace-nav-link .app-workspace-nav-icon { width: 30px; height: 30px; }
-.app-user-workspace.app-product-workspace .app-workspace-nav-link .app-workspace-nav-icon svg { width: 22px; height: 22px; }
+.app-user-workspace.app-product-workspace .app-workspace-nav-link .app-workspace-nav-icon { width: 26px; height: 26px; }
+.app-user-workspace.app-product-workspace .app-workspace-nav-link .app-workspace-nav-icon svg { width: 17px; height: 17px; }
 .app-user-workspace.app-product-workspace .app-workspace-nav-group-toggle { color:var(--user-ink-soft); }
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-footer { border-top: 1px solid var(--user-border); background:var(--user-surface-muted); }
 .app-user-workspace.app-product-workspace .app-workspace-update-version {
@@ -636,7 +636,7 @@
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-checkin,
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-storage { display:none; }
 .app-user-workspace.app-product-workspace .app-workspace-sidebar-profile { color:var(--user-ink-muted); }
-.app-user-workspace.app-product-workspace .app-workspace-topbar { height: 89px; min-height: 89px; padding: 0 34px; border-bottom: 0; background:var(--user-page-bg); }
+.app-user-workspace.app-product-workspace .app-workspace-topbar { height: 72px; min-height: 72px; padding: 0 24px; border-bottom: 0; background:var(--user-page-bg); }
 .app-user-workspace.app-product-workspace .app-workspace-topbar-spacer { margin-right:auto; }
 .app-user-workspace.app-product-workspace .app-workspace-topbar-breadcrumb { color:var(--user-ink-soft); }
 .app-user-workspace.app-product-workspace .app-workspace-topbar-breadcrumb a,
@@ -654,9 +654,9 @@
     left: 12px;
 }
 @media (max-width: 1500px) {
-    .app-user-workspace.app-product-workspace { --workspace-reference-sidebar: 240px; --workspace-reference-topbar: 78px; }
-    .app-user-workspace.app-product-workspace .app-workspace-sidebar-brand-row { min-height:78px; }
-    .app-user-workspace.app-product-workspace .app-workspace-topbar { height:78px;min-height:78px; }
+    .app-user-workspace.app-product-workspace { --workspace-reference-sidebar: 240px; --workspace-reference-topbar: 72px; }
+    .app-user-workspace.app-product-workspace .app-workspace-sidebar-brand-row { min-height:72px; }
+    .app-user-workspace.app-product-workspace .app-workspace-topbar { height:72px;min-height:72px; }
 }
 @media (max-width: 1023px) {
     .app-user-workspace.app-product-workspace .app-workspace-topbar-utility span { display:none; }
@@ -664,7 +664,7 @@
 }
 
 
-.dark .app-user-workspace.app-product-workspace { --user-accent: #c1c1c5; }
+.dark .app-user-workspace.app-product-workspace { --user-accent: #76b9ad; }
 /* ========================================================================
    Product interaction contract
    ------------------------------------------------------------------------
@@ -1221,14 +1221,6 @@
     padding: 0 34px !important;
     border-bottom: 0 !important;
     box-shadow: none !important;
-}
-.app-user-workspace.app-product-workspace .app-workspace-brand-placeholder {
-    color: #0b0b0b;
-    font-size: 20px;
-    font-style: italic;
-    font-weight: 900;
-    letter-spacing: -.08em;
-    line-height: 1;
 }
 .app-user-workspace.app-product-workspace .app-workspace-brand-wordmark {
     overflow: visible !important;

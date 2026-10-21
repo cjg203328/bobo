@@ -277,6 +277,8 @@ func registerSkillRoutes(r *gin.RouterGroup, svc *app.Service, includeRemote boo
 	r.DELETE("/skills/:id/add", setSkillAdded(svc, false))
 	r.POST("/skills/:id/like", setSkillLiked(svc, true))
 	r.DELETE("/skills/:id/like", setSkillLiked(svc, false))
+	r.POST("/skills/:id/publish", setSkillVisibility(svc, false))
+	r.POST("/skills/:id/unpublish", setSkillVisibility(svc, true))
 }
 
 func parseOptionalBool(value string) (bool, error) {
@@ -311,6 +313,24 @@ func setSkillLiked(svc *app.Service, liked bool) gin.HandlerFunc {
 			return
 		}
 		skill, err := svc.SetSkillLiked(user.ID, c.Param("id"), liked)
+		if err != nil {
+			failService(c, err)
+			return
+		}
+		ok(c, gin.H{"skill": skill})
+	}
+}
+
+// setSkillVisibility 驱动技能发布/下架：private=false 为发布到广场，
+// private=true 为下架回仅自己可见。
+func setSkillVisibility(svc *app.Service, private bool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user, err := currentUser(c, svc)
+		if err != nil {
+			failService(c, err)
+			return
+		}
+		skill, err := svc.SetSkillVisibility(user.ID, c.Param("id"), private)
 		if err != nil {
 			failService(c, err)
 			return

@@ -31,7 +31,6 @@ export function FirstCreationGuide() {
     const guide = useOnboardingStore();
     const config = useConfigStore((state) => state.config);
     const projects = useCanvasStore((state) => state.projects);
-    const hydrated = useCanvasStore((state) => state.hydrated);
     const { pathname, search } = useLocation();
     const navigate = useNavigate();
     const [welcome, setWelcome] = useState(false);
@@ -50,9 +49,6 @@ export function FirstCreationGuide() {
     const connected = Boolean(official && channelHasGenerationCredential(official) && filterModelsByCapability(modelOptionsFromChannels([official]), "image", [official]).length);
     const ready = step === "official" ? connected : step === "project" ? Boolean(project) : step === "node" ? Boolean(node) : step === "generate" ? Boolean(result) : step === "assets" ? pathname === "/assets" && new URLSearchParams(search).get("tab") === "history" && Boolean(result) : guide.visitedLibrary && Boolean(project) && pathname === `/canvas/${project?.id}`;
 
-    useEffect(() => {
-        if (hydrated && !projects.length && guide.status === "new") setWelcome(true);
-    }, [hydrated, projects.length, guide.status]);
     useEffect(() => {
         const open = () => { guide.restart(); setCollapsed(false); setWelcome(true); };
         window.addEventListener("huabu:open-guide", open);
@@ -170,7 +166,7 @@ export function FirstCreationGuide() {
         bottom: Math.min(window.innerHeight, highlightRect.bottom + 8),
     };
     return <>
-        <AppModal open={finished} transitionName="" maskTransitionName="" title="引导已结束" onCancel={() => setFinished(false)} footer={<Button type="primary" onClick={() => setFinished(false)}>继续使用 Huabu</Button>} width={420}>
+        <AppModal open={finished} transitionName="" maskTransitionName="" title="引导已结束" onCancel={() => setFinished(false)} footer={<Button type="primary" onClick={() => setFinished(false)}>继续使用波波 AI 画</Button>} width={420}>
             <p className="first-creation-intro">随时从侧栏重新打开引导。</p>
         </AppModal>
         <AppModal open={welcome} transitionName="" maskTransitionName="" title="完成第一次创作" onCancel={dismiss} footer={null} width={420} destroyOnHidden>

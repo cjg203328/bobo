@@ -112,7 +112,7 @@ export function normalizeSkillCatalog(value) {
 export function formatSkillCatalog(items) {
   if (!items?.length) return undefined;
   const lines = [
-    '用户已安装下列技能，每个技能提供特定任务的步骤。用户的要求符合某个技能的说明时，先调用 skill_load 并传入它的 id 读取完整步骤，再按步骤执行。对话里已有的技能不用重复读取。',
+    '当前工作区可用下列技能，包含波波内置技能和用户安装的技能。每个技能提供特定任务的步骤；用户的要求符合某个技能的说明时，先调用 skill_load 并传入它的 id 读取完整步骤，再按步骤执行。对话里已有的技能不用重复读取。',
     '',
     '<available_skills>',
   ];

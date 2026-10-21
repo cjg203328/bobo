@@ -90,16 +90,16 @@ cd Huabu
 
 | 服务 | 端口 | 定义位置 |
 | --- | --- | --- |
-| Web 前端（Vite dev / preview） | `3000` | `web/package.json` |
-| 后端 API（Gin） | `8080` | `backend/cmd/server/main.go`、`backend/internal/bootstrap/config.go` |
-| Nginx（Compose 内置 Web） | `3000` | `nginx.conf` |
-| 前端代理目标（本地开发） | `http://127.0.0.1:8080` | `web/vite.config.ts` |
+| Web 前端（Vite dev / preview） | `1010` | `web/package.json` |
+| 后端 API（Gin） | `2010` | `backend/cmd/server/main.go`、`backend/internal/bootstrap/config.go` |
+| Nginx（Compose 内置 Web） | `1010` | `nginx.conf` |
+| 前端代理目标（本地开发） | `http://127.0.0.1:2010` | `web/vite.config.ts` |
 
-### 端口规划（尚未执行）
+### 端口规划（已执行）
 
-画布目录下多个项目默认都占用 `3000`，为便于并行启动，Huabu 规划端口如下：
+画布目录下多个项目默认都占用 `3000`，为便于并行启动，Huabu 已切换到独立端口：
 
-| 服务 | 规划端口 | 区间依据 |
+| 服务 | 实际端口 | 区间依据 |
 | --- | --- | --- |
 | Web 前端 | `1010` | 前端 `1001–2000` |
 | 后端 API | `2010` | 后端 `2001–3000` |
@@ -113,14 +113,17 @@ cd Huabu
 | Toonflow-app | `3000`（Bun 服务） |
 | AI-Canvas-tauri | `1420`（Vite dev） |
 
-切换到规划端口需要同步修改以下位置，改完按第 8 节验证：
+本次切换到 `1010` / `2010` 已同步修改以下位置：
 
 - `web/package.json`：`dev`、`dev:slim`、`start` 三处 `--port`
 - `web/vite.config.ts`：`apiProxyTarget` 默认值
-- `backend/cmd/server/main.go`、`backend/internal/bootstrap/config.go`：`CANVAS_BACKEND_ADDR`
-- `scripts/start-local.ps1`：端口占用检查与访问提示
-- `nginx.conf`：`listen`
-- `docker-compose.yml`、`docker-compose.dev.yml`、`docker-compose.local.yml`：`ports` 与 `CANVAS_CORS_ORIGINS`
+- `backend/cmd/server/main.go`、`backend/internal/bootstrap/config.go`、`backend/internal/assistantruntime/env.go`：`CANVAS_BACKEND_ADDR` 与端口兜底
+- `backend/cmd/desktop/wails.json`：`frontend:dev:serverUrl`
+- `scripts/start-local.ps1`、`scripts/huabu-shared-dev.sh`：端口占用检查与访问提示
+- `web/scripts/huabu-local-network-audit.mjs`：审计脚本默认地址
+- `nginx.conf`：`listen` 与 `proxy_pass`
+- `docker-compose.yml`、`docker-compose.dev.yml`、`docker-compose.local.yml`：`ports`、`CANVAS_BACKEND_ADDR` 与 `CANVAS_CORS_ORIGINS`
+- `Dockerfile`、`backend/Dockerfile`：`EXPOSE` 与 `HEALTHCHECK`
 
 ### 数据目录与启动
 

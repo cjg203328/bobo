@@ -18,7 +18,7 @@ beforeAll(async () => {
         builder.onResolve({ filter: /^@\// }, args => ({ path: Bun.resolveSync("../src/" + args.path.slice(2), import.meta.dir) }));
         // Delay only test persistence, keeping the actual store flush implementation.
         // This exposes the real hook's await boundary without replacing its save API.
-        builder.onLoad({ filter: /stores\/canvas\/use-canvas-store\.ts$/ }, args => ({
+        builder.onLoad({ filter: /stores[\\/]canvas[\\/]use-canvas-store\.ts$/ }, args => ({
             loader: "ts",
             contents: readFileSync(args.path, "utf8").replace("export async function flushCanvasStorePersistence()", "async function originalFlushCanvasStorePersistence()") + `
                 export async function flushCanvasStorePersistence() {
@@ -38,7 +38,7 @@ beforeAll(async () => {
         if (path === "/harness.js") return new Response(script, { headers: { "Content-Type": "application/javascript" } });
         if (path === "/api/canvas-projects/c1") return json({ project: backend });
         if (path === "/api/canvas-projects/c2") return json({ project: secondBackend });
-        if (path === "/api/ops/canvas.document.commit") {
+        if (path === "/api/canvas-projects/c1/document-commit") {
             const body = await request.json();
             const current = body.params.canvasId === "c2" ? secondBackend : backend;
             if (body.params.expectedRevision !== current.revision) return Response.json({ code: 409, data: null, msg: "Revision conflict", reason: "canvas_revision_conflict" }, { status: 409 });

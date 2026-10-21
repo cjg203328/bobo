@@ -346,6 +346,45 @@ paths:
           description: 版本或资源状态冲突，原内容未被覆盖；保留草稿后加载最新版
         "428":
           description: 缺少 revision，需刷新客户端并重新读取
+  /canvas-projects/{id}/document-commit:
+    post:
+      tags: [canvas]
+      summary: 本机编辑器按版本提交画布文档并获取幂等回执
+      description: 仅允许本机工作区界面。校验 Host、Origin 与 RemoteAddr，桌面模式另需可信 UI 凭据；拒绝外部客户端和助手宿主。复用 canvas.document.commit 的 CAS、归属检查与操作回执，不放宽通用 /ops 的身份要求。请求上限 5MB。
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [opId, params]
+              properties:
+                opId: { type: string, description: "本次提交的稳定操作 ID；结果未知时以原 ID 和原正文重试" }
+                params:
+                  type: object
+                  required: [canvasId, expectedRevision, document]
+                  properties:
+                    canvasId: { type: string, description: 必须与路径 id 一致 }
+                    expectedRevision: { type: integer, format: int64, minimum: 0 }
+                    document: { type: object, additionalProperties: true }
+      responses:
+        "200":
+          description: 信封 data 包含 op、opId、replayed、revision、caller 及 result；result 包含 canvasId、revision、updatedAt。同 ID 同内容重放返回原回执，不重复递增版本
+        "400":
+          description: 请求字段、画布 ID、文档或体积无效
+        "403":
+          description: 来源或身份不允许通过本机编辑器提交
+        "404":
+          description: 画布不存在或不属于当前用户
+        "409":
+          description: 期望版本过期、已删除或操作 ID 与已有内容不一致；不得自动覆盖，先保留草稿
+        "500":
+          description: 持久化失败；客户端保留未确认操作及草稿，不能显示已保存
   /canvas-projects/{id}/history:
     get:
       tags: [canvas]

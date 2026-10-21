@@ -6,8 +6,9 @@ import { useUserStore } from "@/stores/use-user-store";
 import { listWorkspaceCanvasProjectsPage, type CanvasLibrarySummary } from "@/services/api/workspace-data";
 import { isLocalWorkspaceMode } from "@/services/workspace-mode";
 import { listCanvasWorkspaceProjectRoots, previewNodesForWorkspaceProject } from "@/lib/canvas/canvas-workspace-project";
+import { homeWorkspaceModules } from "@/lib/workspace-modules";
 import { HomeDashboard } from "./home-dashboard";
-import "./home-dashboard.css";
+import "./home-platform.css";
 
 export default function HomePage() {
     const userId = useUserStore((state) => state.user?.id);
@@ -15,6 +16,7 @@ export default function HomePage() {
     const sessionHydrated = useUserStore((state) => state.hydrated);
     const localProjects = useCanvasStore((state) => state.projects);
     const localHydrated = useCanvasStore((state) => state.hydrated);
+    const features = useUserStore((state) => state.features);
     const localMode = isLocalWorkspaceMode() || storageMode === "local";
     const query = useQuery({
         queryKey: ["huabu-home-canvases", userId],
@@ -31,5 +33,5 @@ export default function HomePage() {
         })), [localProjects]);
     const projects = localMode ? localSummaries : query.data?.projects || [];
 
-    return <HomeDashboard projects={projects} loading={!sessionHydrated || !localHydrated || (!localMode && Boolean(userId) && query.isPending)} error={!localMode && query.isError} onRetry={() => void query.refetch()} />;
+    return <HomeDashboard modules={homeWorkspaceModules(features)} projects={projects} loading={!sessionHydrated || !localHydrated || (!localMode && Boolean(userId) && query.isPending)} error={!localMode && query.isError} onRetry={() => void query.refetch()} />;
 }

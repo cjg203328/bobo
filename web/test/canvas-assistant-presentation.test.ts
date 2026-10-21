@@ -1,7 +1,10 @@
 import { describe, expect, test } from "bun:test";
 
 import {
-    ASSISTANT_STARTER_PROMPTS,
+    assistantWorkflowDraft,
+    assistantAgentActionDraft,
+    assistantCreationDraft,
+    assistantCreationPrompt,
     ASSISTANT_UNAVAILABLE_FALLBACK,
     assistantActionLabel,
     assistantChangeSummary,
@@ -13,6 +16,7 @@ import {
     assistantStatusNotice,
     assistantUndoFailureText,
 } from "@/pages/canvas/canvas-assistant-copy";
+import { ASSISTANT_AGENT_ACTIONS, ASSISTANT_WORKFLOW_TEMPLATES } from "@/lib/agent/assistant-workflows";
 import { ASSISTANT_DEFAULT_WIDTH, ASSISTANT_MAX_WIDTH, ASSISTANT_MIN_WIDTH, clampAssistantWidth, dismissedProposalKey, resolveCanvasRightPanel } from "@/pages/canvas/use-canvas-assistant";
 import type { AssistantTurnChange } from "@/services/api/agent-assistant";
 
@@ -28,7 +32,7 @@ describe("助手不可用原因映射成一句用户语加一个出路", () => {
 
     test("缺凭据指向去连接", () => {
         const notice = assistantStatusNotice("credential_missing");
-        expect(notice.text).toBe("Huabu 还没连接好");
+        expect(notice.text).toBe("波波 AI 画还没连接好");
         expect(notice.action).toBe("model-settings");
     });
 
@@ -138,7 +142,7 @@ describe("撤销失败原因映射", () => {
 describe("付费生成确认", () => {
     test("说清数量、用哪个模型、谁扣款", () => {
         const text = assistantProposalText({ proposalId: "p1", kind: "image", nodeIds: ["a", "b"], model: "seedream-4", modelKey: "ch::seedream-4", note: "" });
-        expect(text).toBe("生成 2 张参考图片 · seedream-4\n确认后开始，按所选渠道计费。");
+        expect(text).toBe("生成 2 张图片 · seedream-4\n确认后开始，按所选渠道计费。");
         // 不能把带渠道前缀的内部值显示出来。
         expect(text).not.toContain("ch::");
     });
@@ -209,12 +213,63 @@ describe("停靠宽度", () => {
 });
 
 describe("空态起步提示", () => {
-    test("四条都是短剧创作能直接用的一句话", () => {
-        expect(ASSISTANT_STARTER_PROMPTS).toHaveLength(4);
-        for (const prompt of ASSISTANT_STARTER_PROMPTS) {
-            expect(prompt.length).toBeGreaterThan(5);
-            expect(prompt.length).toBeLessThan(20);
+    test("提供围绕实际视觉交付物的场景任务", () => {
+        expect(ASSISTANT_WORKFLOW_TEMPLATES.map(item => item.id)).toEqual(["product-visual", "social-content", "short-video"]);
+        for (const workflow of ASSISTANT_WORKFLOW_TEMPLATES) {
+            expect(workflow.prompt).toContain("每轮最多问 3 个问题");
+            expect(workflow.prompt).toContain("当前画布");
+            expect(workflow.prompt).toContain("先给我检查并确认");
         }
+    });
+
+    test("选择场景保留用户已有草稿，并把新任务放在后面", () => {
+        const template = ASSISTANT_WORKFLOW_TEMPLATES[0];
+        expect(assistantWorkflowDraft("已有商品信息", template.id)).toBe(`已有商品信息\n\n${template.prompt}`);
+        expect(assistantWorkflowDraft("", template.id)).toBe(template.prompt);
+    });
+});
+
+describe("Agent 专项创作入口", () => {
+    test("提示词反推、优化和图片细化保留源内容并遵守生成确认", () => {
+        expect(ASSISTANT_AGENT_ACTIONS.map(item => item.id)).toEqual(["reverse-prompt", "optimize-prompt", "refine-image"]);
+        const reverse = ASSISTANT_AGENT_ACTIONS[0].prompt;
+        const optimize = ASSISTANT_AGENT_ACTIONS[1].prompt;
+        const refine = ASSISTANT_AGENT_ACTIONS[2].prompt;
+        expect(reverse).toContain("先请我添加图片");
+        expect(reverse).toContain("不覆盖源图或已有提示词");
+        expect(optimize).toContain("独立文本节点");
+        expect(optimize).toContain("不要自动发起计费生成");
+        expect(refine).toContain("保留源图");
+        expect(refine).toContain("由我确认后再执行");
+        expect(refine).toContain("不要用裁切或插值冒充 AI 细化");
+    });
+
+    test("选择专项入口会保留已有草稿并在后面追加可编辑任务", () => {
+        const action = ASSISTANT_AGENT_ACTIONS[1];
+        expect(assistantAgentActionDraft("已有提示词", action.id)).toBe(`已有提示词\n\n${action.prompt}`);
+        expect(assistantAgentActionDraft("", action.id)).toBe(action.prompt);
+    });
+});
+
+describe("图片与视频创作快捷入口", () => {
+    test("保留对话创作，同时预填可编辑提示词和实际参考素材要求", () => {
+        const imagePrompt = assistantCreationPrompt("image");
+        const videoPrompt = assistantCreationPrompt("video");
+        expect(imagePrompt).toContain("生成一张图片");
+        expect(imagePrompt).toContain("本轮附件作为实际生成参考");
+        expect(imagePrompt).toContain("等我确认再开始");
+        expect(videoPrompt).toContain("生成一段视频");
+        expect(videoPrompt).toContain("镜头运动");
+        expect(videoPrompt).toContain("连接参考素材");
+        expect(videoPrompt).toContain("等我确认再开始");
+    });
+
+    test("保留未发送的用户描述，且允许切换未编辑的创作模板", () => {
+        const imagePrompt = assistantCreationPrompt("image");
+        const videoPrompt = assistantCreationPrompt("video");
+        expect(assistantCreationDraft("", "image")).toBe(imagePrompt);
+        expect(assistantCreationDraft(imagePrompt, "video")).toBe(videoPrompt);
+        expect(assistantCreationDraft("一只戴红围巾的猫", "image")).toContain("一只戴红围巾的猫\n\n帮我直接生成一张图片。");
     });
 });
 

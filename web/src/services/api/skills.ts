@@ -243,3 +243,11 @@ export function likeSkill(id: string) {
 export function unlikeSkill(id: string) {
     return http.delete<{ skill: Skill }>(`/skills/${encodeURIComponent(id)}/like`);
 }
+
+export function publishSkill(id: string) {
+    return http.post<{ skill: Skill }>(`/skills/${encodeURIComponent(id)}/publish`).finally(invalidateAddedSkillsCache);
+}
+
+export function unpublishSkill(id: string) {
+    return http.post<{ skill: Skill }>(`/skills/${encodeURIComponent(id)}/unpublish`).finally(invalidateAddedSkillsCache);
+}

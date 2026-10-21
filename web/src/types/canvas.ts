@@ -38,6 +38,7 @@ export enum CanvasNodeType {
     MediaConversion = "media-conversion",
     BatchTable = "batch-table",
     Director = "director",
+    Note = "note",
 }
 
 /** Runtime IDs contributed by plugins share the persisted node type field. */
@@ -517,6 +518,16 @@ export type CanvasNodeMetadata = {
         sourceMode: "ai" | "image";
         smartBase: boolean;
         directImageUrl?: string | null;
+    };
+    /**
+     * 笔记节点外观。
+     *
+     * 只存"用户选了什么"，不存派生样式——字号、行高、内边距都由渲染层按 tone
+     * 现算，避免在这里冻结一套值以后改主题要迁移历史数据。
+     */
+    note?: {
+        tone?: "amber" | "sky" | "rose" | "violet" | "slate";
+        pinned?: boolean;
     };
 };
 

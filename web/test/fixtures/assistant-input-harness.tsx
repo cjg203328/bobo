@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { App } from "antd";
 import { AgentConnectPanel } from "@/pages/agents/agent-connect-panel";
 import { useCanvasAssistant } from "@/pages/canvas/use-canvas-assistant";
@@ -29,12 +29,19 @@ Object.assign(window, { assistantInputFixture: {
     libraryInvalidated: () => appQueryClient.getQueryState(initialAssetQuery)?.isInvalidated,
     changedCanvases: () => [...changedCanvases],
     locatedNodes: () => [...locatedNodes],
+    seedInitialDraft: (text: string) => window.dispatchEvent(new CustomEvent("assistant-input-initial-draft", { detail: text })),
     switchScope: async (scope = "other-workspace") => { await fetch("/test/asset-scope", { method: "POST", body: JSON.stringify({ scope }) }); setActiveUserScope(scope); useAssetStore.setState({ assets: [] }); },
 } });
 function Harness() {
     const [externalOpen, setExternalOpen] = useState(false);
+    const [initialDraft, setInitialDraft] = useState<string>();
     const assistant = useCanvasAssistant({ canvasId: "input-canvas", onCanvasChanged: canvasId => { changedCanvases.push(canvasId); } });
-    return <App><div style={{ height: "100vh", width: "100%", display: "flex" }}><CanvasAssistantSidebar assistant={assistant} canvasTitle="附件流程验证" dockable readOnly={false}
+    useEffect(() => {
+        const receiveInitialDraft = (event: Event) => setInitialDraft((event as CustomEvent<string>).detail);
+        window.addEventListener("assistant-input-initial-draft", receiveInitialDraft);
+        return () => window.removeEventListener("assistant-input-initial-draft", receiveInitialDraft);
+    }, []);
+    return <App><div style={{ height: "100vh", width: "100%", display: "flex" }}><CanvasAssistantSidebar assistant={assistant} initialDraft={initialDraft} onInitialDraftConsumed={() => setInitialDraft(undefined)} canvasTitle="附件流程验证" dockable readOnly={false}
         selectedNodeIds={[]} references={[{ id: "node:n1", nodeId: "n1", kind: "image", label: "画布人像", title: "画布人像", active: true, storageKey: resourceStorageKey("existing"), previewUrl: resourceFileUrl("existing") }]}
         onLocateNodes={nodeIds => { locatedNodes.push(nodeIds); }} onRunProposal={() => {}} onOpenModelSettings={() => {}} /></div>
         <button style={{ position: "fixed", left: 4, top: 4 }} onClick={() => setExternalOpen(true)}>连接外部 Agent</button>

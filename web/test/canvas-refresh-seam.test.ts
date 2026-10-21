@@ -206,7 +206,7 @@ describe("画布刷新接缝（服务端基线）", () => {
         await refreshLocalCanvasProjectIfChanged("c1");
         useCanvasStore.getState().updateProject("c1", { title: "手工再改" });
         await syncLocalCanvasProjectToBackend("c1");
-        expect(server.posts).toEqual([expect.objectContaining({ path: "/ops/canvas.document.commit", expectedRevision: 2 })]);
+        expect(server.posts).toEqual([expect.objectContaining({ path: "/canvas-projects/c1/document-commit", expectedRevision: 2 })]);
         expect(useCanvasStore.getState().projects[0].title).toBe("手工再改");
         expect(hasUnconfirmedCanvasEdits("c1")).toBe(false);
     });

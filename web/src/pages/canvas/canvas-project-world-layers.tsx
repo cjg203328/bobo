@@ -3,6 +3,8 @@ import { Link2 } from "lucide-react";
 
 import { ConnectionPath, canvasConnectionPath } from "@/components/canvas/canvas-connections";
 import { subscribeCanvasNodeDragPreview } from "@/lib/canvas/canvas-live-viewport";
+import { canvasEdgeRoutingBounds, queryCanvasRoutingObstacles, type CanvasRoutingObstacle } from "@/lib/canvas/canvas-edge-routing";
+import { buildCanvasSpatialIndex } from "@/lib/canvas/canvas-spatial-index";
 import { CanvasFrameNode } from "@/components/canvas/canvas-frame-node";
 import { CanvasNode } from "@/components/canvas/canvas-node";
 import type { CanvasVideoCropRect } from "@/components/canvas/canvas-video-crop-dialog";
@@ -34,6 +36,7 @@ type CanvasProjectWorldLayersProps = {
     connectionApproach: CanvasConnectionApproach;
     nodeById: Map<string, CanvasNodeData>;
     visibleNodes: CanvasNodeData[];
+    routingNodes: CanvasNodeData[];
     nodeStackOrder: CanvasNodeStackOrder;
     frameChildrenById: Map<string, CanvasNodeData[]>;
     linkedFolderPreviewNodesById: Map<string, CanvasNodeData[]>;
@@ -103,6 +106,12 @@ const EMPTY_CANVAS_NODES: CanvasNodeData[] = [];
 export const CanvasProjectWorldLayers = memo(function CanvasProjectWorldLayers(props: CanvasProjectWorldLayersProps) {
     const { viewportScale } = props;
     const connectionLayerRef = useRef<SVGSVGElement>(null);
+    // 使用完整展开图的障碍，避免视口裁剪让平移、缩放改变走线。
+    // useMemo 保持数组引用稳定，否则 memo 化的 ConnectionPath 会全部重渲染。
+    const routingObstacles = useMemo<CanvasRoutingObstacle[]>(
+        () => props.routingNodes.map((node) => ({ id: node.id, x: node.position.x, y: node.position.y, width: node.width, height: node.height })),
+        [props.routingNodes],
+    );
     useLayoutEffect(() => {
         const layer = connectionLayerRef.current;
         const container = props.containerRef.current || layer?.closest<HTMLDivElement>("[data-canvas-viewport]");
@@ -112,14 +121,47 @@ export const CanvasProjectWorldLayers = memo(function CanvasProjectWorldLayers(p
             const id = group.dataset.canvasConnectionId;
             if (id) groups.set(id, group);
         });
+        const obstacleById = new Map(routingObstacles.map((obstacle) => [obstacle.id, obstacle]));
+        const connectionsByNode = new Map<string, Set<string>>();
+        const connectionById = new Map(props.displayConnections.map((item) => [item.connection.id, item]));
+        const edgeIndex = buildCanvasSpatialIndex(props.displayConnections.map((item) => {
+            for (const id of [item.from.id, item.to.id]) {
+                if (!connectionsByNode.has(id)) connectionsByNode.set(id, new Set());
+                connectionsByNode.get(id)!.add(item.connection.id);
+            }
+            const endpoints = canvasConnectionPath(item.connection, item.from, item.to, props.scriptScrollTopById[item.from.id] || 0, props.scriptScrollTopById[item.to.id] || 0);
+            return { id: item.connection.id, value: item.connection.id, bounds: canvasEdgeRoutingBounds(endpoints) };
+        }));
+        let previousAffected = new Set<string>();
         return subscribeCanvasNodeDragPreview(container, (preview) => {
-            for (const { connection, from, to } of props.displayConnections) {
-                if (preview && !preview.nodeIds.has(from.id) && !preview.nodeIds.has(to.id)) continue;
+            const currentAffected = new Set<string>();
+            const movedObstacles: CanvasRoutingObstacle[] = [];
+            if (preview) for (const id of preview.nodeIds) {
+                connectionsByNode.get(id)?.forEach((edgeId) => currentAffected.add(edgeId));
+                const obstacle = obstacleById.get(id);
+                if (!obstacle) continue;
+                const shifted = { ...obstacle, x: obstacle.x + preview.x, y: obstacle.y + preview.y };
+                movedObstacles.push(shifted);
+                for (const position of [obstacle, shifted]) {
+                    edgeIndex.query({ left: position.x, top: position.y, right: position.x + position.width, bottom: position.y + position.height }).forEach((edgeId) => currentAffected.add(edgeId));
+                }
+            }
+            // Restore edges as obstacles leave their corridor, including cancel/reset.
+            const affected = new Set([...previousAffected, ...currentAffected]);
+            previousAffected = currentAffected;
+            for (const id of affected) {
+                const item = connectionById.get(id);
+                if (!item) continue;
+                const { connection, from, to } = item;
                 const group = groups.get(connection.id);
                 if (!group) continue;
                 const movedFrom = preview?.nodeIds.has(from.id) ? { ...from, position: { x: from.position.x + preview.x, y: from.position.y + preview.y } } : from;
                 const movedTo = preview?.nodeIds.has(to.id) ? { ...to, position: { x: to.position.x + preview.x, y: to.position.y + preview.y } } : to;
-                const { pathD, startX, startY, endX, endY } = canvasConnectionPath(connection, movedFrom, movedTo, props.scriptScrollTopById[from.id] || 0, props.scriptScrollTopById[to.id] || 0);
+                const routeEndpoints = canvasConnectionPath(connection, movedFrom, movedTo, props.scriptScrollTopById[from.id] || 0, props.scriptScrollTopById[to.id] || 0);
+                const shiftedObstacles = preview
+                    ? [...queryCanvasRoutingObstacles(routingObstacles, canvasEdgeRoutingBounds(routeEndpoints)).filter((obstacle) => !preview.nodeIds.has(obstacle.id)), ...movedObstacles]
+                    : routingObstacles;
+                const { pathD, startX, startY, endX, endY } = canvasConnectionPath(connection, movedFrom, movedTo, props.scriptScrollTopById[from.id] || 0, props.scriptScrollTopById[to.id] || 0, shiftedObstacles);
                 group.querySelectorAll<SVGPathElement>("path[d]").forEach((path) => path.setAttribute("d", pathD));
                 const endpoints = group.querySelectorAll<SVGCircleElement>("circle");
                 endpoints[0]?.setAttribute("cx", String(startX));
@@ -133,7 +175,7 @@ export const CanvasProjectWorldLayers = memo(function CanvasProjectWorldLayers(p
                 gradient?.setAttribute("y2", String(endY));
             }
         });
-    }, [props.containerRef, props.displayConnections, props.scriptScrollTopById]);
+    }, [props.containerRef, props.displayConnections, props.scriptScrollTopById, routingObstacles]);
     const [activeMediaNodeId, setActiveMediaNodeId] = useState<string | null>(null);
     useEffect(() => {
         if (activeMediaNodeId && !props.nodeById.has(activeMediaNodeId)) setActiveMediaNodeId(null);
@@ -174,6 +216,7 @@ export const CanvasProjectWorldLayers = memo(function CanvasProjectWorldLayers(p
                         toScrollTop={props.scriptScrollTopById[to.id] || 0}
                         active={props.selectedConnectionId === connection.id || props.relatedConnectionIds.has(connection.id)}
                         visualMode="full"
+                        obstacles={routingObstacles}
                         onSelect={() => props.onConnectionSelect(connection.id)}
                         onContextMenu={(event) => props.onConnectionContextMenu(event, connection.id)}
                     />

@@ -44,7 +44,7 @@ beforeAll(async () => {
                 }
                 return Response.json({ code: 0, data: { project: canonicalCanvas } });
             }
-            if (path === "/api/ops/canvas.document.commit") {
+            if (path === "/api/canvas-projects/canvas-a/document-commit") {
                 const body = await request.json();
                 canonicalCanvas = { ...body.params.document, revision: (canonicalCanvas?.revision ?? 0) + 1 };
                 return Response.json({ code: 0, data: { op: "canvas.document.commit", opId: body.opId, result: { id: "canvas-a", revision: canonicalCanvas.revision }, revision: canonicalCanvas.revision } });

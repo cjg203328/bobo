@@ -41,7 +41,8 @@ export function SkillInstallModal({ open, onClose, onInstalled, onManualCreate }
         if (!open) return;
         setMode("markdown");
         setFileList([]);
-        form.setFieldsValue({ tag: "creative", is_public: !localRuntime, autoUpdate: true, name: "", description: "", url: "", ref: "", subdir: "" });
+        /* 安装后默认私有（草稿）：作者确认内容后再从技能卡片一键发布到广场。 */
+        form.setFieldsValue({ tag: "creative", is_public: false, autoUpdate: true, name: "", description: "", url: "", ref: "", subdir: "" });
     }, [form, open, localRuntime]);
 
     const install = async () => {

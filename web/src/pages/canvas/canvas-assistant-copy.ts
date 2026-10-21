@@ -2,6 +2,9 @@
 // 翻译成用户语。组件只负责排版，不自己拼文案，避免同一种状态在两处写出两句话。
 import type { AgentLifecycleEvent, AgentToolCall, AssistantGenerationProposal, AssistantSkillSelection, AssistantTurnChange, AssistantUndoFailure } from "@/services/api/agent-assistant";
 import { seedancePortraitLabel } from "@/lib/seedance-portrait";
+import { ASSISTANT_AGENT_ACTIONS, ASSISTANT_WORKFLOW_TEMPLATES, type AssistantAgentActionId, type AssistantWorkflowId } from "@/lib/agent/assistant-workflows";
+export { assistantCreationDraft, assistantCreationPrompt } from "@/lib/agent/assistant-workflows";
+export type { AssistantCreationKind } from "@/lib/agent/assistant-workflows";
 
 export type AssistantStatusAction = "model-settings" | "retry";
 
@@ -22,7 +25,7 @@ export function assistantStatusNotice(reason: string | undefined): AssistantStat
         case "model_protocol_unsupported":
             return { text: "还没有可用的助手模型", actionLabel: "去模型配置", action: "model-settings" };
         case "credential_missing":
-            return { text: "Huabu 还没连接好", actionLabel: "去连接", action: "model-settings" };
+            return { text: "波波 AI 画还没连接好", actionLabel: "去连接", action: "model-settings" };
         case "host_starting":
             return { text: "助手正在启动…", starting: true };
         case "host_start_failed":
@@ -122,15 +125,22 @@ export function assistantUndoFailureText(failure: AssistantUndoFailure): string 
 export function assistantProposalText(proposal: AssistantGenerationProposal, priceLines: string[] = []): string {
     const count = proposal.nodeIds?.length ?? 0;
     const target = proposal.kind === "video" ? "视频" : "图片";
-    return `生成 ${count} ${target === "视频" ? "段视频" : "张参考图片"} · ${seedancePortraitLabel(proposal.model) || proposal.model}\n${priceLines.length ? priceLines.join("\n") + "\n" : ""}确认后开始，按所选渠道计费。`;
+    return `生成 ${count} ${target === "视频" ? "段视频" : "张图片"} · ${seedancePortraitLabel(proposal.model) || proposal.model}\n${priceLines.length ? priceLines.join("\n") + "\n" : ""}确认后开始，按所选渠道计费。`;
 }
 
-export const ASSISTANT_STARTER_PROMPTS = [
-    "把剧本拆成分镜草案",
-    "给选中的镜头补充景别和情绪",
-    "整理画布并按顺序连线",
-    "检查哪些镜头还缺参考图",
-];
+export function assistantWorkflowDraft(current: string, workflowId: AssistantWorkflowId) {
+    const template = ASSISTANT_WORKFLOW_TEMPLATES.find(item => item.id === workflowId);
+    if (!template) return current;
+    const existing = current.trimEnd();
+    return existing ? `${existing}\n\n${template.prompt}` : template.prompt;
+}
+
+export function assistantAgentActionDraft(current: string, actionId: AssistantAgentActionId) {
+    const action = ASSISTANT_AGENT_ACTIONS.find(item => item.id === actionId);
+    if (!action) return current;
+    const existing = current.trimEnd();
+    return existing ? `${existing}\n\n${action.prompt}` : action.prompt;
+}
 
 /** 官方压缩/重试进度：只说现在在做什么，不提内部事件名。 */
 export function assistantLifecycleText(event: { phase: AgentLifecycleEvent["phase"] | "tool" | "tool_end"; toolName?: string } | string | null | undefined): string | null {

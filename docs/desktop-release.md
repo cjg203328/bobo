@@ -185,8 +185,8 @@ export HUABU_UPDATER_PUBLIC_KEY="$(tr -d '[:space:]' < /path/to/huabu-updater.pu
 
 脚本会把下面两个链接期变量写进二进制：
 
-- `infinite-canvas/backend/internal/desktopupdate.FeedURL` = `https://updates.beefapi.com/huabu/desktop-update.json`
-- `infinite-canvas/backend/internal/desktopupdate.PublicKey` = 公钥 Base64
+- `huabu/backend/internal/desktopupdate.FeedURL` = `https://updates.beefapi.com/huabu/desktop-update.json`
+- `huabu/backend/internal/desktopupdate.PublicKey` = 公钥 Base64
 
 两个都为空时，应用里的更新器保持关闭，但仍显示当前版本。
 

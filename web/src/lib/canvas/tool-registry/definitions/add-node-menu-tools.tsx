@@ -15,6 +15,7 @@ export const addNodeMenuCommands: AddNodeMenuCommand[] = [
     { id: "style", label: "项目画风", icon: <Palette />, section: "project", defaultOrder: 10, applicable: (ctx) => !ctx.isProjectLinked, run: (ctx) => ctx.handlers.onChooseStyle() },
     // 创作节点
     nodeCommand(CanvasNodeType.Text, { defaultOrder: 10, run: (ctx) => ctx.handlers.onAddText() }),
+    nodeCommand(CanvasNodeType.Note, { defaultOrder: 15, run: (ctx) => ctx.handlers.onAddExtensionNode(CanvasNodeType.Note) }),
     nodeCommand(CanvasNodeType.Image, { defaultOrder: 20, run: (ctx) => ctx.handlers.onAddImage() }),
     nodeCommand(CanvasNodeType.Video, { defaultOrder: 30, run: (ctx) => ctx.handlers.onAddVideo() }),
     nodeCommand(CanvasNodeType.Audio, { defaultOrder: 40, applicable: (ctx) => ctx.workspaceMode !== "simple", run: (ctx) => ctx.handlers.onAddAudio() }),

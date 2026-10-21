@@ -35,14 +35,14 @@ export async function commitCanvasDocument(input: {
     document: Record<string, unknown>;
     expectedScope?: CapturedUserScope;
 }) {
-    return executeWorkspaceOperation<CanvasDocumentCommitResult>("canvas.document.commit", {
+    return http.post<WorkspaceOperationResult<CanvasDocumentCommitResult>>(`/canvas-projects/${encodeURIComponent(input.canvasId)}/document-commit`, {
         opId: input.operationId,
         params: {
             canvasId: input.canvasId,
             expectedRevision: input.expectedRevision,
             document: input.document,
         },
-    }, undefined, input.expectedScope);
+    }, { expectedScope: input.expectedScope });
 }
 
 export type CanvasTaskBindReceipt = {

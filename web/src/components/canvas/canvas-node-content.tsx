@@ -39,6 +39,7 @@ import { useCanvasNodeActions } from "./canvas-node-action-context";
 import { CanvasSubtitleOverlay } from "./canvas-subtitle-overlay";
 import { CanvasFileUploadContent } from "./canvas-file-upload-content";
 import { MarkdownNodeContent } from "./nodes/markdown-node";
+import { NoteNodeContent } from "./nodes/note-node";
 import { ChartNodeContent } from "./nodes/chart-node";
 import { CompareNodeContent } from "./nodes/compare-node";
 import { ColorGradeNodeContent } from "./nodes/color-grade-node";
@@ -137,6 +138,7 @@ const nodeContentRenderers: Partial<Record<string, (props: CanvasNodeContentProp
     [CanvasNodeType.Compare]: CompareNodeContent,
     [CanvasNodeType.Chart]: ChartNodeContent,
     [CanvasNodeType.ColorGrade]: ColorGradeNodeContent,
+    [CanvasNodeType.Note]: NoteNodeContent,
 };
 
 function DrawingContent({ node, theme, drawingProjectId }: CanvasNodeContentProps) {

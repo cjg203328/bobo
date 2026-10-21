@@ -43,9 +43,12 @@ describe("处理未完成仍保留可检查的结果", () => {
     });
     test("运行中保留输入和停止，并有明确补充入口，不新增素材附件", () => {
         const html = renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><CanvasAssistantComposer value="只改结尾" onChange={() => {}} onSend={() => {}} onStop={() => {}}
-            streaming disabled={false} canSupplement supplementBusy={false} references={[]} selectedCount={3} selectionAttached onDetachSelection={() => {}} /></QueryClientProvider>);
+            streaming disabled={false} canSupplement supplementBusy={false} references={[]} selectedCount={3} selectionAttached onDetachSelection={() => {}}
+            onQuickCreate={() => {}} /></QueryClientProvider>);
         expect(html).toMatch(/补\s*充/);
         expect(html).toContain("停止");
+        expect(html).toContain("AI 生图");
+        expect(html).toContain("AI 生视频");
         const input = html.match(/<textarea\b[^>]*>/)?.[0] || html.match(/<div\b[^>]*contentEditable="true"[^>]*>/)?.[0];
         expect(input).toBeDefined();
         expect(input).not.toContain('disabled=""');

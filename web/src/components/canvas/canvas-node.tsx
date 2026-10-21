@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { AlertCircle, BookOpenCheck, CheckCircle2, ChevronRight, Clapperboard, Copy, Download, FileText, GripVertical, Image as ImageIcon, Lock, Maximize2, Move3d, Music2, Pencil, RefreshCw, ScanSearch, Settings2, Star, Trash2, Video, WandSparkles } from "lucide-react";
+import { AlertCircle, BookOpenCheck, CheckCircle2, ChevronRight, Clapperboard, Copy, Download, FileText, GripVertical, Image as ImageIcon, Lock, Maximize2, Move3d, Music2, Pencil, RefreshCw, ScanSearch, Settings2, Star, StickyNote, Trash2, Video, WandSparkles } from "lucide-react";
 
 import { useCanvasNodeActions } from "./canvas-node-action-context";
 import { shouldBlockAutomaticRetry } from "@/lib/generation-error";
@@ -145,6 +145,7 @@ export const CanvasNode = React.memo(function CanvasNode({
     const theme = canvasThemes[useActiveTheme()];
     const [hovered, setHovered] = useState(false);
     const [isEditingContent, setIsEditingContent] = useState(false);
+    const canEditContent = !readOnly && !data.metadata?.locked && (data.type === CanvasNodeType.Text || data.type === CanvasNodeType.Note);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [titleDraft, setTitleDraft] = useState(data.title);
     const { download: downloadNode, duplicate: duplicateNode, deleteNode } = useCanvasNodeActions();
@@ -173,6 +174,10 @@ export const CanvasNode = React.memo(function CanvasNode({
         keepRatio: false,
         ratio: 1,
     });
+
+    useEffect(() => {
+        if (!canEditContent) setIsEditingContent(false);
+    }, [canEditContent]);
 
     useEffect(() => {
         const textarea = textareaRef.current;
@@ -411,7 +416,7 @@ export const CanvasNode = React.memo(function CanvasNode({
                         onOpenTextEditor?.(data);
                         return;
                     }
-                    if (readOnly || data.type !== CanvasNodeType.Text) return;
+                    if (!canEditContent) return;
                     event.stopPropagation();
                     setIsEditingContent(true);
                 }}
@@ -497,7 +502,22 @@ export const CanvasNode = React.memo(function CanvasNode({
                     ) : null}
                 </div>
 
-                {data.type === CanvasNodeType.Text && data.metadata?.workflowKind !== "character" && !readOnly ? (
+                {data.type === CanvasNodeType.Note && canEditContent && !isEditingContent ? (
+                    <button
+                        type="button"
+                        className="canvas-node-inline-action absolute right-2 top-2 z-[var(--node-z-overlay)] inline-flex h-8 items-center gap-1.5 px-2 text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                        style={{ outlineColor: theme.accent.primary }}
+                        aria-label="编辑笔记"
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={(event) => { event.stopPropagation(); setIsEditingContent(true); }}
+                    >
+                        <Pencil className="size-3.5" />
+                        编辑
+                    </button>
+                ) : null}
+
+                {data.type === CanvasNodeType.Text && data.metadata?.workflowKind !== "character" && canEditContent ? (
                     <div
                         className={`canvas-node-inline-edit absolute bottom-[10%] left-1/2 z-[var(--node-z-overlay)] -translate-x-1/2 motion-safe:transition motion-safe:duration-200 ${isSelected ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`}
                         aria-hidden={!isSelected}

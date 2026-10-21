@@ -369,7 +369,7 @@ if ([string]::IsNullOrWhiteSpace($env:CANVAS_BUILD_TIME)) {
     $env:CANVAS_BUILD_TIME = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
 }
 $env:CANVAS_BUILD_VERSION = $versionValue
-$ldflags = "-X infinite-canvas/backend/internal/buildinfo.Version=$versionValue -X infinite-canvas/backend/internal/buildinfo.Commit=$commitValue -X infinite-canvas/backend/internal/buildinfo.BuildTime=$($env:CANVAS_BUILD_TIME)"
+$ldflags = "-X huabu/backend/internal/buildinfo.Version=$versionValue -X huabu/backend/internal/buildinfo.Commit=$commitValue -X huabu/backend/internal/buildinfo.BuildTime=$($env:CANVAS_BUILD_TIME)"
 if (-not [string]::IsNullOrWhiteSpace($env:HUABU_UPDATER_PUBLIC_KEY)) {
     Write-Step "Injecting desktop updater FeedURL and PublicKey ldflags"
     $previousLocation = Get-Location

@@ -5,6 +5,7 @@ import { canvasThemes } from "@/lib/canvas-theme";
 import { useActiveTheme } from "@/stores/canvas/use-canvas-theme-store";
 import { STORYBOARD_HEADER_HEIGHT, STORYBOARD_ROW_HEIGHT, storyboardTableHeight } from "@/lib/canvas/canvas-storyboard-layout";
 import { batchReferenceHandleY } from "@/lib/canvas/canvas-batch-table";
+import { bezierEdgePath, routeCanvasEdgePath, type CanvasRoutingObstacle } from "@/lib/canvas/canvas-edge-routing";
 import type { CanvasConnection, CanvasNodeData, ConnectionHandle, Position } from "@/types/canvas";
 
 export const ConnectionPath = React.memo(function ConnectionPath({
@@ -16,6 +17,7 @@ export const ConnectionPath = React.memo(function ConnectionPath({
     active,
     visualMode = "full",
     hideVisual = false,
+    obstacles,
     onSelect,
     onContextMenu,
 }: {
@@ -27,12 +29,14 @@ export const ConnectionPath = React.memo(function ConnectionPath({
     active: boolean;
     visualMode?: "full" | "hover-only";
     hideVisual?: boolean;
+    /** 画布上的其它节点矩形；传入后连线会在被遮挡时自动绕行。 */
+    obstacles?: readonly CanvasRoutingObstacle[];
     onSelect: () => void;
     onContextMenu?: (event: ReactMouseEvent<SVGPathElement>) => void;
 }) {
     const theme = canvasThemes[useActiveTheme()];
     const [hovered, setHovered] = useState(false);
-    const { pathD, startX, startY, endX, endY } = canvasConnectionPath(connection, from, to, fromScrollTop, toScrollTop);
+    const { pathD, startX, startY, endX, endY } = canvasConnectionPath(connection, from, to, fromScrollTop, toScrollTop, obstacles);
     const emphasized = active || hovered;
     // The public read-only LibTV overview uses hairline, low-contrast graph
     // wires at 10% zoom. Keep the fixture's wires visually faithful without
@@ -147,17 +151,19 @@ export const ConnectionPath = React.memo(function ConnectionPath({
             /> : null}
         </g>
     );
-}, (previous, next) => previous.connection === next.connection && previous.from === next.from && previous.to === next.to && previous.active === next.active && previous.visualMode === next.visualMode && previous.hideVisual === next.hideVisual && previous.fromScrollTop === next.fromScrollTop && previous.toScrollTop === next.toScrollTop);
+}, (previous, next) => previous.connection === next.connection && previous.from === next.from && previous.to === next.to && previous.active === next.active && previous.visualMode === next.visualMode && previous.hideVisual === next.hideVisual && previous.fromScrollTop === next.fromScrollTop && previous.toScrollTop === next.toScrollTop && previous.obstacles === next.obstacles);
 
-export function canvasConnectionPath(connection: CanvasConnection, from: CanvasNodeData, to: CanvasNodeData, fromScrollTop = 0, toScrollTop = 0) {
+export function canvasConnectionPath(connection: CanvasConnection, from: CanvasNodeData, to: CanvasNodeData, fromScrollTop = 0, toScrollTop = 0, obstacles?: readonly CanvasRoutingObstacle[]) {
     if (connection.pathD) return { pathD: connection.pathD, startX: from.position.x + from.width, startY: from.position.y + from.height / 2, endX: to.position.x, endY: to.position.y + to.height / 2 };
     const startX = from.position.x + from.width;
     const startY = connectionHandleY(from, connection.fromHandleId, fromScrollTop);
     const endX = to.position.x;
     const endY = connectionHandleY(to, connection.toHandleId, toScrollTop);
-    const dx = Math.abs(endX - startX);
-    const curvature = Math.max(dx * 0.5, 50);
-    return { pathD: `M ${startX} ${startY} C ${startX + curvature} ${startY}, ${endX - curvature} ${endY}, ${endX} ${endY}`, startX, startY, endX, endY };
+    // 不传 obstacles 时保持原有纯贝塞尔行为（版本预览、缩略图等只读场景用得上）。
+    const pathD = obstacles?.length
+        ? routeCanvasEdgePath({ startX, startY, endX, endY, obstacles, skipObstacleIds: [from.id, to.id] })
+        : bezierEdgePath(startX, startY, endX, endY);
+    return { pathD, startX, startY, endX, endY };
 }
 
 export function shouldShowConnectionVisual({ visualMode, hovered, hideVisual }: { visualMode: "full" | "hover-only"; hovered: boolean; hideVisual: boolean }) {

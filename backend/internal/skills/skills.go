@@ -156,7 +156,14 @@ func (s *Service) AddedSkills(userID string) ([]SkillItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.skillItems(userID, rows, false)
+	items, err := s.skillItems(userID, rows, false)
+	if err != nil {
+		return nil, err
+	}
+	for _, definition := range boboBuiltinAgentSkills() {
+		items = append(items, builtinAgentSkillItem(definition))
+	}
+	return items, nil
 }
 
 func (s *Service) SkillDetail(userID string, id string) (*SkillItem, error) {
@@ -264,6 +271,23 @@ func (s *Service) SetSkillLiked(userID string, id string, liked bool) (*SkillIte
 	}
 	state.Liked = liked
 	if err := s.repo.SetUserSkillLiked(state); err != nil {
+		return nil, err
+	}
+	return s.SkillDetail(userID, id)
+}
+
+// SetSkillVisibility 只切换技能的公开状态（发布/下架），不改动名称、简介、
+// 指令或技能包内容，因此不会生成新版本，仅持久化 IsPrivate。
+func (s *Service) SetSkillVisibility(userID string, id string, private bool) (*SkillItem, error) {
+	skill, err := s.ownedSkill(userID, id)
+	if err != nil {
+		return nil, err
+	}
+	if skill.IsPrivate == private {
+		return s.SkillDetail(userID, id)
+	}
+	skill.IsPrivate = private
+	if err := s.repo.SaveSkill(skill); err != nil {
 		return nil, err
 	}
 	return s.SkillDetail(userID, id)

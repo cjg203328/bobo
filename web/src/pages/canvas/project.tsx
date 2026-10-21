@@ -1,5 +1,6 @@
 import { localAssetToInsertPayload } from "@/components/canvas/asset-picker-modal";
 import { isCanvasNodeGenerating } from "@/lib/canvas/canvas-node-task-state";
+import { consumeAssistantDraftHandoff } from "@/services/assistant-draft-handoff";
 import { CanvasAssistantSidebar } from "./canvas-assistant-sidebar";
 import { highlightAssistantNodes } from "./canvas-assistant-highlight";
 import { resolveCanvasRightPanel, useCanvasAssistant, useCanvasAssistantDockable } from "./use-canvas-assistant";
@@ -98,6 +99,7 @@ import { CanvasNodeActionContext, type CanvasNodeActionContextValue } from "@/co
 import { bringCanvasNodeToFront, type CanvasNodeStackOrder } from "@/lib/canvas/canvas-node-stack-order";
 import { CanvasNodeGraphContext, type CanvasNodeGraphContextValue } from "@/components/canvas/canvas-node-graph-context";
 import { CanvasRefreshShell } from "./canvas-refresh-shell";
+import "./canvas-glass-ui.css";
 import type { CanvasImageEmotionPayload } from "@/components/canvas/canvas-node-emotion-panel";
 import { CanvasEmotionWorkspace } from "@/components/canvas/canvas-emotion-workspace";
 import { removeCanvasDrawing } from "@/lib/canvas/canvas-drawing-storage";
@@ -182,6 +184,9 @@ function InfiniteCanvasPage() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const projectId = params.id || "";
+    // React StrictMode 会在开发环境重复运行初始化 effect；一次性首页草稿只能消费一次，
+    // 否则第一次读取后第二次会把已经移除的临时交接误当成空草稿。
+    const consumedAssistantDraftRef = useRef<string | null>(null);
     const readOnly = searchParams.get("readonly") === "1" || searchParams.get("mode") === "readonly";
     const canvasStorageScope = getActiveUserScope();
     const canvasCapturedScope = captureUserScope();
@@ -283,6 +288,7 @@ function InfiniteCanvasPage() {
     const [canvasTool, setCanvasTool] = useState<CanvasToolMode>("box-select");
     const [mediaPerformanceMode, setMediaPerformanceMode] = useState<CanvasMediaPerformanceMode>(readCanvasMediaPerformanceMode);
     const [projectLoaded, setProjectLoaded] = useState(false);
+    const [assistantInitialDraft, setAssistantInitialDraft] = useState<string>();
     const workspaceMode: CanvasWorkspaceMode = "professional";
     const {
         clearConfirmOpen,
@@ -790,9 +796,7 @@ function InfiniteCanvasPage() {
     // 每帧新对象会让所有节点跟着重渲染，错题本里多条崩溃都出在画布高频更新。
     const nodeGraphContext = useMemo<CanvasNodeGraphContextValue>(() => ({ getUpstreamNodes: (nodeId: string) => getContextResourceNodes(nodeId, nodes, connections) }), [connections, nodes]);
 
-    // 旧内置 Agent 的深链参数（?agent=1 / ?conversation=）仍然存在于历史书签里。
-    // 画布不再有 Agent 停靠面板，这里只把参数剥离，让旧链接落到正常可用的画布，
-    // 画布会话数据本身保留在项目记录中。
+    // 旧版 Agent 深链参数仍存在于书签中；新入口使用 start=agent 和一次性草稿交接。
     useEffect(() => {
         if (!projectLoaded) return;
         if (!searchParams.has("agent") && !searchParams.has("conversation")) return;
@@ -1668,6 +1672,7 @@ function InfiniteCanvasPage() {
         upscaleNode,
         versionCompareNodes,
         visibleNodes,
+        routingNodes,
     } = useCanvasRenderModel({
         nodes,
         connections,
@@ -1807,7 +1812,8 @@ function InfiniteCanvasPage() {
 
     useEffect(() => {
         const starter = searchParams.get("start");
-        if (!projectLoaded || (starter !== "director" && starter !== "agent")) return;
+        const assistantDraftId = searchParams.get("assistantDraft");
+        if (!projectLoaded || (starter !== "director" && starter !== "agent" && !assistantDraftId)) return;
 
         let frame = 0;
         const startWhenCanvasIsLaidOut = () => {
@@ -1819,12 +1825,19 @@ function InfiniteCanvasPage() {
 
             if (starter === "director" && !nodesRef.current.some((node) => node.type === CanvasNodeType.Director)) {
                 createDirectorShot();
-            } else if (starter === "agent") {
+            } else if (starter === "agent" || assistantDraftId) {
                 openAssistant();
             }
 
             const next = new URLSearchParams(searchParams);
             next.delete("start");
+            if (assistantDraftId) {
+                if (consumedAssistantDraftRef.current !== assistantDraftId) {
+                    consumedAssistantDraftRef.current = assistantDraftId;
+                    setAssistantInitialDraft(consumeAssistantDraftHandoff(assistantDraftId) || undefined);
+                }
+                next.delete("assistantDraft");
+            }
             setSearchParams(next, { replace: true });
         };
         frame = requestAnimationFrame(startWhenCanvasIsLaidOut);
@@ -2548,7 +2561,7 @@ function InfiniteCanvasPage() {
             >
                 跳转到画布主内容
             </a>
-            <main ref={canvasMainRef} id="canvas-main" data-canvas-readonly={readOnly ? "true" : "false"} data-libtv-readonly-dense={searchParams.get("fixture") === "libtv-readonly-dense" ? "true" : "false"} tabIndex={-1} className="flex h-full min-h-0 overflow-hidden outline-none" style={{ background: resolvedCanvasAppearance.background, color: theme.node.text }}>
+            <main ref={canvasMainRef} id="canvas-main" data-huabu-canvas-glass="true" data-canvas-theme={colorTheme} data-canvas-readonly={readOnly ? "true" : "false"} data-libtv-readonly-dense={searchParams.get("fixture") === "libtv-readonly-dense" ? "true" : "false"} tabIndex={-1} className="flex h-full min-h-0 overflow-hidden outline-none" style={{ background: resolvedCanvasAppearance.background, color: theme.node.text }}>
                 {!focusMode && !versions.preview && shortDramaEnabled && currentProject?.projectId ? (
                     <CanvasProjectSidebar projectId={currentProject.projectId} detail={linkedProjectQuery.data} onAddChapter={handleProjectChapterInsert} onLocateStyle={locateProjectStyleNode} onOpenAssets={() => openProjectAssets()} />
                 ) : null}
@@ -2573,7 +2586,7 @@ function InfiniteCanvasPage() {
                                         setScriptEditorNodeId(null);
                                     }
                                 }}
-                                syncStatus={<CanvasSyncStatus projectId={projectId} onLoadLatest={reloadLatestCanvasProject} onOpenVersions={openVersions} />}
+                                syncStatus={<CanvasSyncStatus projectId={projectId} onLoadLatest={reloadLatestCanvasProject} onOpenVersions={openVersions} onSave={saveCanvasProject} />}
                                 readOnly={readOnly}
                                 onDuplicateProject={duplicateCurrentProject}
                                 versionsOpen={versions.open}
@@ -2685,6 +2698,7 @@ function InfiniteCanvasPage() {
                                                 connectionTargetNodeId={connectionTargetNodeId}
                                                 nodeById={nodeById}
                                                 visibleNodes={visibleNodes}
+                                                routingNodes={routingNodes}
                                                 nodeStackOrder={nodeStackOrder}
                                                 frameChildrenById={frameChildrenById}
                                                 linkedFolderPreviewNodesById={linkedFolderPreviewNodesById}
@@ -2755,7 +2769,7 @@ function InfiniteCanvasPage() {
 
                                 {focusMode ? (
                                     <CanvasFocusModeBar
-                                        syncStatus={<CanvasSyncStatus projectId={projectId} onLoadLatest={reloadLatestCanvasProject} onOpenVersions={openVersions} />}
+                                        syncStatus={<CanvasSyncStatus projectId={projectId} onLoadLatest={reloadLatestCanvasProject} onOpenVersions={openVersions} onSave={saveCanvasProject} />}
                                         versionsOpen={versions.open}
                                         onToggleVersions={toggleVersions}
                                         dockRevealed={focusDockRevealed}
@@ -3362,6 +3376,8 @@ function InfiniteCanvasPage() {
                 </CanvasOverlayLayerProvider>
                 {rightPanel === "assistant" && !focusMode && !versions.preview ? (
                     <CanvasAssistantSidebar
+                        initialDraft={assistantInitialDraft}
+                        onInitialDraftConsumed={() => setAssistantInitialDraft(undefined)}
                         proposalFeedback={assistantProposalFeedback}
                         runningProposalIds={runningProposalIds}
                         assistant={assistant}

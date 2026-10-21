@@ -4,6 +4,7 @@ Huabu 是一个本地优先、轻量、AI Native 的视频工作台。本页只�
 
 ## 开始使用
 
+- [波波 AI 画产品需求文档](product/bobo-ai-canvas-prd.md)
 - [项目首页与快速开始](../README.md)
 - [功能概览](content/docs/overview/features.mdx)
 - [本地优先架构](local-first-architecture.md)

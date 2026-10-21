@@ -136,6 +136,7 @@ export function useCanvasRenderModel({
         return { batchChildCountById, batchMotionById, canvasImageNodes, collapsedBatchChildIds, frameChildrenById, renderHiddenNodeIds };
     }, [collapsingBatchIds, nodeById, nodes]);
     const { batchChildCountById, batchMotionById, canvasImageNodes, collapsedBatchChildIds, frameChildrenById, renderHiddenNodeIds } = nodeDerivedData;
+    const routingNodes = useMemo(() => nodes.filter((node) => !renderHiddenNodeIds.has(node.id) && (!isFrameNode(node) || node.metadata?.frame?.collapsed)), [nodes, renderHiddenNodeIds]);
     const connectionLayerBounds = useMemo(() => {
         const padding = (reduceMediaEffects ? 96 : 144) / Math.max(viewport.k, 0.05);
         const left = -viewport.x / viewport.k - padding;
@@ -413,5 +414,6 @@ export function useCanvasRenderModel({
         upscaleNode,
         versionCompareNodes,
         visibleNodes,
+        routingNodes,
     };
 }

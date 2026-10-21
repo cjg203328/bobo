@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GO_DIR="${GO_DIR:-/tmp/huabu-go.rpIfVN}"
-BACKEND_ADDR="${CANVAS_DESKTOP_BACKEND_ADDR:-127.0.0.1:8080}"
+BACKEND_ADDR="${CANVAS_DESKTOP_BACKEND_ADDR:-127.0.0.1:2010}"
 LAUNCH_TOKEN="${CANVAS_DESKTOP_LAUNCH_TOKEN:-$(openssl rand -hex 32)}"
 
 export CANVAS_DESKTOP_BACKEND_ADDR="$BACKEND_ADDR"
@@ -16,7 +16,7 @@ fi
 export GOTOOLCHAIN=local
 
 cd "$ROOT_DIR"
-(cd web && bun run dev -- --host 127.0.0.1 --port 3000) &
+(cd web && bun run dev -- --host 127.0.0.1 --port 1010) &
 VITE_PID=$!
 trap 'kill "$VITE_PID" 2>/dev/null || true' EXIT INT TERM
 

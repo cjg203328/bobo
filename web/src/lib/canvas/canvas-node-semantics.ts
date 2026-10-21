@@ -84,6 +84,7 @@ export function canOpenCanvasNodePromptPanel(node: CanvasNodeData | null | undef
             || (canvasMediaNodeOrigin(node) === "generated" && Boolean((node.metadata?.composerContent || node.metadata?.prompt)?.trim()));
     }
     return node.type !== CanvasNodeType.Script
+        && node.type !== CanvasNodeType.Note
         && node.type !== CanvasNodeType.Drawing
         && node.type !== CanvasNodeType.Panorama
         && node.type !== CanvasNodeType.Director

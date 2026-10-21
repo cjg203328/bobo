@@ -3,9 +3,9 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="AI 影视与短剧创作工作台" />
-        <link rel="icon" href="/beef-logo.png" type="image/png" />
-        <title>正在加载</title>
+        <meta name="description" content="波波 AI 画，以创作 Agent 驱动的视觉内容画布" />
+        <link rel="icon" href="/bobo-mark.svg" type="image/svg+xml" />
+        <title>波波 AI 画</title>
         <style>
             html,
             body {
@@ -30,8 +30,8 @@
                 background: linear-gradient(105deg, #c9c9c9 0%, #e4e4e4 43%, #fff 49%, #fff 52%, #e4e4e4 58%, #c9c9c9 100%);
                 background-size: 240% 100%;
                 background-position: 100% 0;
-                -webkit-mask: url('/beef-logo.png') center / contain no-repeat;
-                mask: url('/beef-logo.png') center / contain no-repeat;
+                -webkit-mask: url('/bobo-mark.svg') center / contain no-repeat;
+                mask: url('/bobo-mark.svg') center / contain no-repeat;
                 animation: appearance-bootstrap-shimmer 2.6s ease-in-out infinite;
             }
             @keyframes appearance-bootstrap-shimmer {
@@ -49,7 +49,7 @@
             // Match the saved preference before the first paint; invalid storage stays dark.
             let theme = "dark";
             try {
-                if (JSON.parse(localStorage.getItem("infinite-canvas:theme_store"))?.state?.theme === "light") theme = "light";
+                if (JSON.parse(localStorage.getItem("huabu:theme_store"))?.state?.theme === "light") theme = "light";
             } catch {}
             document.documentElement.classList.toggle("dark", theme === "dark");
             document.documentElement.style.colorScheme = theme;

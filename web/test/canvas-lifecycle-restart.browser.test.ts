@@ -23,7 +23,7 @@ beforeAll(async () => {
         const path = new URL(request.url).pathname;
         if (path === "/harness.js") return new Response(script, { headers: { "Content-Type": "application/javascript" } });
         if (path === "/api/canvas-projects/c1") { await gate; return json({ project: backend }); }
-        if (path === "/api/ops/canvas.document.commit") {
+        if (path === "/api/canvas-projects/c1/document-commit") {
             const body = await request.json();
             if (body.params.expectedRevision !== backend.revision) return Response.json({ code: 409, data: null, msg: "Revision conflict", reason: "canvas_revision_conflict" }, { status: 409 });
             commits.push(body);

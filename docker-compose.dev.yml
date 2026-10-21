@@ -15,7 +15,7 @@ services:
       HOME: /tmp
       GOCACHE: /tmp/go-build
       GOMODCACHE: /tmp/go-mod
-      CANVAS_BACKEND_ADDR: ":8080"
+      CANVAS_BACKEND_ADDR: ":2010"
       CANVAS_BACKEND_DATA_DIR: /data
       CANVAS_DATABASE_DRIVER: ${CANVAS_DATABASE_DRIVER:-sqlite}
       CANVAS_WORKER_CONCURRENCY: ${CANVAS_WORKER_CONCURRENCY:-3}
@@ -23,7 +23,7 @@ services:
       CANVAS_REGISTRATION_ENABLED: ${CANVAS_REGISTRATION_ENABLED:-false}
       CANVAS_ALLOW_PRIVATE_UPSTREAMS: ${CANVAS_ALLOW_PRIVATE_UPSTREAMS:-false}
       CANVAS_ALLOWED_PRIVATE_UPSTREAM_HOSTS: ${CANVAS_ALLOWED_PRIVATE_UPSTREAM_HOSTS:-}
-      CANVAS_CORS_ORIGINS: ${CANVAS_CORS_ORIGINS:-http://localhost:3000}
+      CANVAS_CORS_ORIGINS: ${CANVAS_CORS_ORIGINS:-http://localhost:1010}
       GIN_MODE: debug
     volumes:
       - type: bind
@@ -47,7 +47,7 @@ services:
         bind:
           create_host_path: false
     ports:
-      - "127.0.0.1:${CANVAS_BACKEND_HOST_PORT:-8080}:8080"
+      - "127.0.0.1:${CANVAS_BACKEND_HOST_PORT:-2010}:2010"
     init: true
 
   web:
@@ -55,7 +55,7 @@ services:
     working_dir: /workspace/web
     command: ["sh", "-c", "bun install --frozen-lockfile && bun run dev"]
     environment:
-      VITE_API_PROXY_TARGET: http://backend:8080
+      VITE_API_PROXY_TARGET: http://backend:2010
     volumes:
       - type: bind
         source: .
@@ -63,7 +63,7 @@ services:
       - web-node-modules:/workspace/web/node_modules
       - web-bun-cache:/root/.bun/install/cache
     ports:
-      - "${CANVAS_WEB_HOST_PORT:-3000}:3000"
+      - "${CANVAS_WEB_HOST_PORT:-1010}:1010"
     depends_on:
       - backend
     init: true

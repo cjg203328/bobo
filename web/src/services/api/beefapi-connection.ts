@@ -58,13 +58,14 @@ export function openBeefAPIWallet(signal?: AbortSignal) {
 
 export function beefAPIConnectionLabel(summary: BeefAPIConnectionSummary | null | undefined) {
     const state = summary?.state || "disconnected";
+    const errorReason = summary?.errorReason?.replace(/\bHuabu\b\s*/gi, "官方算力");
     switch (state) {
         case "connecting":
-            return summary?.errorReason || "正在连接 Huabu";
+            return errorReason || "正在连接官方算力";
         case "connection_error":
-            return summary?.errorReason || "无法连接 Huabu 服务，请检查网络后重试";
+            return errorReason || "无法连接官方算力服务，请检查网络后重试";
         case "pending":
-            return summary?.errorReason || (summary?.userCode ? `请在浏览器中确认 ${summary.userCode}` : "请在浏览器中确认授权");
+            return errorReason || (summary?.userCode ? `请在浏览器中确认 ${summary.userCode}` : "请在浏览器中确认授权");
         case "connected":
             return connectedAccountLabel(summary);
         case "expired":

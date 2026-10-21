@@ -111,7 +111,7 @@ writeFileSync(
     operationsPath,
     `import { http } from ${JSON.stringify(pathToFileURL(requestPath).href)};
 export async function commitCanvasDocument(input) {
-  return http.post("/ops/canvas.document.commit", {
+  return http.post("/canvas-projects/" + encodeURIComponent(input.canvasId) + "/document-commit", {
     opId: input.operationId,
     params: { canvasId: input.canvasId, expectedRevision: input.expectedRevision, document: input.document },
   });
@@ -253,7 +253,7 @@ describe("persistCanvasTimeline http", () => {
     it("PUTs the timeline document to the desktop canvas route", async () => {
         await repository.persistCanvasTimeline(project.id, timeline);
         expect(request.puts).toHaveLength(1);
-        expect(request.puts[0].path).toBe("/ops/canvas.document.commit");
+        expect(request.puts[0].path).toBe("/canvas-projects/canvas-a/document-commit");
         expect(request.puts[0].body.project.timeline.durationMs).toBe(5600);
         expect(request.puts[0].body.project.timeline.clips).toEqual([expect.objectContaining({ id: "clip-audio-1", kind: "audio", nodeId: "7vvfM674HnenwTekmj88V", durationMs: 5600 })]);
         expect(request.puts[0].body.project.timeline.tracks.map((track: { kind: string }) => track.kind)).toEqual(["video", "audio", "subtitle"]);
@@ -361,7 +361,7 @@ describe("persistCanvasDocument http", () => {
         store.resetProjects([{ ...project, timeline, nodes: [originalAudioNode] }]);
         await repository.persistCanvasDocument(project.id, { nodes: [originalAudioNode, historyAudioNode] });
         expect(request.puts).toHaveLength(1);
-        expect(request.puts[0].path).toBe("/ops/canvas.document.commit");
+        expect(request.puts[0].path).toBe("/canvas-projects/canvas-a/document-commit");
         expect(request.puts[0].body.project.nodes.map((node: { title: string }) => node.title)).toEqual(["旁白", "历史音频"]);
         expect(request.puts[0].body.project.nodes[1].metadata.storageKey).toBe("resource:audio-owned");
         expect(request.puts[0].body.project.timeline.durationMs).toBe(5600);
@@ -471,7 +471,7 @@ describe("persistCanvasDocument http", () => {
         store.resetProjects([{ ...project, nodes: [original] }]);
         await repository.persistCanvasDocument(project.id, { nodes: [original, history] });
         expect(request.puts).toHaveLength(1);
-        expect(request.puts[0].path).toBe("/ops/canvas.document.commit");
+        expect(request.puts[0].path).toBe("/canvas-projects/canvas-a/document-commit");
         expect(request.puts[0].body.assets).toBeUndefined();
         expect(
             request.puts[0].body.project.nodes.map((node: { title: string; metadata?: { assetId?: string } }) => ({

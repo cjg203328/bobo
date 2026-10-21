@@ -27,6 +27,7 @@ test("local workspace bootstrap is the product startup contract", () => {
     expect(router).not.toContain("AuthScene");
     expect(router).toContain("createWorkspaceRouter");
     expect(router).toContain('path: "/tasks"');
+    expect(router).toContain("loadTasksPage");
     expect(router).toContain('path: "/projects"');
     expect(router).toContain('path: "/project"');
     expect(router).toContain('path: "/project/:projectId"');
@@ -43,6 +44,7 @@ test("local workspace bootstrap is the product startup contract", () => {
     expect(userSession).not.toContain("syncRemoteUserData");
     expect(userSession).not.toContain("getModelCatalogForSession");
     expect(sidebarNav).toContain("footer: []");
+    expect(sidebarNav).toContain("availableWorkspaceModules(features)");
     expect(sidebarNav).not.toContain('title: "退出登录"');
     expect(imageStorage).toContain("const localRuntime = isLocalRuntimeMode();");
     expect(imageStorage).toContain("The desktop Go resource service is local storage");

@@ -257,7 +257,7 @@ jobs:
         if: runner.os == 'Windows'
         env:
           HUABU_UPDATER_PUBLIC_KEY: ${{ vars.HUABU_UPDATER_PUBLIC_KEY }}
-          HUABU_EXTRA_LDFLAGS: -X infinite-canvas/backend/internal/app.depthWindowsManifestPublicKeyBase64=${{ vars.HUABU_UPDATER_PUBLIC_KEY }}
+          HUABU_EXTRA_LDFLAGS: -X huabu/backend/internal/app.depthWindowsManifestPublicKeyBase64=${{ vars.HUABU_UPDATER_PUBLIC_KEY }}
           CGO_ENABLED: "1"
         shell: pwsh
         run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-huabu-windows-release.ps1

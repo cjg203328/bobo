@@ -1,4 +1,4 @@
-import { ChartColumn, Clapperboard, Code, Columns2, FileText, Globe, Image as ImageIcon, Music2, PanelTop, Palette, Pencil, Settings2, Shapes, Sparkles, Table2, Type, Video, WandSparkles } from "lucide-react";
+import { ChartColumn, Clapperboard, Code, Columns2, FileText, Globe, Image as ImageIcon, Music2, PanelTop, Palette, Pencil, Settings2, Shapes, Sparkles, StickyNote, Table2, Type, Video, WandSparkles } from "lucide-react";
 
 import { NODE_SPECS } from "@/constant/canvas";
 import { MEDIA_NODE_MIN_SIZE } from "@/lib/canvas/canvas-node-size";
@@ -168,6 +168,15 @@ const BUILTIN_NODE_TRAITS = {
         // readReferenceImage 返回 null 跳过，不需要在这里提前判空。
         resourceKind: () => "image",
         inputKind: "image",
+    },
+    [CanvasNodeType.Note]: {
+        label: "笔记",
+        icon: <StickyNote />,
+        minSize: { width: 180, height: 120 },
+        showInCreateMenu: true,
+        // 笔记是纯文本，可作为生成输入；但它自己不发起生成，所以不设 generationMode。
+        resourceKind: (node: CanvasNodeData) => (node.metadata?.content ? "text" : null),
+        inputKind: "text",
     },
 } satisfies Record<string, Omit<CanvasNodeDefinition, "type" | "defaultTitle" | "defaultSize" | "defaultMetadata">>;
 

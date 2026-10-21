@@ -7,6 +7,8 @@ let activeEpoch = 1;
 let failNextSetItem = false;
 let failSetItemOn = 0;
 let setItemCount = 0;
+let failDraftWrite = false;
+const preservedDrafts: Array<{ title: string }> = [];
 
 function assertMockExpectedScope(config?: { expectedScope?: { userScope: string; epoch: number } }) {
     if (!config?.expectedScope) return;
@@ -182,7 +184,11 @@ mock.module("@/services/api/request", () => ({
 }));
 
 mock.module("@/services/local-workspace-sync", () => ({ notifyCanvasRefresh: () => {} }));
-mock.module("@/services/canvas-sync-drafts", () => ({ preserveCanvasSyncDraft: async () => 1 }));
+mock.module("@/services/canvas-sync-drafts", () => ({ preserveCanvasSyncDraft: async (project: { title: string }) => {
+    if (failDraftWrite) throw new Error("Draft storage unavailable");
+    preservedDrafts.push(structuredClone(project));
+    return preservedDrafts.length;
+} }));
 mock.module("@/stores/use-asset-store", () => ({ useAssetStore: { getState: () => ({ assets: [] }) } }));
 mock.module("@/services/workspace-mode", () => ({ isLocalWorkspaceMode: () => true }));
 mock.module("@/services/api/resources", () => ({ resourceIdFromStorageKey: () => "" }));
@@ -310,6 +316,8 @@ beforeEach(() => {
     failNextSetItem = false;
     failSetItemOn = 0;
     setItemCount = 0;
+    failDraftWrite = false;
+    preservedDrafts.length = 0;
     server.revision = 1;
     server.missingCreateReceipt = false;
     server.document = canvas("基线", 1);
@@ -333,6 +341,60 @@ beforeEach(() => {
 });
 
 describe("画布文档提交日记", () => {
+    test("保存失败保留实时草稿并显示失败，重试收到回执后才完成", async () => {
+        await seedConfirmed();
+        useCanvasStore.getState().updateProject("c1", { title: "失败后应恢复的内容" });
+        server.failNext = { status: 500 };
+        await expect(syncLocalCanvasProjectToBackend("c1")).rejects.toThrow("保存失败");
+        expect(projectSyncProgress("c1")).toMatchObject({ phase: "error", draftCount: 1 });
+        expect(preservedDrafts[0].title).toBe("失败后应恢复的内容");
+        expect(server.document?.title).toBe("基线");
+        let release!: () => void;
+        server.hold = new Promise<void>((resolve) => { release = resolve; });
+        const retry = syncLocalCanvasProjectToBackend("c1");
+        await waitUntil(() => server.postStarted === 2);
+        expect(projectSyncProgress("c1")?.phase).toBe("saving");
+        release();
+        await retry;
+        expect(projectSyncProgress("c1")?.phase).toBe("done");
+        expect(server.document?.title).toBe("失败后应恢复的内容");
+    });
+
+    test("后端与草稿同时失败时不宣称草稿已保护，保留原始保存错误", async () => {
+        await seedConfirmed();
+        useCanvasStore.getState().updateProject("c1", { title: "仍在内存中的修改" });
+        server.failNext = { status: 500 };
+        failDraftWrite = true;
+        await expect(syncLocalCanvasProjectToBackend("c1")).rejects.toThrow("保存失败");
+        expect(projectSyncProgress("c1")).toMatchObject({ phase: "error", draftCount: undefined });
+        expect(projectSyncProgress("c1")?.message).toContain("草稿尚未确认落盘");
+        expect(preservedDrafts).toEqual([]);
+    });
+
+    test("写入期间继续编辑不能在旧回执返回时误报完成", async () => {
+        await seedConfirmed();
+        useCanvasStore.getState().updateProject("c1", { title: "第一次修改" });
+        let release!: () => void;
+        server.hold = new Promise<void>((resolve) => { release = resolve; });
+        const completedTitles: unknown[] = [];
+        const unsubscribe = useSyncProgressStore.subscribe(() => {
+            if (projectSyncProgress("c1")?.phase === "done") completedTitles.push(server.document?.title);
+        });
+        try {
+            const saving = syncLocalCanvasProjectToBackend("c1");
+            await waitUntil(() => server.postStarted === 1);
+            expect(projectSyncProgress("c1")?.phase).toBe("saving");
+            useCanvasStore.getState().updateProject("c1", { title: "后来的修改" });
+            release();
+            await saving;
+            expect(projectSyncProgress("c1")?.phase).toBe("pending");
+            expect(completedTitles).toEqual([]);
+            await syncLocalCanvasProjectToBackend("c1");
+            expect(server.commits.map((item) => item.title)).toEqual(["第一次修改", "后来的修改"]);
+            expect(completedTitles).toEqual(["后来的修改"]);
+        } finally { unsubscribe(); }
+    });
+
     test("revision 76 confirmed graph survives cache projection, restart and revision 77 ordinary save", async () => {
         await useCanvasStore.persist.rehydrate();
         const nodes = Array.from({ length: 10 }, (_, index) => node(`n${index}`, `Node ${index}`));
@@ -785,6 +847,7 @@ describe("画布文档提交日记", () => {
 
         await expect(syncLocalCanvasProjectToBackend("c1")).rejects.toBeInstanceOf(CanvasBackendSubmitPausedError);
         expect(server.commits).toEqual([]);
+        expect(projectSyncProgress("c1")?.phase).toBe("conflict");
         expect((server.document as { nodes: Array<{ id: string }> }).nodes.map((item) => item.id)).toEqual(["n1", "n2"]);
         expect(useCanvasStore.getState().projects[0].nodes[0].title).toBe("本地改名");
     });

@@ -8,7 +8,7 @@ import { resolveHeavyMediaEnabled } from "./media-build-mode";
 
 const webDir = dirname(fileURLToPath(import.meta.url));
 const appVersion = process.env.CANVAS_BUILD_VERSION?.trim() || readFileSync(resolve(webDir, "../VERSION"), "utf8").trim();
-const apiProxyTarget = process.env.VITE_API_PROXY_TARGET?.trim() || "http://127.0.0.1:8080";
+const apiProxyTarget = process.env.VITE_API_PROXY_TARGET?.trim() || "http://127.0.0.1:2010";
 const desktopLaunchToken = process.env.VITE_DESKTOP_LAUNCH_TOKEN?.trim();
 const heavyMediaEnabled = resolveHeavyMediaEnabled(process.env.HUABU_FULL_MEDIA_RESOURCES);
 

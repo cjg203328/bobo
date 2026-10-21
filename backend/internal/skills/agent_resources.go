@@ -95,6 +95,9 @@ func (s *Service) agentPackage(userID string, pin Pin) (*model.Skill, *model.Ski
 
 func (s *Service) AgentVersion(userID string, pin Pin) (*AgentResource, error) {
 	pin = pin.Identity()
+	if resource, builtin, err := builtinAgentResource(pin); builtin || err != nil {
+		return resource, err
+	}
 	skill, version, files, err := s.agentPackage(userID, pin)
 	if err != nil {
 		return nil, err
@@ -116,6 +119,17 @@ func (s *Service) AgentVersion(userID string, pin Pin) (*AgentResource, error) {
 
 func (s *Service) AgentFile(userID string, pin Pin, filePath string) (*AgentFile, error) {
 	pin = pin.Identity()
+	if resource, builtin, err := builtinAgentResource(pin); builtin || err != nil {
+		if err != nil {
+			return nil, err
+		}
+		for _, file := range resource.Files {
+			if file.Path == filePath {
+				return &AgentFile{Pin: pin, File: file, Content: resource.Instruction, ExecutionSupported: false}, nil
+			}
+		}
+		return nil, kernel.BadAuthRequest("这个文件不在所选技能版本中")
+	}
 	_, version, files, err := s.agentPackage(userID, pin)
 	if err != nil {
 		return nil, err
@@ -200,6 +214,12 @@ func (s *Service) AgentCatalog(userID string) ([]AgentCatalogItem, error) {
 	for _, item := range items {
 		pin := Pin{SkillID: item.SkillID, VersionID: item.VersionID, ContentHash: item.ContentHash}
 		if item.Status != skillStatusEnabled || ValidatePin(pin) != nil {
+			continue
+		}
+		if item.SourceType == "bobo_builtin" {
+			pin.SkillName = item.SkillName
+			pin.Version = item.Version
+			result = append(result, AgentCatalogItem{Pin: pin, Name: item.SkillName, Description: item.Description})
 			continue
 		}
 		state, err := s.repo.UserSkillState(userID, item.SkillID)

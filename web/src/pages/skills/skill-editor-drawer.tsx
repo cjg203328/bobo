@@ -30,7 +30,8 @@ export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boo
             description: skill?.description || "",
             instruction: skill?.instruction || "",
             tag: skill?.tag || "creative",
-            is_public: skill ? !skill.isPrivate : true,
+            /* 新技能默认私有（草稿）：保存后仅在“我创建的”可见，发布是独立的头等动作。 */
+            is_public: skill ? !skill.isPrivate : false,
             markdownUrl: skill?.markdownUrl || skill?.sourceUrl || "",
             showcaseMedia: skill?.showcaseMedia || [],
             extraInfo: skill?.extraInfo || "",

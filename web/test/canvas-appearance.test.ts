@@ -160,7 +160,7 @@ describe("canvas custom appearance", () => {
         const value = { appearance: customCanvasAppearanceFromTheme("dark"), backgroundMode: "lines" as const };
         writeCanvasAppearanceDefault(value);
 
-        expect(values.has("infinite-canvas:canvas-appearance-default:v2:user:account-A")).toBe(true);
+        expect(values.has("huabu:canvas-appearance-default:v2:user:account-A")).toBe(true);
         expect(readCanvasAppearanceDefault()).toEqual(value);
 
         setActiveUserScope("account-B");

@@ -36,7 +36,7 @@ func (c Config) withDefaults() Config {
 		if c.Profile == ProfileDesktop {
 			c.ListenAddr = "127.0.0.1:0"
 		} else {
-			c.ListenAddr = ":8080"
+			c.ListenAddr = ":2010"
 		}
 	}
 	if c.ShutdownTimeout <= 0 {

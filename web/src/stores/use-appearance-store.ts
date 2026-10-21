@@ -5,22 +5,22 @@ import { applySkinTheme, DEFAULT_CLASSIC_SKIN, normalizeSkinDefinition } from "@
 
 export const DEFAULT_PUBLIC_APPEARANCE: PublicAppearance = {
     schemaVersion: 7,
-    brandName: "Huabu",
-    brandSlug: "huabu",
-    authHeroTitle: "让一个故事，\n从文字走向银幕。",
-    authHeroDescription: "",
-    logoUrl: "/beef-logo.png",
-    darkLogoUrl: "/beef-logo.png",
+    brandName: "波波 AI 画",
+    brandSlug: "bobo-ai-canvas",
+    authHeroTitle: "把创作目标，\n交给波波 Agent。",
+    authHeroDescription: "从提示词、参考素材到图像与视频方案，Agent 与你一起完成每一步。",
+    logoUrl: "/bobo-mark.svg",
+    darkLogoUrl: "/bobo-mark.svg",
     logoFrameEnabled: false,
     authVideoUrl: "https://boss-shjd.biliapi.net/updream/aniforge/video/video_bbcb00bd-650d-4249-9346-5cd21fd2484c_m1hc-u0-1pu13x-3v1s.mp4",
     authVideoPosterUrl: "https://i0.hdslb.com/bfs/aitool/aniforge/image/02933f26-5f1b-49ff-a811-b7f95ee5e5b8_m1hc-u0-sau.jpg",
     authVideoAutoplay: true,
     skinId: "classic",
     activeSkin: DEFAULT_CLASSIC_SKIN,
-    seoTitle: "Huabu",
-    seoDescription: "Huabu，本地优先的开源 AI 视频创作工作台。",
-    seoKeywords: "",
-    footerCopyright: `© ${new Date().getFullYear()} Huabu. Open source video studio.`,
+    seoTitle: "波波 AI 画",
+    seoDescription: "波波 AI 画，面向图像与视频创作的智能体工作台。",
+    seoKeywords: "AI 画布,创作智能体,AI 生图,AI 生视频,提示词优化,提示词反推,Agent 技能",
+    footerCopyright: `${new Date().getFullYear()} 波波 AI 画。保留所有权利。`,
     icpFilingEnabled: false,
     icpFilingNumber: "",
     logoConfigured: false,
@@ -45,19 +45,24 @@ export const useAppearanceStore = create<AppearanceStore>((set) => ({
 
 export function normalizePublicAppearance(value?: Partial<PublicAppearance> | null): PublicAppearance {
     const brandName = String(value?.brandName || "").trim();
-    const brandSlug = normalizeBrandSlug(value?.brandSlug);
-    const authHeroTitle = normalizeAppearanceCopy(value?.authHeroTitle, DEFAULT_PUBLIC_APPEARANCE.authHeroTitle);
+    const legacyDefaultBrand = brandName === "Huabu" && String(value?.brandSlug || "").trim().toLowerCase() === "huabu";
+    const brandSlug = legacyDefaultBrand ? DEFAULT_PUBLIC_APPEARANCE.brandSlug : normalizeBrandSlug(value?.brandSlug);
+    const isLegacyHero = legacyDefaultBrand && value?.authHeroTitle === "让一个故事，\n从文字走向银幕。";
+    const authHeroTitle = normalizeAppearanceCopy(isLegacyHero ? DEFAULT_PUBLIC_APPEARANCE.authHeroTitle : value?.authHeroTitle, DEFAULT_PUBLIC_APPEARANCE.authHeroTitle);
     const authHeroDescription = normalizeAppearanceCopy(value?.authHeroDescription, DEFAULT_PUBLIC_APPEARANCE.authHeroDescription, true);
     const customVideo = Boolean(value?.authVideoConfigured);
     const customLogo = Boolean(value?.logoConfigured);
     const customDarkLogo = Boolean(value?.darkLogoConfigured);
     const logoUrl = customLogo ? safeAppearanceURL(value?.logoUrl, DEFAULT_PUBLIC_APPEARANCE.logoUrl) : DEFAULT_PUBLIC_APPEARANCE.logoUrl;
     const darkLogoUrl = customDarkLogo ? safeAppearanceURL(value?.darkLogoUrl, logoUrl) : customLogo ? logoUrl : DEFAULT_PUBLIC_APPEARANCE.darkLogoUrl;
-    const resolvedBrandName = brandName || DEFAULT_PUBLIC_APPEARANCE.brandName;
-    const seoTitle = normalizeAppearanceCopy(value?.seoTitle, resolvedBrandName);
-    const seoDescription = normalizeAppearanceCopy(value?.seoDescription, `${resolvedBrandName}，面向 AI 影视与短剧创作的工作台。`, true);
+    const resolvedBrandName = legacyDefaultBrand || !brandName ? DEFAULT_PUBLIC_APPEARANCE.brandName : brandName;
+    const legacySeoTitle = legacyDefaultBrand && value?.seoTitle?.trim() === "Huabu";
+    const legacySeoDescription = legacyDefaultBrand && value?.seoDescription === "Huabu，本地优先的开源 AI 视频创作工作台。";
+    const legacyCopyright = legacyDefaultBrand && /^© \d{4} Huabu\. Open source video studio\.$/.test(value?.footerCopyright || "");
+    const seoTitle = normalizeAppearanceCopy(legacySeoTitle ? DEFAULT_PUBLIC_APPEARANCE.seoTitle : value?.seoTitle, resolvedBrandName);
+    const seoDescription = normalizeAppearanceCopy(legacySeoDescription ? DEFAULT_PUBLIC_APPEARANCE.seoDescription : value?.seoDescription, `${resolvedBrandName}，面向 AI 视觉创作的工作台。`, true);
     const seoKeywords = normalizeAppearanceCopy(value?.seoKeywords, "", true);
-    const footerCopyright = normalizeAppearanceCopy(value?.footerCopyright, `© ${new Date().getFullYear()} ${resolvedBrandName}. All rights reserved.`);
+    const footerCopyright = normalizeAppearanceCopy(legacyCopyright ? DEFAULT_PUBLIC_APPEARANCE.footerCopyright : value?.footerCopyright, DEFAULT_PUBLIC_APPEARANCE.footerCopyright);
     const icpFilingNumber = normalizeAppearanceCopy(value?.icpFilingNumber, "", true);
     return {
         ...DEFAULT_PUBLIC_APPEARANCE,
@@ -125,6 +130,7 @@ export function applyAppearanceMetadata(appearance: PublicAppearance, targetDocu
         targetDocument.head.appendChild(favicon);
     }
     favicon.href = appearanceLogoURL(appearance, "dark");
+    favicon.removeAttribute("type");
 
     const location = targetDocument.defaultView?.location;
     if (location && (location.protocol === "http:" || location.protocol === "https:")) {
@@ -157,7 +163,8 @@ export function appearanceLogoURL(appearance: PublicAppearance, theme: "light" |
 }
 
 export function brandStudioLabel(appearance: PublicAppearance) {
-    if (appearance.brandName === DEFAULT_PUBLIC_APPEARANCE.brandName && appearance.brandSlug === DEFAULT_PUBLIC_APPEARANCE.brandSlug) return "BEEF CREATIVE STUDIO";
+    if (appearance.brandName === DEFAULT_PUBLIC_APPEARANCE.brandName && appearance.brandSlug === DEFAULT_PUBLIC_APPEARANCE.brandSlug) return "BOBO AI CANVAS";
+    if (appearance.brandSlug === "huabu") return appearance.brandName.toLocaleUpperCase();
     return appearance.brandSlug.replace(/-+/g, " ").toLocaleUpperCase();
 }
 

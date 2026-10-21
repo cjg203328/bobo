@@ -25,6 +25,11 @@ function mediaNode(type: CanvasNodeType.Image | CanvasNodeType.Video | CanvasNod
 }
 
 describe("canvas media node semantics", () => {
+    test("notes remain editable sources without opening a generation panel", () => {
+        const note = createCanvasNode(CanvasNodeType.Note, { x: 0, y: 0 });
+        expect(canOpenCanvasNodePromptPanel(note)).toBe(false);
+        expect(getNodeGenerationMode(note)).toBeNull();
+    });
     test("empty media nodes are generators and own the prompt panel", () => {
         for (const type of [CanvasNodeType.Image, CanvasNodeType.Video, CanvasNodeType.Audio] as const) {
             const node = mediaNode(type);

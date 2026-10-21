@@ -25,6 +25,7 @@ type DesktopRuntimeConfig struct {
 }
 
 type DesktopApp struct {
+	closeSave       desktopCloseSaveState
 	mu              sync.RWMutex
 	migrationMu     sync.Mutex
 	migrating       bool

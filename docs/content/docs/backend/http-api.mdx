@@ -8,6 +8,10 @@ Wails 和浏览器开发模式共用同一套 `127.0.0.1` HTTP 合同。路由�
 
 ## 合同规则
 
+画布编辑器使用 `POST /canvas-projects/:id/document-commit` 保存正文，请求为 `{ opId, params: { canvasId, expectedRevision, document } }`。本机 Web 与桌面复用 `canvas.document.commit` 的版本检查和幂等回执；网络结果未知时，用原 `opId` 与原正文重试，收到确认后再提交后续编辑。成功信封的 `data` 包含 `revision`、`replayed` 和 `result`。版本冲突返回 409 并暂停提交，普通失败保留浏览器草稿，收到数据库回执后才显示已保存。
+
+该接口校验本机 Host、来源和连接地址，桌面模式另需可信 UI 凭据，拒绝外部客户端及助手宿主；正文上限 5MB。外部客户端仍通过 `/ops/canvas.document.commit`，助手 UI 会话不能作为通用 `/ops` 的写入凭据。浏览器经 Vite 代理访问时，启动脚本显式允许 `localhost:1010` 与 `127.0.0.1:1010` 两个来源。
+
 - 无登录、Cookie 会话或租户选择；后端从本地 workspace context 解析唯一 owner。
 - 成功响应为 `{ "code": 0, "data": ... }`；错误响应保留结构化 `code/reason/msg`。
 - 写入接口限制 body 大小并校验资源归属；不信任前端提供的文件路径、模型能力或 provider 状态。

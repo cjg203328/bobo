@@ -24,7 +24,41 @@ backend\cmd\desktop\build\bin\Huabu.exe
 
 ## 开发与构建
 
-统一浏览器预览与 Wails dev（共用 `web/src`、Vite `3000` 和本地 Go API `8080`）：
+### Windows Web MVP
+
+浏览器版先安装 Bun、Go 和本机 Chrome，然后在仓库根目录启动：
+
+```powershell
+.\scripts\start-local.ps1
+.\scripts\start-local.ps1 -Action Status
+```
+
+访问 `http://localhost:1010`。脚本将前后端绑定本机地址，API 使用 `2010`，拒绝抢占已使用的端口；进程隐藏运行，关闭终端后仍可继续预览。数据保存在 `.local/project-workbench-debug`，日志和进程记录在 `.local/web-mvp`，Go 缓存在 `.local/cache`。停止只回收本脚本登记的进程树，保留数据：
+
+```powershell
+.\scripts\start-local.ps1 -Action Stop
+```
+
+使用正式 Web 构建产物验收：
+
+```powershell
+Push-Location web
+bun run build
+Pop-Location
+.\scripts\start-local.ps1 -Preview
+Push-Location web
+$env:CHROME_PATH = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+bun run test:web:mvp
+Pop-Location
+```
+
+切换开发和预览模式前先停止已有服务。自动验收仅编辑新建的测试画布，覆盖便签、撤销重做、数据库保存、故障草稿恢复、工具栏、技能详情及拖动障碍即时绕线，截图与结果保存在 `.local/web-mvp-evidence`。它会保留验收画布，不删除既有项目。
+
+此启动方式不打包助手宿主，也不配置模型凭据。助手对话和付费生成需要另外完成运行时及模型配置；技能库的浏览不以模型调用为前提。浏览器关闭页签依靠缓存、未保存提醒和离开页面刷新保存，浏览器不会保证等待网络请求完成；原生 Wails 关闭屏障单独按下文验收。
+
+### Wails 开发
+
+统一浏览器预览与 Wails dev（共用 `web/src`、Vite `1010` 和本地 Go API `2010`）：
 
 ```bash
 ./scripts/huabu-shared-dev.sh
@@ -74,9 +108,39 @@ backend/cmd/desktop/build/bin/Huabu.app
 
 Wails 2.16 生产包只把 `/` 和 `index.html` 交给前端运行时；深路径（例如 `/canvas/:id`）会落到资源 handler 并返回 404。原生窗口因此使用 hash 路由：刷新仍请求 `/`，画布地址形如 `/#/canvas/<id>`。浏览器部署继续使用 History 路径，`/api` 与媒体地址不进入 hash。
 
-## 最近一次验收
+## 原生关闭保存协议
 
-- 统一开发脚本已验证：Wails 日志显示 `Frontend DevServer URL: http://127.0.0.1:3000`；浏览器代理和后端直连的 `/api/health/live` 返回相同 `dev` 构建信息；`/api/workspace/bootstrap` 经浏览器代理返回 HTTP 200。
+桌面窗口在前端完成工作区恢复并注册关闭监听后，通过 `CloseSaveReady()` 启用关闭屏障。启用之前允许退出，不能把启动期间的退出算作保存验收。
+
+1. `OnBeforeClose` 暂停关窗，为本次关闭生成唯一请求 ID，发送 `huabu:before-close-save`。同一时刻只有一个原生关闭请求。
+2. 前端先提交仍有焦点的标题输入，再显示模态保存反馈。模态期间画布及挂在页面外的浮层不能继续输入。
+3. 当前编辑器提交实时节点、连线及工作区状态；随后等待画布、素材和模型配置落盘。本地工作区还会同步已经离开画布但仍未确认保存的修改，等待后端确认后才调用 `CompleteCloseSave(requestId, true)`。
+4. 保存失败返回 `false`。原生对话框默认返回画布，用户可再次关闭以重试；用户明确选择直接退出时，提示未保存修改可能丢失。
+5. 原生等待上限为 30 秒。超时先使旧确认失效，再发送 `huabu:close-save-timeout` 并提供返回画布或直接退出的选择。前端解除模态，但仍串行等待旧写入；重试会在旧写入结束后保存最新内容，迟到响应不能关闭窗口。
+
+协议检查：
+
+```powershell
+# 在仓库根目录执行
+Push-Location backend
+go test ./cmd/desktop -run TestClose -count=1
+Pop-Location
+Push-Location web
+bun test test/desktop-close.test.ts test/desktop-update.test.ts test/desktop-update-preparation.test.ts
+$env:CHROME_PATH = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+bun test test/canvas-stage1.browser.test.ts test/canvas-lifecycle-restart.browser.test.ts test/canvas-leave-flush.browser.test.ts
+Pop-Location
+```
+
+浏览器检查使用随机端口和模拟的原生接口、后端保存响应，覆盖成功、失败、超时、重试及重开。它不能证明 Wails 原生事件、系统对话框和操作系统关窗行为已经通过。
+
+原生验收需要先按发行构建脚本生成包含最新前端的桌面包，并使用隔离数据目录。逐项检查：便签和标题编辑后立即关窗、同目录重开恢复；后端写入失败或超时后默认保留窗口；继续修改后重试关闭；明确放弃保存退出；连续关窗不会跳过屏障。强制结束进程不触发该协议，应另验已落盘草稿的恢复范围。
+
+只跳过前端执行的 Wails 编译用于确认 Go 和绑定可编译；其嵌入资源可能陈旧，不可用于上述原生验收，也不可作为发行完成证据。
+
+## 历史 macOS 验收记录
+
+- 统一开发脚本已验证：Wails 日志显示 `Frontend DevServer URL: http://127.0.0.1:3000`；浏览器代理和后端直连的 `/api/health/live` 返回相同 `dev` 构建信息；`/api/workspace/bootstrap` 经浏览器代理返回 HTTP 200。（记录时为 `3000`/`8080`，本地端口后来已切换为 `1010`/`2010`。）
 
 - Wails 2.16.0 生产包已重新构建并自签名，产物为 `backend/cmd/desktop/build/bin/Huabu.app`。
 - `go test ./internal/handler ./internal/bootstrap ./cmd/desktop -count=1` 通过。

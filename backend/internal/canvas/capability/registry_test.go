@@ -273,6 +273,29 @@ func TestBuiltinMediaCapabilitiesUpdateDraftWithoutOverwritingGeneratedAssets(t 
 	}
 }
 
+func TestBuiltinNoteCanBeCreatedPatchedAndUsedAsTextInput(t *testing.T) {
+	registry := BuiltinRegistry()
+	note, ok := registry.Resolve("note")
+	if !ok {
+		t.Fatal("note capability missing")
+	}
+	metadata := note.Metadata("场景便签")
+	if note.DefaultWidth != 260 || note.DefaultHeight != 200 || note.InputKind != "text" || !note.Connection.CanSource || note.GenerationMode != "" {
+		t.Fatalf("inconsistent note contract: %#v", note)
+	}
+	node := map[string]any{"title": "笔记", "metadata": metadata}
+	if err := note.ApplyPatch(node, map[string]any{"title": "场景要求", "content": "中文新内容"}); err != nil {
+		t.Fatal(err)
+	}
+	if metadata["content"] != "中文新内容" || node["title"] != "场景要求" || metadata["note"].(map[string]any)["tone"] != "amber" {
+		t.Fatalf("note patch lost content or tone: %#v", node)
+	}
+	image, _ := registry.Resolve("image")
+	if !image.AllowsInput(note.InputKind) {
+		t.Fatal("note cannot provide text to image generation")
+	}
+}
+
 func TestRegistryResolveUnknownTypeFailsClosed(t *testing.T) {
 	registry, err := NewRegistry([]Descriptor{testDescriptor()})
 	if err != nil {

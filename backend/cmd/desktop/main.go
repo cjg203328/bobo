@@ -79,9 +79,10 @@ func desktopAppOptions(app *DesktopApp) *options.App {
 			Assets:  assets,
 			Handler: desktopAssetHandler{app: app},
 		},
-		OnStartup:  app.startup,
-		OnShutdown: app.shutdown,
-		Bind:       []interface{}{app},
+		OnStartup:     app.startup,
+		OnBeforeClose: app.beforeClose,
+		OnShutdown:    app.shutdown,
+		Bind:          []interface{}{app},
 	}
 }
 

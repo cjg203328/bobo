@@ -111,8 +111,8 @@ Huabu（`glanderness/BeefTV`）是面向 AI 影视与短剧创作的工作台，
 
 - 先阅读 `.env.example` 和对应 Compose 文件。宿主机后端开发必须使用 Git 忽略的 `.local/project-workbench-debug`，通过 `CANVAS_BACKEND_DATA_DIR` 显式指定；不要把 `backend/data` 当作开发账号数据库。
 - 本地缓存放 `.local/cache`；不要提交数据库、上传文件、`.env`、真实密钥、构建产物或编辑器配置。
-- 宿主机开发：`backend/` 运行 `CANVAS_BACKEND_DATA_DIR=../.local/project-workbench-debug go run ./cmd/server`，`web/` 使用 Bun 和 Vite；不要用 pnpm/npm 覆盖同一套 `node_modules`，也不要提交 `pnpm-lock.yaml` 或 `package-lock.json`。Docker 热更新使用 `docker-compose.dev.yml`；本地构建运行使用 `docker-compose.local.yml`。
-- 单机 Compose 使用 `docker-compose.yml`（SQLite 数据卷，backend、web），源码构建可叠加 `docker-compose.build.yml`。公网只暴露 web 的 `3000`，backend `8080` 留在 Compose 网络内。
+- 宿主机开发：`backend/` 运行 `CANVAS_BACKEND_DATA_DIR=../.local/project-workbench-debug go run ./cmd/server`，`web/` 使用 Bun 和 Vite；不要用 pnpm/npm 覆盖同一套 `node_modules`，也不要提交 `pnpm-lock.yaml` 或 `package-lock.json`。Docker 热更新使用 `docker-compose.dev.yml`；本地构建运行使用 `docker-compose.local.yml`。本地开发端口：前端 `1010`，后端 `2010`。
+- 单机 Compose 使用 `docker-compose.yml`（SQLite 数据卷，backend、web），源码构建可叠加 `docker-compose.build.yml`。公网只暴露 web 的 `1010`，backend `2010` 留在 Compose 网络内。
 - 默认不启动 dev server；只有用户明确要求浏览器预览或联调时才启动，并先确认端口、数据目录和现有进程。
 - macOS 本机唯一正式应用路径是 `/Applications/Huabu.app`。需要更新本机应用时只运行 `./scripts/update-local-huabu-app.sh`；不将 `build/bin/Huabu.app` 作为可使用版本保留，不复制、重命名或存档额外 `.app` 副本。
 - 健康检查只能证明入口可用，不能替代登录、SSE、任务生成和资源访问验证。

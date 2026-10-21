@@ -28,6 +28,7 @@ const selectedSkill = { skillId: "story", versionId: "story-v1", contentHash: "a
 let installedSkills = [selectedSkill];
 const skillInstalls: { sourceType: string; isPrivate: string; fileName: string }[] = [];
 let holdSkillInstall = false, releaseSkillInstall: (() => void) | null = null;
+let assistantStatus: { available: boolean; reason?: string } = { available: true };
 beforeAll(async () => {
     scratch = mkdtempSync(tmpdir() + "/assistant-input-");
     execFileSync("ffmpeg", ["-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=24000:duration=0.25", scratch + "/beat.wav"]);
@@ -99,9 +100,12 @@ beforeAll(async () => {
         }
         if (pathname.endsWith("/skills/added")) return ok({ skills: installedSkills });
         if (pathname.endsWith("/assistant/ui-session")) return ok({ token: "synthetic-only", expiresAt: new Date(Date.now() + 1800000).toISOString() });
-        if (pathname.endsWith("/assistant/status")) return ok({ available: true });
+        if (pathname.endsWith("/assistant/status")) return ok(assistantStatus);
         if (pathname.endsWith("/assistant/sessions")) return ok({ currentSessionId: "s1", sessions: [] });
-        if (pathname.endsWith("/assistant/history")) return ok({ sessionId: "s1", turns, active: running && !cancelled ? { turnId: "busy", userText: "继续创作", permissionMode: activePermissionMode, selectedNodeIds: [], attachments: [], skills: [], supplements: [], status: "running", createdAt: "2026-10-08" } : null });
+        if (pathname.endsWith("/assistant/history")) {
+            if (assistantStatus.reason === "model_not_configured") return Response.json({ code: 503, reason: "model_not_configured" }, { status: 503 });
+            return ok({ sessionId: "s1", turns, active: running && !cancelled ? { turnId: "busy", userText: "继续创作", permissionMode: activePermissionMode, selectedNodeIds: [], attachments: [], skills: [], supplements: [], status: "running", createdAt: "2026-10-08" } : null });
+        }
         if (pathname.endsWith("/assistant/steer")) { supplements.push(await req.json()); return ok({ accepted: true }); }
         if (pathname.endsWith("/assistant/cancel")) { cancelled = true; running = false; return ok({ accepted: true }); }
         if (pathname.includes("/assistant/turns/") && pathname.endsWith("/undo")) {
@@ -128,7 +132,60 @@ beforeAll(async () => {
     browser = await chromium.launch({ executablePath, headless: true });
 }, 60000);
 afterAll(async () => { await browser?.close(); server?.stop(true); if (scratch) rmSync(scratch, { recursive: true, force: true }); });
-beforeEach(() => { registeredAssets.length = 0; assetScope = "guest"; });
+beforeEach(() => { registeredAssets.length = 0; assetScope = "guest"; assistantStatus = { available: true }; });
+
+test("scene Agent entry fills an editable brief and waits for the user's send", async () => {
+    const page = await browser.newPage({ viewport: { width: 390, height: 900 } });
+    await page.goto(server.url.toString().replace("localhost", "127.0.0.1"));
+    const input = page.getByRole("textbox", { name: "给助手的消息" });
+    await page.waitForFunction(() => !document.querySelector<HTMLButtonElement>('.canvas-assistant-workflow')?.disabled);
+    const workflows = page.locator(".canvas-assistant-workflow");
+    expect(await workflows.count()).toBe(3);
+    const assertWorkflowBounds = async () => {
+        const viewportWidth = await page.evaluate(() => window.innerWidth);
+        const boxes = await Promise.all((await workflows.all()).map(button => button.boundingBox()));
+        expect(boxes.every(box => Boolean(box && box.width > 0 && box.x >= 0 && box.x + box.width <= viewportWidth))).toBe(true);
+    };
+    await assertWorkflowBounds();
+    const before = chats.length;
+    await page.getByRole("button", { name: /商品宣传套图/ }).click();
+
+    const draft = (await input.innerText()).trim();
+    expect(draft).toContain("商品特点、目标人群、发布渠道");
+    expect(draft).toContain("每轮最多问 3 个问题");
+    expect(chats).toHaveLength(before);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await assertWorkflowBounds();
+    await page.close();
+}, 15000);
+
+test("Agent task starters remain available when no model is configured", async () => {
+    assistantStatus = { available: false, reason: "model_not_configured" };
+    const page = await browser.newPage({ viewport: { width: 390, height: 900 } });
+    await page.goto(server.url.toString().replace("localhost", "127.0.0.1"));
+    const before = chats.length;
+    await page.getByRole("tab", { name: "提示词与图片", exact: true }).click();
+    const promptAction = page.locator('[data-agent-action="reverse-prompt"]');
+    await promptAction.waitFor();
+    await promptAction.click();
+    expect((await page.getByRole("textbox", { name: "给助手的消息" }).innerText())).toContain("不覆盖源图或已有提示词");
+    expect(chats).toHaveLength(before);
+    await page.close();
+}, 15000);
+
+test("a task handed in from the home page stays editable and unsent", async () => {
+    const page = await browser.newPage({ viewport: { width: 390, height: 900 } });
+    await page.goto(server.url.toString().replace("localhost", "127.0.0.1"));
+    const input = page.getByRole("textbox", { name: "给助手的消息" });
+    await page.waitForFunction(() => !document.querySelector<HTMLButtonElement>('button[aria-label="添加参考素材"]')?.disabled);
+    const message = "请为新款咖啡做春季新品宣传图";
+    const before = chats.length;
+    await page.evaluate(text => (window as any).assistantInputFixture.seedInitialDraft(text), message);
+    expect((await input.innerText()).trim()).toBe(message);
+    await page.waitForFunction(async () => (await (window as any).assistantInputFixture.draft())?.text === "请为新款咖啡做春季新品宣传图");
+    expect(chats).toHaveLength(before);
+    await page.close();
+}, 15000);
 
 test("real Sidebar handles file, paste, drop, attachment-only, purpose/range, draft restore and busy supplement", async () => {
     const page = await browser.newPage({ viewport: { width: 390, height: 900 } }); await page.goto(server.url.toString().replace("localhost", "127.0.0.1"));
@@ -354,7 +411,7 @@ test("external Agent connection has no permission chooser and submits only the c
     await page.goto(server.url.toString().replace("localhost", "127.0.0.1"));
     await page.getByRole("button", { name: "连接外部 Agent", exact: true }).click();
     const panel = page.locator(".agent-connect-panel");
-    await panel.getByText("连接后可使用 Huabu 的全部创作工具。每次操作的审批由 Codex 负责。", { exact: true }).waitFor();
+    await panel.getByText("连接后可使用波波 AI 画的创作工具。每次操作的审批由 Codex 负责。", { exact: true }).waitFor();
     expect(await panel.getByRole("radio").count()).toBe(0);
     const connected = page.waitForResponse(response => response.url().endsWith("/agent-clients"));
     await panel.getByRole("button", { name: "生成连接配置", exact: true }).click(); await connected;

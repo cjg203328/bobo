@@ -68,6 +68,10 @@ func (s *Service) SetSkillLiked(userID string, id string, liked bool) (*SkillIte
 	return s.skillDomain().SetSkillLiked(userID, id, liked)
 }
 
+func (s *Service) SetSkillVisibility(userID string, id string, private bool) (*SkillItem, error) {
+	return s.skillDomain().SetSkillVisibility(userID, id, private)
+}
+
 func (s *Service) EnsureBuiltinSkills() error {
 	return s.skillDomain().EnsureBuiltinSkills()
 }
