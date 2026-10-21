@@ -28,7 +28,7 @@ func (p *captureImagePort) Intercept(req *http.Request) (bool, []byte, string, e
 func TestBeefAPIHyImageUsesGenerationJSONForReferences(t *testing.T) {
 	for _, count := range []int{0, 1, 3} {
 		port := &captureImagePort{}
-		ctx := WithRuntime(context.Background(), Runtime{Images: port})
+		ctx := WithImageReplayProtocol(WithRuntime(context.Background(), Runtime{Images: port}), ImageReplayProtocol)
 		input := Input{Mode: "image", Prompt: "画一只小猫", Config: Config{BaseURL: "https://huabu.app", APIKey: "synthetic", Model: "hy-image-v3", InterfaceType: "chat-completion", Size: "16:9"}}
 		for i := 0; i < count; i++ {
 			input.ReferenceImages = append(input.ReferenceImages, Media{DataURL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII="})
@@ -54,7 +54,7 @@ func TestBeefAPIHyImageUsesGenerationJSONForReferences(t *testing.T) {
 func TestExecuteRepairsOldHyImageProtocolForBothBaseURLs(t *testing.T) {
 	for _, base := range []string{"https://huabu.app", "https://huabu.app/v1", "https://enterprise.beefapi.com/v1"} {
 		port := &captureImagePort{}
-		ctx := WithRuntime(context.Background(), taskRuntime(func(r *Runtime) { r.Images = port }))
+		ctx := WithImageReplayProtocol(WithRuntime(context.Background(), taskRuntime(func(r *Runtime) { r.Images = port })), ImageReplayProtocol)
 		_, err := Execute(ctx, Input{Mode: "image", Prompt: "test", Config: Config{BaseURL: base, APIKey: "synthetic", Model: "hy-image-v3", InterfaceType: "chat-completion", Size: "1:1"}})
 		if err != nil || port.path != "/v1/images/generations" {
 			t.Fatalf("%s: path=%s err=%v", base, port.path, err)

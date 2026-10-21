@@ -137,8 +137,18 @@ func TestSkillScopeFollowsConversationAcrossTurns(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(foreign) != 0 {
-		t.Fatalf("catalog leaked another user's skills: %+v", foreign)
+	if len(foreign) != 3 {
+		t.Fatalf("catalog should include the three public built-in Agent skills: %+v", foreign)
+	}
+	for _, item := range foreign {
+		if !strings.HasPrefix(item.Pin.SkillID, "bobo-") {
+			t.Fatalf("catalog leaked another user's skills: %+v", foreign)
+		}
+	}
+	for _, item := range foreign {
+		if item.Pin.SkillID == installed.SkillID {
+			t.Fatalf("catalog leaked another user's private skill: %+v", foreign)
+		}
 	}
 }
 

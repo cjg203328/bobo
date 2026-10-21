@@ -7,7 +7,7 @@ const source = (name: string) => readFileSync(resolve(import.meta.dir, `../src/p
 describe("storyboard prompt panel boundaries", () => {
     test("creation and duplication clear the previous node panel", () => {
         const operations = source("use-canvas-node-operations.ts");
-        expect(operations).toContain("if (type === CanvasNodeType.Script) setDialogNodeId(null)");
+        expect(operations).toContain("if (type === CanvasNodeType.Script || type === CanvasNodeType.Note) setDialogNodeId(null)");
         expect(operations).toContain("canOpenCanvasNodePromptPanel(copiedNodes.find((node) => node.id === id)) ? id : null");
         expect(operations).toContain("canOpenCanvasNodePromptPanel(primaryNode) ? primaryNode!.id : null");
     });

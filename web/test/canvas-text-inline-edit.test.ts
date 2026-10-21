@@ -13,7 +13,7 @@ const emptyContentSource = readFileSync(resolve(import.meta.dir, "../src/compone
 const inlineEditBlock = nodeSource.slice(nodeSource.indexOf("canvas-node-inline-edit"), nodeSource.indexOf("data.metadata?.versionLabel"));
 const emptyTextBlock = emptyContentSource.slice(emptyContentSource.indexOf("function EmptyTextNodeContent"), emptyContentSource.indexOf("function SkillContent"));
 const panelHideRule = canvasStylesSource.match(/data-canvas-editor-panel-open="true"\][\s\S]*?\{[\s\S]*?\}/)?.[0] || "";
-const agentHideRule = canvasStylesSource.match(/data-agent-open="true"\] \.canvas-node-inline-action[\s\S]*?\{[\s\S]*?\}/)?.[0] || "";
+const agentHideRule = canvasStylesSource.match(/\.canvas-editor-shell\[data-agent-open="true"\][\s\S]*?\.canvas-node-inline-edit[\s\S]*?\{[\s\S]*?\}/)?.[0] || "";
 const inlineActionRule = canvasStylesSource.match(/(?<!:hover)\.canvas-node-inline-action\s*\{[^}]*\}/)?.[0] || "";
 
 /** CSS `pointer-events` is inherited. An explicit child value wins. */
@@ -63,14 +63,14 @@ describe("canvas text inline edit and empty card", () => {
         expect(inlineEditBlock).toContain("onOpenTextEditor?.(data)");
     });
 
-    test("keeps the supported text editing paths besides the hidden inline control", () => {
+    test("keeps the supported text and note editing paths besides the hidden inline control", () => {
         expect(nodeSource).toContain("setIsEditingContent(true)");
-        expect(nodeSource).toMatch(/if \(readOnly \|\| data\.type !== CanvasNodeType\.Text\) return;[\s\S]*setIsEditingContent\(true\)/);
+        expect(nodeSource).toContain("if (!canEditContent) return;");
         expect(contextMenuSource).toContain('{isText ? <MenuButton icon={<Maximize2 />} label="放大编辑" onClick={() => runAction(onEditText)} /> : null}');
         expect(projectSource).toContain("onEditText={openTextNodeEditor}");
         expect(projectSource).toMatch(/node.type === CanvasNodeType.Text\)\s*\{\s*setDialogNodeId\(node.id\)/);
-        expect(createNodeSource).toContain(
-            "if (type !== CanvasNodeType.Text && type !== CanvasNodeType.Script && type !== CanvasNodeType.BatchTable && type !== CanvasNodeType.Frame && type !== CanvasNodeType.Drawing && type !== CanvasNodeType.MediaConversion) setDialogNodeId(node.id);",
-        );
+        expect(createNodeSource).toContain("canOpenCanvasNodePromptPanel(node)");
+        expect(createNodeSource).toContain("type !== CanvasNodeType.Text");
+        expect(createNodeSource).toContain("type !== CanvasNodeType.MediaConversion");
     });
 });

@@ -41,6 +41,9 @@ describe("skill marketplace entrypoints", () => {
 
     test("侧栏提供技能库入口并指向 /skills", async () => {
         const sidebar = await source("../src/components/layout/workspace-sidebar-nav.tsx");
-        expect(sidebar).toContain('toolItem("skills", "/skills")');
+        const modules = await source("../src/lib/workspace-modules.ts");
+        expect(sidebar).toContain("availableWorkspaceModules");
+        expect(modules).toContain('id: "skills"');
+        expect(modules).toContain('to: "/skills"');
     });
 });
