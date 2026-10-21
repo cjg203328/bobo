@@ -181,7 +181,7 @@ async function fixtureZip() {
         {
             name: "projects.json",
             data: JSON.stringify({
-                app: "infinite-canvas",
+                app: "huabu",
                 version: 4,
                 exportedAt: "2026-10-02T00:00:00.000Z",
                 folders: [{ id: "folder-old", name: "剧集", coverPath: "folders/old/cover.png", coverMimeType: "image/png", createdAt: "2026-10-02T00:00:00.000Z", updatedAt: "2026-10-02T00:00:00.000Z" }],
@@ -387,7 +387,7 @@ test("missing archive entry and persist failure do not create a saved SQLite can
         const missing = await createZip([{
             name: "projects.json",
             data: JSON.stringify({
-                app: "infinite-canvas",
+                app: "huabu",
                 version: 4,
                 projects: [{
                     project: {
