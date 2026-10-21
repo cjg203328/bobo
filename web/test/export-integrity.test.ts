@@ -266,7 +266,7 @@ test("missing media and corrupt canvas ZIP fail before writing restored files", 
     const missing = await createZip([{
         name: "projects.json",
         data: JSON.stringify({
-            app: "infinite-canvas",
+            app: "huabu",
             version: 4,
             exportedAt: "2026-10-02T00:00:00.000Z",
             projects: [{ project: { id: "broken", title: "损坏画布", nodes: [] }, files: [{ storageKey: "video:missing", path: "projects/broken/files/missing.mp4", mimeType: "video/mp4", bytes: 3 }] }],
