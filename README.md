@@ -5,8 +5,8 @@
 <p align="center"><strong>Agent Native · Canvas First · Image &amp; Video Creation</strong></p>
 
 <p align="center">
-  面向 AI 时代的视频创作工作台。<br>
-  在一个自由画布中连接创意、模型与素材。
+  面向 AI 时代的视觉创作工作台。<br>
+  通过 Agent 对话和自由画布连接创意、模型与素材。
 </p>
 
 <p align="center">
@@ -48,7 +48,9 @@
 
 ## 一个画布，完整创作链路
 
-- **生成**：从提示词或参考素材生成文字、图片、视频与音频。
+- **Agent 创作**：用自然语言描述目标，由波波创作 Agent 澄清需求、选择 Skill 并提出可确认的方案。
+- **提示词中心**：从图片反推提示词，按用途优化提示词，并保留可比较的版本。
+- **生成与细化**：从提示词或参考素材生成图片、视频与音频，对已有图片做全图或局部细化。
 - **组织**：用节点和连线建立素材关系、创作上下文与生成流程。
 - **加工**：继续裁切、标注、局部重绘、拆分、引用和组合结果。
 - **迭代**：保留过程、复用素材，让一次生成变成可持续演进的工作流。
@@ -81,7 +83,7 @@ AI Native 自由画布
 
 ```bash
 git clone https://github.com/cjg203328/bobo.git
-cd bobo-ai-canvas
+    cd bobo
 ./scripts/build-huabu-release.sh
 ```
 

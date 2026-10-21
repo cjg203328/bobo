@@ -19,7 +19,7 @@ const (
 )
 
 const (
-	DefaultBrandName = "波波 AI 画"
+	DefaultBrandName = "波波 AI 画布"
 	DefaultBrandSlug = "bobo-ai-canvas"
 	DefaultSkinID    = "classic"
 	DefaultLogoURL   = "/bobo-mark.svg"

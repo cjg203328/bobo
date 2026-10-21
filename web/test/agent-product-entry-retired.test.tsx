@@ -99,7 +99,7 @@ describe("旧内置 Agent 页面入口退场", () => {
                 <HomeDashboard modules={[]} projects={[]} loading={false} error={false} onRetry={() => {}} />
             </MemoryRouter>,
         );
-        expect(markup).toContain("波波 AI 画");
+        expect(markup).toContain("波波 AI 画布");
         expect(markup).toContain("波波创作 Agent");
         expect(markup).toContain('>描述创作任务</label>');
         expect(markup).toContain("开始创作");

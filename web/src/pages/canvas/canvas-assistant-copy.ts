@@ -25,7 +25,7 @@ export function assistantStatusNotice(reason: string | undefined): AssistantStat
         case "model_protocol_unsupported":
             return { text: "还没有可用的助手模型", actionLabel: "去模型配置", action: "model-settings" };
         case "credential_missing":
-            return { text: "波波 AI 画还没连接好", actionLabel: "去连接", action: "model-settings" };
+            return { text: "波波 AI 画布还没连接好", actionLabel: "去连接", action: "model-settings" };
         case "host_starting":
             return { text: "助手正在启动…", starting: true };
         case "host_start_failed":

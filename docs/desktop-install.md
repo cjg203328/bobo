@@ -1,6 +1,6 @@
-# 安装 Huabu
+# 安装波波 AI 画布
 
-安装包不使用付费代码签名证书。Windows 可能显示“未知发布者”或 SmartScreen 提示；macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。受组织策略或 Smart App Control 限制的设备可能无法运行。请只从 Huabu 官网或官方 GitHub Releases 下载。
+安装包不使用付费代码签名证书。Windows 可能显示“未知发布者”或 SmartScreen 提示；macOS 可能要求在“系统设置 → 隐私与安全性”中允许打开。受组织策略或 Smart App Control 限制的设备可能无法运行。请只从波波 AI 画布官方 GitHub Releases 下载。当前安装包文件名和安装目录仍保留 `Huabu` 兼容标识，见[迁移说明](product/bobo-ai-canvas-migration-notes.md)。
 
 - Windows：运行 `Huabu-vX.Y.Z-windows-amd64-setup.exe`。打开后直接确认安装位置即可一键安装，默认 `%LOCALAPPDATA%\Programs\Huabu`，覆盖安装会沿用上次的位置；无论选盘符根目录还是文件夹，都会自动装入其下的 `Huabu` 子目录。安装时会自动关闭正在运行的旧版 Huabu，默认创建开始菜单与桌面快捷方式，完成后可直接勾选启动。安装包以当前用户权限运行，无需管理员权限，因此不能写入 `Program Files` 等位置。WebView2 是运行依赖，缺失时应用会提示下载安装。
 - macOS：打开对应芯片的 `.dmg`，将 `Huabu.app` 拖到“Applications”，退出磁盘映像后从“应用程序”启动。已有版本时先退出 Huabu，再替换应用。

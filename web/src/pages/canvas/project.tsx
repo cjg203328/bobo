@@ -756,7 +756,7 @@ function InfiniteCanvasPage() {
                 connectionsRef.current = previousConnections;
                 setNodes(previousNodes);
                 setConnections(previousConnections);
-                throw new Error("画布保存失败，已撤销本次 LibTV 导入");
+                throw new Error("画布保存失败，已撤销本次兼容画布导入");
             }
         },
         [saveCanvasProject, setConnections, setNodes],

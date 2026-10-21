@@ -2,14 +2,14 @@ import { describe, expect, test } from "bun:test";
 
 import { brandStudioLabel, DEFAULT_PUBLIC_APPEARANCE, normalizePublicAppearance } from "@/stores/use-appearance-store";
 
-describe("波波 AI 画默认品牌", () => {
+describe("波波 AI 画布默认品牌", () => {
     test("内置外观使用新产品品牌和图标", () => {
-        expect(DEFAULT_PUBLIC_APPEARANCE.brandName).toBe("波波 AI 画");
+        expect(DEFAULT_PUBLIC_APPEARANCE.brandName).toBe("波波 AI 画布");
         expect(DEFAULT_PUBLIC_APPEARANCE.brandSlug).toBe("bobo-ai-canvas");
         expect(DEFAULT_PUBLIC_APPEARANCE.logoUrl).toBe("/bobo-mark.svg");
         expect(DEFAULT_PUBLIC_APPEARANCE.authVideoUrl).toBe("/bobo-hero.mp4");
         expect(DEFAULT_PUBLIC_APPEARANCE.authVideoPosterUrl).toBe("/bobo-hero-poster.jpg");
-        expect(DEFAULT_PUBLIC_APPEARANCE.seoTitle).toBe("波波 AI 画");
+        expect(DEFAULT_PUBLIC_APPEARANCE.seoTitle).toBe("波波 AI 画布");
         expect(brandStudioLabel(DEFAULT_PUBLIC_APPEARANCE)).toBe("BOBO AI CANVAS");
     });
 
@@ -23,10 +23,10 @@ describe("波波 AI 画默认品牌", () => {
             footerCopyright: "© 2025 Huabu. Open source video studio.",
         });
 
-        expect(appearance.brandName).toBe("波波 AI 画");
+        expect(appearance.brandName).toBe("波波 AI 画布");
         expect(appearance.brandSlug).toBe("bobo-ai-canvas");
         expect(appearance.authHeroTitle).toBe(DEFAULT_PUBLIC_APPEARANCE.authHeroTitle);
-        expect(appearance.seoTitle).toBe("波波 AI 画");
+        expect(appearance.seoTitle).toBe("波波 AI 画布");
         expect(appearance.seoDescription).toBe(DEFAULT_PUBLIC_APPEARANCE.seoDescription);
         expect(appearance.footerCopyright).toBe(DEFAULT_PUBLIC_APPEARANCE.footerCopyright);
         expect(appearance.logoUrl).toBe("/bobo-mark.svg");

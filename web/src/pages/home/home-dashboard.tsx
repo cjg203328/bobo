@@ -66,9 +66,9 @@ export function HomeDashboard({ modules, projects, loading, error, onRetry }: { 
     };
 
     return (
-        <main className="huabu-home" aria-label="波波 AI 画工作台">
+        <main className="huabu-home" aria-label="波波 AI 画布工作台">
             <header className="huabu-home-header">
-                <div className="huabu-home-heading"><span>波波 AI 画</span><h1>工作台</h1></div>
+                <div className="huabu-home-heading"><span>波波 AI 画布</span><h1>工作台</h1></div>
                 <Link className="huabu-home-secondary-action" to="/canvas?mode=new"><Plus aria-hidden="true" />空白画布</Link>
             </header>
 
@@ -156,7 +156,7 @@ export function HomeDashboard({ modules, projects, loading, error, onRetry }: { 
                     <div className="huabu-recent-grid">
                         {loading ? Array.from({ length: 4 }, (_, index) => <div className="huabu-recent-card is-loading" key={index} />) : projects.length ? projects.map((project) => {
                             return <Link to={`/canvas/${project.id}`} className="huabu-recent-card" key={project.id}>
-                                <span className="huabu-recent-preview"><ProjectPreview project={{ id: project.id, nodes: project.previewNodes }} emptyVariant="libtv" /></span>
+                                <span className="huabu-recent-preview"><ProjectPreview project={{ id: project.id, nodes: project.previewNodes }} emptyVariant="bobo" /></span>
                                 <span className="huabu-recent-copy"><strong>{project.title || "未命名"}</strong><small>{formatDate(project.updatedAt)}</small></span>
                                 <ArrowRight className="huabu-recent-arrow" />
                             </Link>;

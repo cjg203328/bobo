@@ -44,7 +44,7 @@ export async function exportDiagnosticBundle(input: DiagnosticExportInput): Prom
         return {
             blob: response.data,
             bundleId: readHeader(response.headers, "x-diagnostic-bundle-id") || "",
-            fileName: parseFileName(readHeader(response.headers, "content-disposition")) || "huabu-diagnostics.zip",
+            fileName: parseFileName(readHeader(response.headers, "content-disposition")) || "bobo-ai-canvas-diagnostics.zip",
         };
     } catch (error) {
         if (error instanceof ApiError) {

@@ -1,8 +1,8 @@
-# justailab 复刻总纲 · 分析 → 复刻 → 计划
+# JustAI 参考拆解 · 分析 → 兼容改造 → 路线
 
 > 日期：2026-10-22（总纲定稿，合并前三份文档）
-> 状态：**决策已定，P0' 待执行令**
-> 前身文档（已归档于 `archive/`，作详细证据）：`archive/02-路线计划-v2-2026-10-22.md`（产品定义与分期 v2）、`archive/03-兼容改造差距分析-2026-10-22.md`（代码级差距）、`archive/04-零基础直达设计原则-2026-10-22.md`（产品原则与北极星）
+> 状态：**历史参考，当前产品执行以 `docs/product/` 为准**
+> 前身文档（已归档于 `archive/`，作详细证据）：`archive/02-roadmap-v2.md`、`archive/03-compatibility-gap-analysis.md`、`archive/04-zero-friction-principles.md`
 > 依据：三份 justailab 分析文档（静态/动态/深扒）+ bobo-ai-canvas 全仓代码级调研 + 用户 4 项决策（2026-10-22）
 
 ---

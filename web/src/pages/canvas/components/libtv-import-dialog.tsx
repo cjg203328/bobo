@@ -70,14 +70,14 @@ export function LibTVImportDialog({ open, projectId, viewport, viewportSize, onC
 
     const load = async () => {
         if (!uuid) {
-            message.error("请填写 LibTV 画布 UUID 或链接");
+            message.error("请填写兼容画布 UUID 或链接");
             return;
         }
         setLoading(true);
         try {
             setResult(await importLibTVCanvas(projectId, uuid));
         } catch (error) {
-            message.error(error instanceof Error ? error.message : "读取 LibTV 画布失败");
+            message.error(error instanceof Error ? error.message : "读取兼容画布失败");
         } finally {
             setLoading(false);
         }
@@ -103,7 +103,7 @@ export function LibTVImportDialog({ open, projectId, viewport, viewportSize, onC
             className="workspace-modal"
             open={open}
             onCancel={close}
-            title="导入 LibTV 画布"
+            title="导入兼容画布"
             width={620}
             footer={
                 result ? (
@@ -124,7 +124,7 @@ export function LibTVImportDialog({ open, projectId, viewport, viewportSize, onC
         >
             <div className="space-y-4">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">LibTV 画布 UUID 或链接</label>
+                    <label className="mb-2 block text-sm font-medium">兼容画布 UUID 或链接</label>
                     <Input
                         value={value}
                         onChange={(event) => changeValue(event.target.value)}
@@ -136,7 +136,7 @@ export function LibTVImportDialog({ open, projectId, viewport, viewportSize, onC
                 {loading && !result ? (
                     <div className="flex items-center gap-2 text-sm text-foreground/55">
                         <LoaderCircle className="size-4 animate-spin" />
-                        正在读取 LibTV 画布…
+                        正在读取兼容画布…
                     </div>
                 ) : null}
                 {result ? (
@@ -144,7 +144,7 @@ export function LibTVImportDialog({ open, projectId, viewport, viewportSize, onC
                         <div className="rounded-xl p-4" style={{ background: "var(--library-surface)" }}>
                             <div className="flex flex-wrap items-start justify-between gap-3">
                                 <div>
-                                    <div className="text-sm font-semibold">{result.projectName || "LibTV 画布"}</div>
+                                    <div className="text-sm font-semibold">{result.projectName || "兼容画布"}</div>
                                     <div className="mt-1 text-sm text-foreground/60">可导入 {result.importedNodeCount} 个节点 · {result.importedConnectionCount} 条连线</div>
                                 </div>
                                 <Tag color="blue">批次：{formatLibTVBatchTime(result.batchCreatedAt)}</Tag>

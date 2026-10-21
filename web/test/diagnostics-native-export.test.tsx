@@ -17,9 +17,9 @@ test("native diagnostic ZIP bytes reach the chosen-file binding and cancellation
     const calls: Array<[string, string]> = [];
     Object.assign(globalThis, { window: { location: { protocol: "wails:" }, go: { main: { DesktopApp: { SaveOwnedArtifact: async (name: string, bytes: string) => { calls.push([name, bytes]); return false; } } } } } });
     const data = new Uint8Array([80, 75, 3, 4, 0, 255]);
-    const result = await downloadDiagnosticBundle({ blob: new Blob([data], { type: "application/zip" }), fileName: "huabu-diagnostics.zip", bundleId: "DIAG_TEST" });
+    const result = await downloadDiagnosticBundle({ blob: new Blob([data], { type: "application/zip" }), fileName: "bobo-ai-canvas-diagnostics.zip", bundleId: "DIAG_TEST" });
     expect(result).toBe("cancelled");
     expect(calls.length).toBe(1);
-    expect(calls[0][0]).toBe("huabu-diagnostics.zip");
+    expect(calls[0][0]).toBe("bobo-ai-canvas-diagnostics.zip");
     expect(new Uint8Array(Buffer.from(calls[0][1], "base64"))).toEqual(data);
 });

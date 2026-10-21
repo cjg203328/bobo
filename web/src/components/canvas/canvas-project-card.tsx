@@ -66,7 +66,7 @@ export function CanvasProjectCard({ project, projectName, variant = "library", r
                         open();
                     }}
                 >
-                    <ProjectPreview project={project} emptyVariant={compact ? "default" : "libtv"} />
+                    <ProjectPreview project={project} emptyVariant={compact ? "default" : "bobo"} />
                 </button>
                 {!compact && !readOnly ? (
                     <span className={`canvas-project-select ${selected ? "is-visible" : ""}`} onClick={(event) => event.stopPropagation()}>
@@ -148,7 +148,7 @@ export function CanvasProjectCard({ project, projectName, variant = "library", r
     );
 }
 
-export function ProjectPreview({ project, preferLatestImage = false, emptyVariant = "default" }: { project: Pick<CanvasProject, "id" | "nodes">; preferLatestImage?: boolean; emptyVariant?: "default" | "libtv" }) {
+export function ProjectPreview({ project, preferLatestImage = false, emptyVariant = "default" }: { project: Pick<CanvasProject, "id" | "nodes">; preferLatestImage?: boolean; emptyVariant?: "default" | "bobo" }) {
     const syncProgress = useSyncProgressStore((state) => state.syncingProjects[canvasSyncProgressKey(project.id)]);
     const isSyncing = Boolean(syncProgress && (syncProgress.phase === "uploading" || syncProgress.phase === "saving"));
     // The progress message can be stale while a canvas is rehydrating. Use the
@@ -164,11 +164,11 @@ export function ProjectPreview({ project, preferLatestImage = false, emptyVarian
             {media.kind === "video" ? (
                 <ProjectPreviewVideo key={`${media.node.id}:${media.url}`} media={media} onError={failMedia} />
             ) : (
-                <CachedResourceImage key={`${media.node.id}:${media.url}`} storageKey={media.storageKey} src={media.url} alt={media.node.title || "项目图片"} loading="lazy" decoding="async" className="size-full min-h-0 object-cover" fallback={emptyVariant === "libtv" ? <LibTvEmptyPreview /> : <MediaPlaceholder failed />} loadingFallback={<MediaPlaceholder label="正在读取封面" />} onError={failMedia} />
+                <CachedResourceImage key={`${media.node.id}:${media.url}`} storageKey={media.storageKey} src={media.url} alt={media.node.title || "项目图片"} loading="lazy" decoding="async" className="size-full min-h-0 object-cover" fallback={emptyVariant === "bobo" ? <BoboEmptyPreview /> : <MediaPlaceholder failed />} loadingFallback={<MediaPlaceholder label="正在读取封面" />} onError={failMedia} />
             )}
         </div>
-    ) : emptyVariant === "libtv" ? (
-        <LibTvEmptyPreview />
+    ) : emptyVariant === "bobo" ? (
+        <BoboEmptyPreview />
     ) : !project.nodes.length ? (
         <div className="canvas-project-empty size-full">
             <Plus className="canvas-project-empty-icon" />
@@ -227,8 +227,8 @@ export function ProjectPreview({ project, preferLatestImage = false, emptyVarian
     );
 }
 
-function LibTvEmptyPreview() {
-    return <div className="canvas-project-empty is-libtv size-full"><Workflow className="canvas-project-empty-icon" aria-hidden="true" /></div>;
+function BoboEmptyPreview() {
+    return <div className="canvas-project-empty is-bobo size-full"><Workflow className="canvas-project-empty-icon" aria-hidden="true" /></div>;
 }
 
 export function projectPreviewMedia(nodes: CanvasNodeData[], preferLatestImage = false) {

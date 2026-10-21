@@ -1,6 +1,6 @@
 # 本地优先架构
 
-Huabu 的桌面构建是一个单用户、本地优先工作区。桌面端只启动一个 Wails 进程：Wails 承载前端，Go runtime 提供 loopback API 和 SQLite/本地资源目录。
+波波 AI 画布的桌面构建是一个单用户、本地优先工作区。桌面端只启动一个 Wails 进程：Wails 承载前端，Go runtime 提供 loopback API 和 SQLite/本地资源目录。内部应用目录暂保留 `Huabu` 兼容名称，商业化远端版本将通过迁移方案切换数据目录。
 
 ## 运行边界
 

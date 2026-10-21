@@ -78,7 +78,7 @@ func builtinAgentSkillItem(definition builtinAgentSkillDefinition) SkillItem {
 		VersionID: definition.versionID, Version: definition.version, ContentHash: definition.contentHash,
 		FileCount: 1, TotalBytes: int64(len(definition.instruction)), SourceType: "bobo_builtin", Source: 0,
 		Tag: "creative", IsPrivate: true, Status: skillStatusEnabled, IsAdded: true,
-		EffectiveUser: SkillEffectiveUser{Name: "波波 AI 画"}, ShowcaseMedia: []SkillShowcaseMedia{},
+		EffectiveUser: SkillEffectiveUser{Name: "波波 AI 画布"}, ShowcaseMedia: []SkillShowcaseMedia{},
 		CreatedAt: createdAt, UpdatedAt: createdAt,
 	}
 }

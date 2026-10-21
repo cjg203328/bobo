@@ -92,7 +92,7 @@ export function CanvasFolderCard({ project, projectName, folders = [], onMoveToF
             onFocusCapture={onPrefetch}
             cover={
                 <div className="canvas-collection-preview-content">
-                    <ProjectPreview project={{ id: project.id, nodes: project.previewNodes }} emptyVariant="libtv" />
+                    <ProjectPreview project={{ id: project.id, nodes: project.previewNodes }} emptyVariant="bobo" />
                     {coverUrl ? <img className="canvas-collection-custom-cover" src={coverUrl} alt="" /> : null}
                     {opening ? <div className="canvas-collection-opening"><LoaderCircle className="size-5 animate-spin" /><span>正在打开</span></div> : null}
                 </div>

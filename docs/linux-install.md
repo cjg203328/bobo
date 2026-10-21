@@ -2,7 +2,7 @@
 
 Linux x64 包面向 Ubuntu 24.04，使用 GTK 3 和 WebKitGTK 4.1。其他发行版尚未完成运行验证；ARM64 不在当前发行范围内。
 
-推荐下载 `Huabu-vX.Y.Z-linux-amd64.deb`，安装时会自动补齐依赖：
+推荐从波波 AI 画布发布页下载 `Huabu-vX.Y.Z-linux-amd64.deb`（文件名暂保留兼容标识），安装时会自动补齐依赖：
 
 ```bash
 sudo apt install ./Huabu-vX.Y.Z-linux-amd64.deb

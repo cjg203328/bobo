@@ -137,7 +137,7 @@ export function CanvasTopBar({
     if (libtvReadonlyChrome) {
         return (
             <div className="canvas-libtv-readonly-bar" data-canvas-no-zoom>
-                <div className="canvas-libtv-readonly-title" title={title}>{title === "未命名工作区" ? "BLUE NIGHT蓝色奇妙夜" : title}</div>
+                <div className="canvas-libtv-readonly-title" title={title}>{title === "未命名工作区" ? "波波视觉实验室" : title}</div>
                 <div className="canvas-libtv-readonly-center" aria-hidden="true">
                     <span className="canvas-libtv-readonly-center-button is-active"><Workflow className="size-4" /></span>
                     <span className="canvas-libtv-readonly-center-button"><Columns2 className="size-4" /></span>

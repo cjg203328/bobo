@@ -35,7 +35,7 @@ try {
         logo: document.querySelector(".app-workspace-brand-mark img")?.getAttribute("src"),
         moduleCount: document.querySelectorAll(".huabu-module-link").length,
     }));
-    assert.match(brand.title, /波波 AI 画/);
+    assert.match(brand.title, /波波 AI 画布/);
     assert.equal(brand.favicon, "/bobo-mark.svg");
     assert.equal(brand.logo, "/bobo-mark.svg");
     assert.ok(brand.moduleCount >= 5);
@@ -62,12 +62,12 @@ try {
     await page.getByRole("heading", { name: "默认模型", exact: true }).waitFor();
 
     await page.goto(`${base}/agents`, { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "波波 AI 画 MCP", exact: true }).waitFor();
+    await page.getByRole("heading", { name: "波波 AI 画布 MCP", exact: true }).waitFor();
 
     await page.goto(`${base}/skills`, { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "技能库", exact: true }).waitFor();
 
-    await page.getByRole("link", { name: "波波 AI 画首页" }).click();
+    await page.getByRole("link", { name: "波波 AI 画布首页" }).click();
     await page.locator(".huabu-home").waitFor();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: resolve(evidence, "workspace-home-mobile.png"), fullPage: true });

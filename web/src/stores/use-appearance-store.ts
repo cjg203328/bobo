@@ -5,7 +5,7 @@ import { applySkinTheme, DEFAULT_CLASSIC_SKIN, normalizeSkinDefinition } from "@
 
 export const DEFAULT_PUBLIC_APPEARANCE: PublicAppearance = {
     schemaVersion: 7,
-    brandName: "波波 AI 画",
+    brandName: "波波 AI 画布",
     brandSlug: "bobo-ai-canvas",
     authHeroTitle: "把创作目标，\n交给波波 Agent。",
     authHeroDescription: "从提示词、参考素材到图像与视频方案，Agent 与你一起完成每一步。",
@@ -17,10 +17,10 @@ export const DEFAULT_PUBLIC_APPEARANCE: PublicAppearance = {
     authVideoAutoplay: true,
     skinId: "classic",
     activeSkin: DEFAULT_CLASSIC_SKIN,
-    seoTitle: "波波 AI 画",
-    seoDescription: "波波 AI 画，面向图像与视频创作的智能体工作台。",
+    seoTitle: "波波 AI 画布",
+    seoDescription: "波波 AI 画布，面向图像、视频与智能体创作的工作台。",
     seoKeywords: "AI 画布,创作智能体,AI 生图,AI 生视频,提示词优化,提示词反推,Agent 技能",
-    footerCopyright: `${new Date().getFullYear()} 波波 AI 画。保留所有权利。`,
+    footerCopyright: `${new Date().getFullYear()} 波波 AI 画布。保留所有权利。`,
     icpFilingEnabled: false,
     icpFilingNumber: "",
     logoConfigured: false,

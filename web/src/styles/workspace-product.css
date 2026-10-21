@@ -54,8 +54,8 @@
 .product-media-placeholder-icon svg { width: 20px; height: 20px; stroke-width: 1.5; }
 .canvas-collection-preview .canvas-project-empty { background: var(--user-surface-muted); }
 .canvas-collection-preview .canvas-project-empty-icon { width: 24px; height: 24px; }
-.app-user-workspace .lib-tv-project-page .canvas-project-empty.is-libtv { gap: 0; background: color-mix(in srgb, var(--user-surface-muted) 82%, var(--background)); color: color-mix(in srgb, var(--user-ink) 20%, transparent); }
-.app-user-workspace .lib-tv-project-page .canvas-project-empty.is-libtv .canvas-project-empty-icon { width: 44px; height: 44px; margin: 0; stroke-width: 1.4; }
+.app-user-workspace .canvas-project-empty.is-bobo { gap: 0; background: color-mix(in srgb, var(--user-surface-muted) 82%, var(--background)); color: color-mix(in srgb, var(--user-ink) 20%, transparent); }
+.app-user-workspace .canvas-project-empty.is-bobo .canvas-project-empty-icon { width: 44px; height: 44px; margin: 0; stroke-width: 1.4; }
 
 .product-icon-button { display: inline-grid; width: 30px; height: 30px; flex-shrink: 0; place-items: center; border: 0; border-radius: 9px; background: transparent; color: var(--user-ink-muted); cursor: pointer; transition: background var(--user-motion), color var(--user-motion), transform var(--user-motion); }
 .product-icon-button svg { width: var(--user-icon-size); height: var(--user-icon-size); stroke-width: 1.7; }

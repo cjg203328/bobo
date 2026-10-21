@@ -95,7 +95,7 @@ export function RecycleBinDialog({ open, onClose }: { open: boolean; onClose: ()
                                                 aria-label={`选择 ${item.title || "未命名项目"}`}
                                             />
                                         </label>
-                                        <div className="recycle-bin-preview">{item.project ? <ProjectPreview project={item.project} emptyVariant="libtv" /> : <div className="canvas-project-empty is-libtv size-full" />}</div>
+                                        <div className="recycle-bin-preview">{item.project ? <ProjectPreview project={item.project} emptyVariant="bobo" /> : <div className="canvas-project-empty is-bobo size-full" />}</div>
                                         <div className="recycle-bin-card-body">
                                             <h3>{item.title || "未命名项目"}</h3>
                                             <time>{formatTimelineDate(item.deletedAt || item.updatedAt)}</time>

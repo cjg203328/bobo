@@ -1,11 +1,15 @@
-# Huabu 文档
+# 波波 AI 画布文档
 
-Huabu 是一个本地优先、轻量、AI Native 的视频工作台。本页只收录公开使用、开发和维护所需的文档。
+波波 AI 画布（Bobo AI Canvas）是一个由 Agent 驱动的视觉创作工作台。用户可以通过对话或画布完成提示词、图片、视频和项目编排；Web MVP 优先验证创作闭环，远端服务负责后续商业化数据与计费。
 
 ## 开始使用
 
-- [波波 AI 画产品需求文档](product/bobo-ai-canvas-prd.md)
+- [波波 AI 画布产品需求文档](product/bobo-ai-canvas-prd.md)
 - [项目首页与快速开始](../README.md)
+- [产品架构](product/bobo-ai-canvas-architecture.md)
+- [模块地图与验收边界](product/bobo-ai-canvas-module-map.md)
+- [兼容改造与目录迁移说明](product/bobo-ai-canvas-migration-notes.md)
+- [文件盘点与保留/删除边界](product/bobo-ai-canvas-file-inventory.md)
 - [功能概览](content/docs/overview/features.mdx)
 - [本地优先架构](local-first-architecture.md)
 - [桌面端本地开发](desktop-local-development.md)
@@ -36,6 +40,11 @@ Huabu 是一个本地优先、轻量、AI Native 的视频工作台。本页只�
 - [AI 审美批改插件](content/docs/plugins/ai-art-critique.mdx)
 - [剪辑导出调用方与规划分叉](refactor/editing.md)
 - [生成结果第一段入库](refactor/media-ingest.md)
+
+## 参考研究
+
+- [竞品研究索引](research/competitors/README.md)
+- [JustAI 参考拆解](research/competitors/justailab-reference/README.md)
 
 ## 项目治理
 
