@@ -75,7 +75,7 @@ function timeline(): TimelineProject {
 
 function archiveData(overrides: Record<string, unknown> = {}) {
     return {
-        app: "infinite-canvas",
+        app: "huabu",
         version: 4,
         exportedAt: "2026-10-02T00:00:00.000Z",
         folders: [{ id: "folder-old", name: "剧集", createdAt: "2026-10-02T00:00:00.000Z", updatedAt: "2026-10-02T00:00:00.000Z" }],
@@ -222,7 +222,7 @@ test("preflight rejects missing media, invalid project, version, duplicate IDs, 
     const missing = await createZip([{
         name: "projects.json",
         data: JSON.stringify({
-            app: "infinite-canvas",
+            app: "huabu",
             version: 4,
             projects: [{
                 project: { id: "broken", title: "损坏画布", nodes: [videoNode()], connections: [] },
@@ -235,20 +235,20 @@ test("preflight rejects missing media, invalid project, version, duplicate IDs, 
 
     const invalidProject = await createZip([{
         name: "projects.json",
-        data: JSON.stringify({ app: "infinite-canvas", version: 4, projects: [{ project: { title: "无编号" }, files: [] }] }),
+        data: JSON.stringify({ app: "huabu", version: 4, projects: [{ project: { title: "无编号" }, files: [] }] }),
     }]);
     await expect(openCanvasArchive(invalidProject)).rejects.toThrow("缺少编号");
 
     const badVersion = await createZip([{
         name: "projects.json",
-        data: JSON.stringify({ app: "infinite-canvas", version: 2, projects: [] }),
+        data: JSON.stringify({ app: "huabu", version: 2, projects: [] }),
     }]);
     await expect(openCanvasArchive(badVersion)).rejects.toThrow("不支持的画布备份版本");
 
     const duplicate = await createZip([{
         name: "projects.json",
         data: JSON.stringify({
-            app: "infinite-canvas",
+            app: "huabu",
             version: 4,
             projects: [
                 { project: { id: "same", title: "一", nodes: [], connections: [] }, files: [] },
@@ -261,7 +261,7 @@ test("preflight rejects missing media, invalid project, version, duplicate IDs, 
     const duplicateDrawing = await createZip([{
         name: "projects.json",
         data: JSON.stringify({
-            app: "infinite-canvas",
+            app: "huabu",
             version: 4,
             projects: [{
                 project: { id: "drawn", title: "重复画板", nodes: [drawingNode()], connections: [] },
@@ -279,7 +279,7 @@ test("preflight rejects missing media, invalid project, version, duplicate IDs, 
         {
             name: "projects.json",
             data: JSON.stringify({
-                app: "infinite-canvas",
+                app: "huabu",
                 version: 4,
                 projects: [{
                     project: { id: "data", title: "内嵌", nodes: [{ ...videoNode(), metadata: { storageKey: "data:image/png;base64,AAAA" } }], connections: [] },
@@ -301,7 +301,7 @@ test("archive zip bounds match the existing desktop extraction limits", () => {
 test("zip traversal and duplicate confined paths fail before restore writes", async () => {
     const traversal = new Blob([zipSync({
         "../secret.txt": new Uint8Array([1]),
-        "projects.json": encoder.encode(JSON.stringify({ app: "infinite-canvas", version: 4, projects: [] })),
+        "projects.json": encoder.encode(JSON.stringify({ app: "huabu", version: 4, projects: [] })),
     })]);
     await expect(openCanvasArchive(traversal)).rejects.toThrow("越界路径");
 
