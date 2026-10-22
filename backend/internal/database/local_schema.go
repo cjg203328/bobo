@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const CurrentSchemaVersion int64 = 16
+const CurrentSchemaVersion int64 = 17
 
 type localSchemaMigration struct {
 	Version   int64 `gorm:"primaryKey;autoIncrement:false"`
@@ -44,6 +44,7 @@ type SchemaStatus struct {
 func LocalModels() []any {
 	return []any{
 		&model.Workspace{}, &model.IDSequence{}, &model.SystemSetting{}, &model.UserDailyActivity{},
+		&model.Tenant{}, &model.TenantMembership{},
 		&model.ModelChannel{}, &model.ChannelModel{}, &model.ChannelModelVariant{}, &model.ApiCallLog{},
 		&model.LogicalModel{}, &model.LogicalModelRevision{}, &model.LogicalModelRoute{}, &model.RouteAttempt{},
 		&model.ImageSubmission{},
@@ -90,6 +91,7 @@ func canonicalLocalMigrations() []localMigration {
 		{version: 14, name: "assistant-skill-version-pins", apply: migrateAssistantSkillPins},
 		{version: 15, name: "assistant-permission-and-canvas-snapshots", apply: migrateAssistantPermissions},
 		{version: 16, name: "assistant-durable-session-binding", apply: migrateAssistantSessions},
+		{version: 17, name: "tenant-membership", apply: migrateTenantMembership},
 	}
 }
 
@@ -482,7 +484,37 @@ func requireReconciledSchema(db *gorm.DB) error {
 		}
 	}
 	if version >= 16 {
-		return requireAssistantSessions(db)
+		if err := requireAssistantSessions(db); err != nil {
+			return err
+		}
+	}
+	if version >= 17 {
+		return requireTenantSchema(db)
+	}
+	return nil
+}
+
+func requireTenantSchema(db *gorm.DB) error {
+	for _, value := range []any{&model.Tenant{}, &model.TenantMembership{}} {
+		stmt := &gorm.Statement{DB: db}
+		if err := stmt.Parse(value); err != nil {
+			return err
+		}
+		if !db.Migrator().HasTable(value) {
+			return fmt.Errorf("本地租户数据库结构缺失表 %s", stmt.Schema.Table)
+		}
+		for _, column := range stmt.Schema.DBNames {
+			has, err := sqliteHasColumn(db, stmt.Schema.Table, column)
+			if err != nil {
+				return err
+			}
+			if !has {
+				return fmt.Errorf("本地租户表 %s 缺失列 %s", stmt.Schema.Table, column)
+			}
+		}
+		if err := requireSQLitePrimaryKey(db, stmt.Schema.Table, stmt.Schema.PrimaryFieldDBNames); err != nil {
+			return err
+		}
 	}
 	return nil
 }
