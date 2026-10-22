@@ -17,10 +17,12 @@ test("local workspace bootstrap is the product startup contract", () => {
     expect(appProviders).toContain("WorkspaceBootstrapHydrator");
     expect(appProviders).not.toContain("AuthSessionHydrator");
     expect(hydrator).toContain("getWorkspaceBootstrap");
-    expect(hydrator).not.toContain("getAuthSession");
+    expect(hydrator).toContain("getRemoteAuthSession");
     expect(hydrator).toContain("createLocalWorkspacePayload");
     expect(hydrator).toContain("applySession: applyUserSession");
-    expect(hydrator).toContain("restoreModelConfig: hydrateLocalModelConfig");
+    expect(hydrator).toContain("hydrateLocalModelConfig");
+    expect(hydrator).toContain('VITE_CANVAS_LOCAL_MODE === "false" ? async () => undefined : hydrateLocalModelConfig');
+    expect(hydrator).toContain('allowLocalFallback: import.meta.env.VITE_CANVAS_LOCAL_MODE !== "false"');
     expect(workspaceApi).toContain('"/workspace/bootstrap"');
     expect(router).not.toContain('path: "/login"');
     expect(router).not.toContain('path: "/register"');

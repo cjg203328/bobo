@@ -29,6 +29,7 @@ func newTaskScopeRepoAt(t *testing.T, path string) (*Repository, *gorm.DB, strin
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := db.AutoMigrate(
 		&model.Task{},
 		&model.TaskTextDelta{},
@@ -68,6 +69,7 @@ func reopenTaskScopeRepo(t *testing.T, db *gorm.DB, path string) (*Repository, *
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, reopened)
 	return New(reopened), reopened
 }
 

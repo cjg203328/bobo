@@ -11,10 +11,10 @@ const deleteDialog = readFileSync(new URL("../src/components/canvas/canvas-delet
 const lifecycle = readFileSync(new URL("../src/pages/canvas/use-canvas-project-lifecycle.ts", import.meta.url), "utf8");
 const projectRepository = readFileSync(new URL("../src/services/workspace-project-repository.ts", import.meta.url), "utf8");
 
-test("local project library exposes the complete local workspace lifecycle", () => {
+test("canvas project library exposes the complete workspace lifecycle", () => {
     expect(libraryPage).toContain("useCanvasStore");
-    expect(libraryPage).toContain("beginLocalCanvasProject");
-    expect(libraryPage).not.toContain("createCanvasProjectWithRemoteSync");
+    expect(libraryPage).toContain("createWorkspaceCanvasProject");
+    expect(libraryPage).not.toContain("beginLocalCanvasProject");
     expect(libraryPage).toContain("新建文件夹");
     expect(libraryPage).toContain("回收站");
     expect(libraryPage).toContain("导入");

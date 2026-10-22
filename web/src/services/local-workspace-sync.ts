@@ -1,6 +1,6 @@
 import { assertUserScope, captureUserScope, type CapturedUserScope } from "@/lib/user-scope-guard";
 import { rebindInconsistentCanvasAssets, type CanvasAssetRebindResult } from "@/services/canvas-asset-repair";
-import { createLocalCanvasProject, deleteLocalCanvasProjects, openLocalCanvasProject, openLocalCanvasProjectFromBackend, persistCanvasDocument, restoreLocalCanvasProjectFromHistory } from "@/services/local-workspace-repository";
+import { createLocalCanvasProject, deleteLocalCanvasProjects, openLocalCanvasProject, openLocalCanvasProjectFromBackend, persistCanvasDocument, restoreLocalCanvasProjectFromHistory, syncLocalCanvasProjectToBackend } from "@/services/local-workspace-repository";
 import { flushAssetStorePersistence, useAssetStore, type Asset } from "@/stores/use-asset-store";
 import {
     loadWorkspaceAssetLibraryPage,
@@ -97,8 +97,15 @@ export async function createCanvasProjectWithRemoteSync(
     title: string,
     projectId?: string,
     initialContent?: Partial<Pick<CanvasProject, "nodes" | "connections" | "chatSessions" | "activeChatId">>,
+    workspaceProjectId?: string,
 ): Promise<{ id: string; syncError?: unknown }> {
-    return { ...await createLocalCanvasProject(title, projectId, initialContent), syncError: undefined };
+    const created = await createLocalCanvasProject(title, projectId, initialContent, workspaceProjectId);
+    try {
+        await syncLocalCanvasProjectToBackend(created.id);
+        return created;
+    } catch (syncError) {
+        return { ...created, syncError };
+    }
 }
 
 export async function deleteAssetWithRemoteSync(id: string) {

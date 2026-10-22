@@ -42,7 +42,7 @@ const { useAssetStore } = await import("@/stores/use-asset-store");
 const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
 
 const backendDir = resolve(import.meta.dir, "../../backend");
-const serverBin = join(tmpdir(), `huabu-archive-restore-server-${process.pid}`);
+const serverBin = join(tmpdir(), `huabu-archive-restore-server-${process.pid}${process.platform === "win32" ? ".exe" : ""}`);
 const videoBytes = new Uint8Array([9, 8, 7, 6]);
 const audioBytes = new Uint8Array([5, 4, 3, 2, 1]);
 const drawingPreviewBytes = new Uint8Array([11, 12, 13, 14, 15]);

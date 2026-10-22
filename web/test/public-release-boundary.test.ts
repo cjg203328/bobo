@@ -8,6 +8,8 @@ const repoRoot = resolve(import.meta.dir, "../..");
 const exportScript = join(repoRoot, "scripts/public-release-export.sh");
 const auditScript = join(repoRoot, "scripts/public-release-audit.sh");
 const workspaces: string[] = [];
+const hasRsync = spawnSync("rsync", ["--version"], { encoding: "utf8", stdio: "ignore" }).status === 0;
+const releaseTest = hasRsync ? test : test.skip;
 
 function temporaryDirectory(prefix: string) {
     const directory = mkdtempSync(join(tmpdir(), prefix));
@@ -28,7 +30,7 @@ afterEach(() => {
 });
 
 describe("public release boundary", () => {
-    test("exports source while excluding private state and generated artifacts", () => {
+    releaseTest("exports source while excluding private state and generated artifacts", () => {
         const source = temporaryDirectory("huabu-public-source-");
         const destinationParent = temporaryDirectory("huabu-public-destination-");
         const destination = join(destinationParent, "snapshot");
@@ -82,7 +84,7 @@ describe("public release boundary", () => {
         expect(existsSync(join(destination, "plugin-packages/example.beeftv-plugin"))).toBe(false);
     });
 
-    test("audit rejects a forbidden artifact and accepts the clean export", () => {
+    releaseTest("audit rejects a forbidden artifact and accepts the clean export", () => {
         const source = temporaryDirectory("huabu-public-audit-source-");
         const destinationParent = temporaryDirectory("huabu-public-audit-destination-");
         const destination = join(destinationParent, "snapshot");

@@ -27,6 +27,7 @@ func conversationRouter(t *testing.T) (*gin.Engine, *app.Service) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := database.MigrateLocalSchema(db); err != nil {
 		t.Fatal(err)
 	}

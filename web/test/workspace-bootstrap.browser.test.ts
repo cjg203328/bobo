@@ -10,6 +10,8 @@ beforeAll(async () => {
         "@/stores/use-config-store": 'import { create } from "zustand"; export const useConfigStore = create(set => ({ config: { channels: [] }, replaceConfig: config => set({config}) })); export const normalizeConfigSnapshot = value => value;',
         "@/lib/user-session": 'import { useUserStore } from "@/stores/use-user-store"; export const localWorkspaceConfig = value => value; export async function applyUserSession() { useUserStore.getState().setHydrated(true); window.sessionReady = true; }',
         "@/services/api/workspace": 'export async function getWorkspaceBootstrap() { return {}; }',
+        "@/services/api/auth": 'export async function getRemoteAuthSession() { return { authenticated: false, user: null }; }',
+        "@/components/workspace/remote-account-gate": 'export const RemoteAccountGate = () => <div role="alert">需要登录</div>;',
         "@/services/model-config-repository": 'export const commitModelConfig = async () => { window.writes = (window.writes || 0) + 1; }; export const flushModelConfig = async () => {}; export const hydrateModelConfig = () => new Promise((resolve, reject) => { window.finishRestore = () => resolve({config:{channels:[{id:"fixture",apiKey:"restored"}]},health:"ready"}); window.failRestore = () => reject(new Error("read failed")); });',
         "@/lib/app-routing": 'export const appPathname = () => "/";',
         "@/lib/workspace-route-modules": 'export const preloadWorkspaceRoute = () => {};',
@@ -18,7 +20,7 @@ beforeAll(async () => {
     };
     const build = await Bun.build({
         entrypoints: [import.meta.dir + "/fixtures/workspace-bootstrap-harness.tsx"], target: "browser",
-        define: { "process.env.NODE_ENV": '"production"' },
+        define: { "import.meta.env": "{}", "process.env.NODE_ENV": '"production"' },
         plugins: [{ name: "bootstrap-dependencies", setup(builder) {
             builder.onResolve({ filter: /^@\// }, args => args.path in stubs
                 ? { path: args.path, namespace: "bootstrap-test" }

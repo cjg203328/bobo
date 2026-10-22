@@ -10,7 +10,7 @@ function leaveFlushEffect() {
     const start = lifecycle.indexOf("const flushOnLeave = (reason: string) => {");
     expect(start).toBeGreaterThan(-1);
     const effectStart = lifecycle.lastIndexOf("useEffect(() => {", start);
-    const end = lifecycle.indexOf("}, [connectionsRef, localMode, nodesRef, projectId, projectLoaded, updateProject, viewportRef]);", start);
+    const end = lifecycle.indexOf("}, [connectionsRef, nodesRef, projectId, projectLoaded, updateProject, viewportRef]);", start);
     expect(end).toBeGreaterThan(start);
     return lifecycle.slice(effectStart, end);
 }
@@ -34,9 +34,9 @@ describe("canvas editor flushes content when leaving", () => {
         expect(effect).toContain("observedContentRef.current = snapshot;");
     });
 
-    test("flushes the store write queue and then the local backend without waiting for timers", () => {
+    test("flushes the store write queue and then the active workspace backend without waiting for timers", () => {
         const effect = leaveFlushEffect();
-        expect(effect).toMatch(/await flushCanvasStorePersistence\(\);\s*if \(!userScopeMatches\(owner\)\) return;\s*if \(localMode\) await syncLocalCanvasProjectToBackend\(projectId, owner\);/);
+        expect(effect).toMatch(/await flushCanvasStorePersistence\(\);\s*if \(!userScopeMatches\(owner\)\) return;\s*await syncLocalCanvasProjectToBackend\(projectId, owner\);/);
         expect(effect).toContain('console.error("离开画布时保存失败"');
     });
 

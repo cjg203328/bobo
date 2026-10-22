@@ -21,6 +21,7 @@ func TestLocalIdentityWrappersKeepExternalUserJSON(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := database.MigrateLocalSchema(db); err != nil {
 		t.Fatal(err)
 	}

@@ -18,6 +18,7 @@ func newUploadReservationRepo(t *testing.T) *Repository {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := db.AutoMigrate(&model.Resource{}, &model.UserDailyUploadUsage{}, &model.UserUploadReservation{}); err != nil {
 		t.Fatal(err)
 	}
@@ -157,6 +158,7 @@ func TestDeleteResourceWithoutReservationTableFails(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := db.AutoMigrate(&model.Resource{}); err != nil {
 		t.Fatal(err)
 	}
@@ -181,6 +183,7 @@ func TestClaimFailedThenReserveAfterReopen(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		closeTestDBOnCleanup(t, db)
 		if err := db.AutoMigrate(&model.Resource{}, &model.UserDailyUploadUsage{}, &model.UserUploadReservation{}); err != nil {
 			t.Fatal(err)
 		}
@@ -229,6 +232,7 @@ func TestClaimFailedSettledThenReserveAfterReopen(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		closeTestDBOnCleanup(t, db)
 		if err := db.AutoMigrate(&model.Resource{}, &model.UserDailyUploadUsage{}, &model.UserUploadReservation{}); err != nil {
 			t.Fatal(err)
 		}

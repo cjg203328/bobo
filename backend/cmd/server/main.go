@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"huabu/backend/internal/bootstrap"
+	_ "huabu/backend/internal/database/postgresdriver"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,13 +42,18 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	cookieSecure, err := envBool("CANVAS_AUTH_COOKIE_SECURE", false)
+	if err != nil {
+		return err
+	}
 	runtime, err := bootstrap.Open(ctx, bootstrap.Config{
-		Profile:          bootstrap.ProfileServer,
+		Profile:          bootstrap.Profile(strings.ToLower(strings.TrimSpace(env("CANVAS_BACKEND_PROFILE", string(bootstrap.ProfileServer))))),
 		DataDir:          dataDir,
 		DatabaseDriver:   env("CANVAS_DATABASE_DRIVER", "sqlite"),
 		DatabaseURL:      os.Getenv("DATABASE_URL"),
 		ListenAddr:       env("CANVAS_BACKEND_ADDR", ":2010"),
 		AutoMigrate:      autoMigrate,
+		AuthCookieSecure: cookieSecure,
 		ShutdownTimeout:  workerTimeout,
 		RouterMiddleware: []gin.HandlerFunc{corsMiddleware},
 	})
@@ -110,7 +116,7 @@ func envDuration(key string, fallback time.Duration) (time.Duration, error) {
 	return parsed, nil
 }
 
-const corsAllowedHeaders = "Accept, Content-Type, Authorization, X-Requested-With, X-Canvas-Scene, X-Idempotency-Key, X-Canvas-Trace-ID, X-Canvas-Upstream-URL, X-Canvas-Upstream-Format, X-Canvas-Upstream-Base-URL"
+const corsAllowedHeaders = "Accept, Content-Type, Authorization, X-Requested-With, X-CSRF-Token, X-Canvas-Scene, X-Idempotency-Key, X-Canvas-Trace-ID, X-Canvas-Upstream-URL, X-Canvas-Upstream-Format, X-Canvas-Upstream-Base-URL"
 
 const corsAllowedMethods = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
 

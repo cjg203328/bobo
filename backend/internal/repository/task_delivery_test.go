@@ -20,6 +20,7 @@ func TestUpsertGenerationDeliverySurvivesSQLiteReopen(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		closeTestDBOnCleanup(t, db)
 		if err := db.AutoMigrate(&model.Task{}, &model.Result{}, &model.Asset{}, &model.AssetVersion{}, &model.AssetRepresentation{}, &model.Resource{}); err != nil {
 			t.Fatal(err)
 		}
@@ -75,6 +76,7 @@ func TestCommitOwnedGenerationDeliveryPreservesEditedMetadata(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := db.AutoMigrate(&model.Task{}, &model.Result{}, &model.Asset{}, &model.AssetVersion{}, &model.AssetRepresentation{}, &model.Resource{}); err != nil {
 		t.Fatal(err)
 	}
@@ -112,6 +114,7 @@ func TestCommitOwnedGenerationDeliveryRejectsForeignAsset(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := db.AutoMigrate(&model.Task{}, &model.Result{}, &model.Asset{}, &model.AssetVersion{}, &model.AssetRepresentation{}, &model.Resource{}); err != nil {
 		t.Fatal(err)
 	}

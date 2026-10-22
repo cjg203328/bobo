@@ -23,7 +23,7 @@ import { reportOwnedMediaSave } from "@/services/desktop-media-save";
 import { loadCanvasProjectForEditing, saveRemoteUserDataNow } from "@/services/local-workspace-sync";
 import { isLocalWorkspaceMode } from "@/services/workspace-mode";
 import { usesBrowserLocalResourceStore } from "@/services/workspace-resource-storage";
-import { beginLocalCanvasProject, deleteLocalCanvasProjects, hydrateLocalCanvasProjectsFromBackend, syncLocalCanvasProjectToBackend } from "@/services/local-workspace-repository";
+import { deleteLocalCanvasProjects, hydrateLocalCanvasProjectsFromBackend, syncLocalCanvasProjectToBackend } from "@/services/local-workspace-repository";
 import { createWorkspaceCanvasProject } from "@/services/workspace-project-repository";
 import { listWorkspaceCanvasProjectsPage, type CanvasLibrarySummary } from "@/services/api/workspace-data";
 import { useUserStore } from "@/stores/use-user-store";
@@ -121,8 +121,8 @@ export default function CanvasPage() {
     );
     const createAndEnter = () => {
         setCreationError(false);
-        const { id, saved } = beginLocalCanvasProject("未命名项目");
-        void saved.then(() => {
+        void createWorkspaceCanvasProject("未命名项目").then(({ id, syncError }) => {
+            if (syncError) message.warning("云端保存失败，内容已保留在当前浏览器；恢复连接后可重试。");
             // Only enter after the desktop repository has accepted the new canvas.
             if (searchParams.get("stay") !== "1") enterProject(id);
         }).catch((error) => {
@@ -270,8 +270,10 @@ export default function CanvasPage() {
             enterProject(projects[0].id);
             return;
         }
-        const { id, saved } = beginLocalCanvasProject("未命名项目");
-        void saved.then(() => enterProject(id)).catch((error) => {
+        void createWorkspaceCanvasProject("未命名项目").then(({ id, syncError }) => {
+            if (syncError) message.warning("云端保存失败，内容已保留在当前浏览器；恢复连接后可重试。");
+            enterProject(id);
+        }).catch((error) => {
             setCreationError(true);
             message.error(error instanceof Error ? error.message : "创建项目失败，请重试");
         });

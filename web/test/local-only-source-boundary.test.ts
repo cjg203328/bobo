@@ -7,7 +7,6 @@ const root = resolve(import.meta.dir, "..");
 describe("local-only source boundary", () => {
     test("hosted UI and API entrypoints are physically absent", () => {
         for (const path of [
-            "src/services/api/auth.ts",
             "src/services/api/wallet.ts",
             "src/services/api/announcements.ts",
             "src/services/user-data-sync.ts",
@@ -28,11 +27,15 @@ describe("local-only source boundary", () => {
         ]) expect(existsSync(resolve(root, path))).toBe(false);
     });
 
-    test("workspace startup depends only on the local contract", () => {
+    test("workspace startup keeps local behavior and gates remote identity by profile", () => {
         const session = readFileSync(resolve(root, "src/lib/user-session.ts"), "utf8");
+        const hydrator = readFileSync(resolve(root, "src/components/workspace/workspace-bootstrap-hydrator.tsx"), "utf8");
         const sync = readFileSync(resolve(root, "src/services/local-workspace-sync.ts"), "utf8");
         expect(session).not.toMatch(/auth\/session|remote user|cloud/i);
         expect(sync).not.toMatch(/getRemote|upsertRemote|remoteUserDataPhase|activeRemoteUserId/);
+        expect(hydrator).toContain('import.meta.env.VITE_CANVAS_LOCAL_MODE === "false"');
+        expect(hydrator).toContain("getRemoteAuthSession");
+        expect(hydrator).toContain("allowLocalFallback: import.meta.env.VITE_CANVAS_LOCAL_MODE !== \"false\"");
         expect(sync).toContain("flushCanvasStorePersistence");
         expect(sync).toContain("flushAssetStorePersistence");
     });

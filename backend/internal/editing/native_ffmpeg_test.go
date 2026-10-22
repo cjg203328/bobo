@@ -19,13 +19,8 @@ func TestSubtitleFontFailureWithSuccessfulExit(t *testing.T) {
 		"couldn't find font family", "missing glyph 0x4E2D", "no fonts found",
 	} {
 		t.Run(message, func(t *testing.T) {
-			cmd := exec.Command("/bin/sh", "-c", `printf '%s\n' "$1" >&2; exit 0`, "font-fixture", message)
-			output, err := cmd.CombinedOutput()
-			if err != nil {
-				t.Fatalf("fixture must exit zero: %v", err)
-			}
-			if !SubtitleFontFailure(string(output)) {
-				t.Fatalf("successful exit masked missing subtitles: %s", output)
+			if !SubtitleFontFailure(message) {
+				t.Fatalf("successful ffmpeg output masked missing subtitles: %s", message)
 			}
 		})
 	}

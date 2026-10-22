@@ -5,7 +5,9 @@ FROM oven/bun:1.3.13 AS web-build
 
 WORKDIR /app/web
 ARG BUILD_VERSION
+ARG VITE_CANVAS_LOCAL_MODE=true
 ENV CANVAS_BUILD_VERSION=${BUILD_VERSION}
+ENV VITE_CANVAS_LOCAL_MODE=${VITE_CANVAS_LOCAL_MODE}
 COPY web/package.json web/bun.lock ./
 COPY web/patches ./patches
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --cache-dir=/root/.bun/install/cache

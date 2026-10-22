@@ -406,11 +406,12 @@ function syncLocalCanvasProject(id: string, expected: CapturedUserScope): Promis
     if (scheduled) clearTimeout(scheduled);
     backendSaveTimers.delete(key);
     const previous = backendSaveTails.get(key) || Promise.resolve();
+    const saveTarget = isLocalWorkspaceMode() ? "本机数据库" : "云端";
     const next = previous.catch(() => undefined).then(async () => {
         if (canvasDeleting.has(key)) throw new CanvasBackendSubmitPausedError("画布正在删除，未提交");
         assertDispatchGuard(expected);
         if (!canvasSubmitBlocked(id, scope)) {
-            useSyncProgressStore.getState().setProjectProgress(id, { phase: "saving", message: "正在保存到本机数据库" }, scope);
+            useSyncProgressStore.getState().setProjectProgress(id, { phase: "saving", message: `正在保存到${saveTarget}` }, scope);
         }
         try {
             await commitLiveCanvasDocument(id, expected);
@@ -448,7 +449,7 @@ function syncLocalCanvasProject(id: string, expected: CapturedUserScope): Promis
         const pending = backendSaveTimers.has(key) || !confirmed || !sameCanvasDocument(live, confirmed);
         useSyncProgressStore.getState().setProjectProgress(id, {
             phase: pending ? "pending" : "done",
-            message: pending ? "修改待保存到本机数据库" : "画布已保存到本机数据库",
+            message: pending ? `修改待保存到${saveTarget}` : `画布已保存到${saveTarget}`,
         }, scope);
     });
     backendSaveTails.set(key, tail);
@@ -774,7 +775,8 @@ export function scheduleLocalCanvasBackendSync(id: string) {
     const key = saveKey(expected.userScope, id);
     if (canvasDeleting.has(key)) return;
     if (canvasSubmitBlocked(id, expected.userScope)) return;
-    useSyncProgressStore.getState().setProjectProgress(id, { phase: "pending", message: "修改待保存到本机数据库" }, expected.userScope);
+    const saveTarget = isLocalWorkspaceMode() ? "本机数据库" : "云端";
+    useSyncProgressStore.getState().setProjectProgress(id, { phase: "pending", message: `修改待保存到${saveTarget}` }, expected.userScope);
     const existing = backendSaveTimers.get(key);
     if (existing) clearTimeout(existing);
     backendSaveTimers.set(key, setTimeout(() => {

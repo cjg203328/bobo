@@ -89,8 +89,7 @@ test("删除渠道保持现有按钮与确认框，确认后渠道移除并留�
             const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
             return hit === button || button.contains(hit);
         }, handle, { timeout: 3000 });
-        const box = (await ok.boundingBox())!;
-        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+        await ok.click();
         await page.getByTestId("channel-count").filter({ hasText: /^0$/ }).waitFor({ timeout: 3000 });
         await page.waitForFunction(() => (window as unknown as { diagnostics: () => DiagnosticEvent[] }).diagnostics().some(event => event.code === "CHANNEL_DELETED"), undefined, { timeout: 3000 });
         const codes = (await events(page)).map(event => event.code);

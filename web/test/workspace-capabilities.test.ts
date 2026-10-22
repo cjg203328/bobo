@@ -22,6 +22,9 @@ test("workspace capabilities expose only the local runtime contract", () => {
         local: true,
         localAssets: true,
         providerCalls: true,
+        auth: false,
+        cloudStorage: false,
+        remoteSync: false,
     });
 });
 
@@ -30,5 +33,8 @@ test("workspace capabilities use safe local defaults before bootstrap", () => {
         local: true,
         localAssets: true,
         providerCalls: true,
+        auth: false,
+        cloudStorage: false,
+        remoteSync: false,
     });
 });

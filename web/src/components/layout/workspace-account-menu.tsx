@@ -8,7 +8,7 @@ import { UserAvatar } from "./user-avatar";
 import { useUserStore } from "@/stores/use-user-store";
 
 /** 顶部与侧栏复用同一账户卡片，并保留版本入口。 */
-export function WorkspaceAccountMenu() {
+export function WorkspaceAccountMenu({ collapsed = false }: { collapsed?: boolean }) {
     const user = useUserStore((state) => state.user);
     const hydrated = useUserStore((state) => state.hydrated);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -20,7 +20,7 @@ export function WorkspaceAccountMenu() {
     return user ? (
         <><Popover
             trigger="click"
-            placement="bottomRight"
+            placement="topRight"
             rootClassName="workspace-account-popover"
             open={menuOpen}
             onOpenChange={setMenuOpen}
@@ -34,8 +34,10 @@ export function WorkspaceAccountMenu() {
                 </div>
             )}
         >
-            <button type="button" className="app-workspace-topbar-icon-button app-workspace-account-trigger" aria-label="账户菜单" title={user.displayName || user.username}>
-                <UserAvatar user={user} className="size-6" />
+            <button type="button" className={`app-workspace-sidebar-profile ${collapsed ? "is-collapsed" : ""}`} aria-label={`账户菜单：${user.displayName || user.username}`} title={collapsed ? user.displayName || user.username : undefined}>
+                <UserAvatar user={user} className="app-workspace-sidebar-profile-avatar" />
+                {!collapsed ? <span className="app-workspace-sidebar-profile-copy"><strong>{user.displayName || user.username}</strong><span>{user.email || user.username}</span></span> : null}
+                {!collapsed ? <span aria-hidden="true" className="text-xs opacity-45">···</span> : null}
             </button>
         </Popover></>
     ) : <span className="app-workspace-topbar-icon-button grid place-items-center" aria-label="本地工作区" title="本地工作区"><UserRound className="size-4 opacity-70" /></span>;

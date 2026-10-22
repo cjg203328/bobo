@@ -14,20 +14,17 @@ import type { WorkspaceBootstrapPayload } from "@/services/api/workspace";
 import { setWorkspaceCapabilitySnapshot } from "@/services/workspace-mode";
 import { withGenerationConsumersPaused } from "@/services/generation-consumer-lifecycle";
 
-/**
- * Hydrate the one implicit local workspace. This is deliberately not an auth
- * session: it only selects the persistence namespace and restores local stores.
- */
+/** Hydrate the account persistence namespace and its declared runtime profile. */
 export async function applyUserSession(payload: WorkspaceBootstrapPayload) {
     // Drain old result writers before changing the persistence namespace or stores.
-    return withGenerationConsumersPaused(() => hydrateLocalWorkspace(payload));
+    return withGenerationConsumersPaused(() => hydrateWorkspaceSession(payload));
 }
 
-async function hydrateLocalWorkspace(payload: WorkspaceBootstrapPayload) {
+async function hydrateWorkspaceSession(payload: WorkspaceBootstrapPayload) {
     useUserStore.getState().setHydrated(false);
     setWorkspaceCapabilitySnapshot({
         contractVersion: payload.contractVersion,
-        profile: "local",
+        profile: payload.profile,
         capabilities: payload.capabilities,
     });
 
@@ -46,7 +43,7 @@ async function hydrateLocalWorkspace(payload: WorkspaceBootstrapPayload) {
 
         usePluginStore.setState({ hydrated: false, runtimeStatuses: {}, pluginStates: {} });
         useUserStore.getState().setUser(payload.user);
-        useUserStore.getState().setStorageMode("local");
+        useUserStore.getState().setStorageMode(payload.storageMode);
         useUserStore.getState().setRuntimeLimits(payload.runtimeLimits);
         useUserStore.getState().setFeatures({ ...defaultFeatureAvailability, ...payload.features });
 
@@ -59,9 +56,13 @@ async function hydrateLocalWorkspace(payload: WorkspaceBootstrapPayload) {
             useCreationPreferencesStore.persist.rehydrate(),
         ]);
 
-        useConfigStore.getState().replaceConfig(localWorkspaceConfig(useConfigStore.getState().config));
-        useCanvasStore.setState((state) => ({ projects: state.projects.map(normalizeLocalCanvasProject) }));
-        useAssetStore.setState((state) => ({ assets: state.assets.map(normalizeLocalAsset) }));
+        if (payload.profile === "local") {
+            useConfigStore.getState().replaceConfig(localWorkspaceConfig(useConfigStore.getState().config));
+            useCanvasStore.setState((state) => ({ projects: state.projects.map(normalizeLocalCanvasProject) }));
+            useAssetStore.setState((state) => ({ assets: state.assets.map(normalizeLocalAsset) }));
+        } else {
+            useConfigStore.getState().replaceConfig(defaultConfig);
+        }
 
         // Zustand keeps the previous in-memory value when a scoped snapshot is
         // absent, so every empty local namespace must be reset explicitly.
@@ -77,7 +78,9 @@ async function hydrateLocalWorkspace(payload: WorkspaceBootstrapPayload) {
         }
         if (!persistedPlugins) usePluginStore.setState({ installations: [], runtimeStatuses: {}, pluginStates: {} });
         if (!persistedCreationPreferences) useCreationPreferencesStore.setState({ preferences: {} });
-        if (!persistedConfig) useConfigStore.getState().replaceConfig(localWorkspaceConfig(defaultConfig));
+        if (!persistedConfig) {
+            useConfigStore.getState().replaceConfig(payload.profile === "local" ? localWorkspaceConfig(defaultConfig) : defaultConfig);
+        }
     } finally {
         useUserStore.getState().setHydrated(true);
     }

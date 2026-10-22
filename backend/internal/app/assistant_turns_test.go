@@ -24,6 +24,7 @@ func newAssistantTurnService(t *testing.T) (*Service, string, int64) {
 	if err != nil {
 		t.Fatalf("打开临时库失败: %v", err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := database.MigrateLocalSchema(db); err != nil {
 		t.Fatalf("迁移失败: %v", err)
 	}

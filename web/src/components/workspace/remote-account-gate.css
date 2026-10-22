@@ -1,0 +1,253 @@
+.remote-account-page {
+    display: grid;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
+    grid-template-columns: minmax(0, 1.08fr) minmax(420px, 0.92fr);
+    background: #f5f8f7;
+    color: #182421;
+    font-family: var(--font-sans);
+}
+
+.remote-account-visual {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    background: #102d2a;
+}
+
+.remote-account-film {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.88;
+}
+
+.remote-account-brand {
+    position: absolute;
+    top: 34px;
+    left: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 650;
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.32);
+}
+
+.remote-account-mark {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba(231, 251, 244, 0.5);
+    border-radius: 10px;
+    background: rgba(18, 57, 51, 0.44);
+    color: #b9eee0;
+    backdrop-filter: blur(14px);
+}
+
+.remote-account-panel {
+    display: grid;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    place-items: center;
+    padding: 44px clamp(28px, 6vw, 88px);
+    background: rgba(255, 255, 255, 0.76);
+    backdrop-filter: blur(28px);
+}
+
+.remote-account-form-shell {
+    width: min(100%, 390px);
+}
+
+.remote-account-switch {
+    display: inline-flex;
+    gap: 5px;
+    padding: 4px;
+    border: 1px solid #dce6e2;
+    border-radius: 11px;
+    background: #edf3f0;
+}
+
+.remote-account-switch button {
+    min-width: 82px;
+    min-height: 34px;
+    border: 0;
+    border-radius: 8px;
+    padding: 0 12px;
+    background: transparent;
+    color: #64736e;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+}
+
+.remote-account-switch button.is-active {
+    background: #fff;
+    color: #173d37;
+    box-shadow: 0 1px 4px rgba(29, 56, 49, 0.12);
+}
+
+.remote-account-heading {
+    margin-top: 42px;
+}
+
+.remote-account-eyebrow {
+    margin: 0 0 12px;
+    color: #43877c;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+}
+
+.remote-account-heading h1 {
+    margin: 0;
+    color: #182421;
+    font-size: 30px;
+    font-weight: 650;
+    line-height: 1.25;
+}
+
+.remote-account-heading > p:last-child {
+    margin: 11px 0 0;
+    color: #74807b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.remote-account-form {
+    display: grid;
+    gap: 19px;
+    margin-top: 32px;
+}
+
+.remote-account-form label {
+    display: grid;
+    gap: 8px;
+    color: #394944;
+    font-size: 13px;
+    font-weight: 580;
+}
+
+.remote-account-form input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #d8e2de;
+    border-radius: 10px;
+    outline: none;
+    padding: 0 14px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #182421;
+    font: inherit;
+    font-size: 15px;
+    transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.remote-account-form input:hover {
+    border-color: #aabeb7;
+}
+
+.remote-account-form input:focus-visible {
+    border-color: #278b7c;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(39, 139, 124, 0.15);
+}
+
+.remote-account-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: -3px 0 0;
+    color: #ad493a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.remote-account-error svg {
+    flex: 0 0 auto;
+    margin-top: 1px;
+}
+
+.remote-account-submit {
+    display: flex;
+    width: 100%;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 0;
+    border-radius: 10px;
+    margin-top: 4px;
+    background: #176f63;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    transition: background 140ms ease, transform 140ms ease;
+}
+
+.remote-account-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: #10594f;
+}
+
+.remote-account-submit:focus-visible,
+.remote-account-switch button:focus-visible {
+    outline: 3px solid rgba(39, 139, 124, 0.35);
+    outline-offset: 2px;
+}
+
+.remote-account-submit:disabled {
+    cursor: progress;
+    opacity: 0.68;
+}
+
+.remote-account-footnote {
+    margin: 20px 0 0;
+    color: #909a96;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+    .remote-account-page {
+        min-height: 100svh;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(170px, 25svh) 1fr;
+    }
+
+    .remote-account-visual {
+        min-height: 170px;
+        height: 25svh;
+        max-height: 240px;
+    }
+
+    .remote-account-brand {
+        top: 20px;
+        left: 22px;
+    }
+
+    .remote-account-panel {
+        min-height: calc(75svh - 0px);
+        place-items: start center;
+        padding: 30px 24px 42px;
+    }
+
+    .remote-account-heading {
+        margin-top: 28px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .remote-account-form input,
+    .remote-account-submit {
+        transition: none;
+    }
+}

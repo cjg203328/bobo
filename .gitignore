@@ -4,6 +4,7 @@ node_modules/
 open-storyboard-canvas/
 .env*
 !.env.example
+!.env.cloud.example
 data/
 .local/
 coverage/

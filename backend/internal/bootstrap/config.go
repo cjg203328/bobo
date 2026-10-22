@@ -11,6 +11,7 @@ type Profile string
 const (
 	ProfileServer  Profile = "server"
 	ProfileDesktop Profile = "desktop"
+	ProfileCloud   Profile = "cloud"
 )
 
 type Config struct {
@@ -21,6 +22,7 @@ type Config struct {
 	ListenAddr       string
 	LaunchToken      string
 	AutoMigrate      bool
+	AuthCookieSecure bool
 	ShutdownTimeout  time.Duration
 	RouterMiddleware []gin.HandlerFunc
 }

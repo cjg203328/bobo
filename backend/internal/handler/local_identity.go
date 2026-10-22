@@ -10,6 +10,10 @@ import (
 // currentUser resolves the stable workspace owner. Local routes never inspect
 // cookies and never create a session record.
 func currentUser(c *gin.Context, svc *app.Service) (*model.User, error) {
+	if principal := RemotePrincipal(c); principal != nil {
+		user := principal.User
+		return &user, nil
+	}
 	if _, exists := c.Get(workspaceContextKey); exists {
 		scope, err := CurrentWorkspace(c)
 		if err != nil {

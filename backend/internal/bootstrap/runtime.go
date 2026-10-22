@@ -23,6 +23,7 @@ import (
 	"huabu/backend/internal/eagle"
 	canvasHandler "huabu/backend/internal/handler"
 	"huabu/backend/internal/localapp"
+	"huabu/backend/internal/remoteauth"
 	"huabu/backend/internal/repository"
 	"huabu/backend/internal/runtimeinfo"
 	httptransport "huabu/backend/internal/transport/http"
@@ -57,8 +58,11 @@ type Runtime struct {
 
 func Open(_ context.Context, raw Config) (result *Runtime, openErr error) {
 	cfg := raw.withDefaults()
-	if cfg.Profile != ProfileServer && cfg.Profile != ProfileDesktop {
+	if cfg.Profile != ProfileServer && cfg.Profile != ProfileDesktop && cfg.Profile != ProfileCloud {
 		return nil, fmt.Errorf("不支持的运行模式：%s", cfg.Profile)
+	}
+	if cfg.Profile == ProfileCloud && cfg.DatabaseDriver != "postgres" && cfg.DatabaseDriver != "postgresql" {
+		return nil, errors.New("cloud profile requires PostgreSQL; set CANVAS_DATABASE_DRIVER=postgres and DATABASE_URL")
 	}
 	if strings.TrimSpace(cfg.DataDir) == "" {
 		return nil, errors.New("后端数据目录不能为空")
@@ -95,7 +99,13 @@ func Open(_ context.Context, raw Config) (result *Runtime, openErr error) {
 		cleanupDB()
 		return nil, err
 	}
-	if cfg.AutoMigrate {
+	if cfg.Profile == ProfileCloud {
+		if cfg.AutoMigrate {
+			err = database.MigrateCloudSchema(db)
+		} else {
+			err = database.RequireCloudSchema(db)
+		}
+	} else if cfg.AutoMigrate {
 		err = database.MigrateLocalSchema(db)
 	} else {
 		err = database.RequireLocalSchema(db)
@@ -106,7 +116,12 @@ func Open(_ context.Context, raw Config) (result *Runtime, openErr error) {
 	}
 
 	repo := repository.New(db)
-	svc := app.NewLocal(repo, cfg.DataDir)
+	var svc *app.Service
+	if cfg.Profile == ProfileCloud {
+		svc = app.New(repo, cfg.DataDir)
+	} else {
+		svc = app.NewLocal(repo, cfg.DataDir)
+	}
 	cleanupService := func() {
 		_ = svc.Close()
 		cleanupDB()
@@ -114,6 +129,14 @@ func Open(_ context.Context, raw Config) (result *Runtime, openErr error) {
 	if err := initializeService(svc); err != nil {
 		cleanupService()
 		return nil, err
+	}
+	if cfg.Profile == ProfileCloud {
+		cloudRuntime, cloudErr := openCloudRuntime(cfg, db, svc)
+		if cloudErr != nil {
+			cleanupService()
+			return nil, cloudErr
+		}
+		return cloudRuntime, nil
 	}
 	providerConfig, configErr := workspace.NewProviderConfig(cfg.DataDir)
 	if configErr != nil {
@@ -301,6 +324,26 @@ func Open(_ context.Context, raw Config) (result *Runtime, openErr error) {
 		beefAPI:          beefAPIConnection,
 		assistantHost:    assistantHost,
 		serveErr:         make(chan error, 1),
+	}, nil
+}
+
+func openCloudRuntime(cfg Config, db *gorm.DB, svc *app.Service) (*Runtime, error) {
+	router := gin.New()
+	router.Use(gin.Logger(), gin.Recovery(), canvasHandler.RequestCorrelationMiddleware())
+	for _, middleware := range cfg.RouterMiddleware {
+		router.Use(middleware)
+	}
+	api := router.Group("/api")
+	status := newSystemStatus(db, svc)
+	registerSystemStatusRoutes(api, status)
+	canvasHandler.RegisterOpenAPIRoutes(api)
+	canvasHandler.RegisterRemoteTrialRoutes(api, svc, remoteauth.New(db, 0), cfg.AuthCookieSecure)
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"code": http.StatusNotFound, "data": nil, "msg": "not found"})
+	})
+	return &Runtime{
+		cfg: cfg, db: db, service: svc, handler: router, status: status,
+		serveErr: make(chan error, 1),
 	}, nil
 }
 

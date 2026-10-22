@@ -12,9 +12,11 @@ import (
 
 func TestHTTPSChildProxyPreservesRedirectBypassAndExplicitDirect(t *testing.T) {
 	t.Setenv("HTTPS_PROXY", "http://127.0.0.1:7890")
-	t.Setenv("https_proxy", "http://127.0.0.1:9999")
 	t.Setenv("NO_PROXY", "*.internal,cdn.example.com,10.0.0.0/8")
-	t.Setenv("no_proxy", "")
+	if runtime.GOOS != "windows" {
+		t.Setenv("https_proxy", "http://127.0.0.1:9999")
+		t.Setenv("no_proxy", "")
+	}
 	env := strings.Join(HTTPSProxyEnvironment(), "\n")
 	if !strings.Contains(env, "https_proxy=http://127.0.0.1:7890") || !strings.Contains(env, "no_proxy=.internal,cdn.example.com,10.0.0.0/8") {
 		t.Fatal("child downloader lost desktop proxy precedence or redirect exclusions")

@@ -1,7 +1,7 @@
 import { isLocalWorkspaceMode } from "@/services/workspace-mode";
 import { createLocalCanvasProject, deleteLocalCanvasProjects } from "@/services/local-workspace-repository";
 import { createCanvasProjectWithRemoteSync, deleteCanvasProjectsWithRemoteSync } from "@/services/local-workspace-sync";
-import { useCanvasStore, type CanvasProject } from "@/stores/canvas/use-canvas-store";
+import type { CanvasProject } from "@/stores/canvas/use-canvas-store";
 
 type InitialCanvasContent = Partial<Pick<CanvasProject, "nodes" | "connections" | "chatSessions" | "activeChatId">>;
 
@@ -15,9 +15,7 @@ export async function createWorkspaceCanvasProject(title: string, projectId?: st
         const local = await createLocalCanvasProject(title, projectId, initialContent, workspaceProjectId);
         return { ...local, syncError: undefined as undefined };
     }
-    const created = await createCanvasProjectWithRemoteSync(title, projectId, initialContent);
-    if (workspaceProjectId) useCanvasStore.getState().updateProject(created.id, { workspaceProjectId });
-    return created;
+    return createCanvasProjectWithRemoteSync(title, projectId, initialContent, workspaceProjectId);
 }
 
 export async function deleteWorkspaceCanvasProjects(ids: readonly string[]) {

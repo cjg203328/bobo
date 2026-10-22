@@ -49,6 +49,11 @@ export let apiBaseURL = import.meta.env.VITE_CANVAS_BACKEND_URL || "/api";
 // 本地预览和桌面模式都必须在后端暂不可用时尽快降级到本地工作区；
 // 没有超时会让启动水合一直停留在 loading，Playwright 和用户都看不到页面。
 export const apiClient = axios.create({ baseURL: apiBaseURL, withCredentials: true, timeout: 4_000 });
+let remoteCSRFToken = "";
+
+export function setRemoteCSRFToken(token: string | undefined) {
+    remoteCSRFToken = token?.trim() || "";
+}
 
 export function configureApiRuntime(baseURL: string, launchToken: string, uiBootstrapToken?: string) {
     apiBaseURL = baseURL;
@@ -154,6 +159,11 @@ function assertExpectedHttpScope(config?: { expectedScope?: CapturedUserScope })
 
 apiClient.interceptors.request.use((config) => {
     assertExpectedHttpScope(config as HttpRequestConfig);
+    const method = config.method?.toLowerCase();
+    if (remoteCSRFToken && method && !["get", "head", "options"].includes(method)) {
+        if (typeof config.headers.set === "function") config.headers.set("X-CSRF-Token", remoteCSRFToken);
+        else Object.assign(config.headers, { "X-CSRF-Token": remoteCSRFToken });
+    }
     return config;
 });
 

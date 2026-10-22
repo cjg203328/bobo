@@ -100,6 +100,11 @@ func reopenRepoQuotaDomain(t *testing.T, repo *repository.Repository, dataDir st
 	if err != nil {
 		t.Fatal(err)
 	}
+	reopenedSQLDB, err := db.DB()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = reopenedSQLDB.Close() })
 	if err := db.AutoMigrate(&model.Resource{}, &model.UserDailyUploadUsage{}, &model.UserUploadReservation{}); err != nil {
 		t.Fatal(err)
 	}

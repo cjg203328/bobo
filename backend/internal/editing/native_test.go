@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -231,6 +232,9 @@ func shortVideoPlan() *Plan {
 
 func writeFakeFFmpeg(t *testing.T, script string) string {
 	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip("fake ffmpeg fixture requires a POSIX shell")
+	}
 	path := filepath.Join(t.TempDir(), "ffmpeg")
 	body := "#!/bin/sh\n" + script + "\n"
 	if err := os.WriteFile(path, []byte(body), 0700); err != nil {

@@ -3,6 +3,7 @@ package eagle
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -111,6 +112,9 @@ func TestPathJailCanonicalizesLibrarySymlinkAndRejectsEscapingSymlinks(t *testin
 
 	linkedRoot := filepath.Join(t.TempDir(), "library-link")
 	if err := os.Symlink(realRoot, linkedRoot); err != nil {
+		if runtime.GOOS == "windows" {
+			t.Skipf("Windows symlink privilege is unavailable: %v", err)
+		}
 		t.Fatal(err)
 	}
 	got, err := originalPath(thumbnail, itemID, linkedRoot)

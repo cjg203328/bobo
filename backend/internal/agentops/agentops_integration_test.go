@@ -51,6 +51,10 @@ func newHarness(t *testing.T) *harness {
 	}
 	dataDir := t.TempDir()
 	service := app.NewLocal(repository.New(db), dataDir)
+	t.Cleanup(func() {
+		_ = service.Close()
+		_ = sqlDB.Close()
+	})
 	registry := agentops.NewRegistry(service, agentops.NewStore(db))
 	agentops.RegisterDefaultOps(registry)
 

@@ -10,13 +10,20 @@ export type LocalWorkspace = {
     storage: "sqlite";
 };
 
+export type RemoteWorkspace = {
+    id: string;
+    name: string;
+    owner: "personal";
+    storage: "server";
+};
+
 export type WorkspaceBootstrapPayload = {
     contractVersion: number;
-    profile: "local";
+    profile: "local" | "remote";
     capabilities: WorkspaceCapabilityContract["capabilities"];
     user: LocalUser;
-    workspace: LocalWorkspace;
-    storageMode: "local";
+    workspace: LocalWorkspace | RemoteWorkspace;
+    storageMode: "local" | "remote";
     runtimeLimits?: RuntimeLimits;
     features?: FeatureAvailability;
 };

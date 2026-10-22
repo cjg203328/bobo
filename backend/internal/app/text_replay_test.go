@@ -39,6 +39,7 @@ func TestTextReplayFacadeDelegatesCompleteAppendRead(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err := db.AutoMigrate(&model.Task{}, &model.TaskTextDelta{}); err != nil {
 		t.Fatal(err)
 	}

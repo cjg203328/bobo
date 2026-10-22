@@ -22,6 +22,7 @@ func creationTestService(t *testing.T) (*Service, *gorm.DB, string, CreationGuar
 	if err != nil {
 		t.Fatal(err)
 	}
+	closeTestDBOnCleanup(t, db)
 	if err = db.AutoMigrate(database.LocalModels()...); err != nil {
 		t.Fatal(err)
 	}

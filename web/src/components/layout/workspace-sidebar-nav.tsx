@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 
 import { BrandLogoFrame, BoboMarkGlyph } from "@/components/brand/brand-logo";
 import { WorkspaceSidebarUpdate } from "@/components/layout/workspace-sidebar-update";
+import { WorkspaceAccountMenu } from "@/components/layout/workspace-account-menu";
 import { Kbd } from "@/components/ui/base/kbd";
 import { aceternityMotion } from "@/lib/aceternity-motion";
 import { cn } from "@/lib/utils";
@@ -299,6 +300,9 @@ export function WorkspaceSidebarNav({ collapsed, onNavigate, onOpenSearch, onExp
 
             <div className="app-workspace-sidebar-footer shrink-0 px-3 py-3">
                 <OnboardingEntry compact={collapsed} />
+                <div className={cn("app-workspace-sidebar-profile-row mt-2", collapsed && "is-collapsed")}>
+                    <WorkspaceAccountMenu collapsed={collapsed} />
+                </div>
                 {footer.length ? (
                     <div className="flex flex-col gap-0.5">
                         {footer.map((item) => (

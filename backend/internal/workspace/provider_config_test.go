@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -555,6 +556,9 @@ func TestProviderConfigSymlinkAliasSharesLock(t *testing.T) {
 	}
 	alias := filepath.Join(base, "alias")
 	if err := os.Symlink(real, alias); err != nil {
+		if runtime.GOOS == "windows" {
+			t.Skipf("Windows symlink privilege is unavailable: %v", err)
+		}
 		t.Fatal(err)
 	}
 	first, err := NewProviderConfig(real)
@@ -586,9 +590,15 @@ func TestProviderConfigSymlinkLoopFailsSafely(t *testing.T) {
 	left := filepath.Join(dir, "left")
 	right := filepath.Join(dir, "right")
 	if err := os.Symlink(right, left); err != nil {
+		if runtime.GOOS == "windows" {
+			t.Skipf("Windows symlink privilege is unavailable: %v", err)
+		}
 		t.Fatal(err)
 	}
 	if err := os.Symlink(left, right); err != nil {
+		if runtime.GOOS == "windows" {
+			t.Skipf("Windows symlink privilege is unavailable: %v", err)
+		}
 		t.Fatal(err)
 	}
 	_, err := NewProviderConfig(left)

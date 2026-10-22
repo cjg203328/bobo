@@ -520,6 +520,9 @@ func requireTenantSchema(db *gorm.DB) error {
 }
 
 func ReadSchemaStatus(db *gorm.DB) (SchemaStatus, error) {
+	if db != nil && db.Dialector.Name() == "postgres" {
+		return ReadCloudSchemaStatus(db)
+	}
 	status := SchemaStatus{Expected: CurrentSchemaVersion}
 	var err error
 	status.Current, err = currentSchemaVersion(db)
