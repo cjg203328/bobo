@@ -1,17 +1,16 @@
 import { App, Button, Form, Input } from "antd";
 import { AppDrawer } from "@/components/ui/product/app-drawer";
 import { Select } from "@/components/ui/base/select";
-import { Switch } from "@/components/ui/base/switch";
-import { Minus, Plus, Save, Wand2 } from "lucide-react";
+import { Save, Wand2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { fallbackSkillCategories } from "@/pages/skills/skill-catalog";
 import { generateSkillDraft } from "@/lib/canvas/skill-drafting";
 import { navigateToSettings } from "@/lib/settings-navigation";
 import { useConfigStore, useEffectiveConfig } from "@/stores/use-config-store";
-import { createSkill, updateSkill, type Skill, type SkillMutationInput, type SkillShowcaseMedia } from "@/services/api/skills";
+import { createSkill, updateSkill, type Skill, type SkillMutationInput } from "@/services/api/skills";
 
-type SkillFormValues = Omit<SkillMutationInput, "isPrivate"> & { is_public: boolean };
+type SkillFormValues = SkillMutationInput;
 
 export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boolean; skill: Skill | null; onClose: () => void; onSaved: (skill: Skill) => void }) {
     const { message, modal } = App.useApp();
@@ -30,8 +29,6 @@ export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boo
             description: skill?.description || "",
             instruction: skill?.instruction || "",
             tag: skill?.tag || "creative",
-            /* 新技能默认私有（草稿）：保存后仅在“我创建的”可见，发布是独立的头等动作。 */
-            is_public: skill ? !skill.isPrivate : false,
             markdownUrl: skill?.markdownUrl || skill?.sourceUrl || "",
             showcaseMedia: skill?.showcaseMedia || [],
             extraInfo: skill?.extraInfo || "",
@@ -55,9 +52,9 @@ export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boo
                 description: values.description,
                 instruction: values.instruction || "",
                 tag: values.tag,
-                isPrivate: !values.is_public,
+                isPrivate: true,
                 markdownUrl: values.markdownUrl || "",
-                showcaseMedia: (values.showcaseMedia || []).map((item) => ({ ...item, showcaseUri: item.showcaseUri || "" })),
+                showcaseMedia: skill?.showcaseMedia || [],
                 extraInfo: values.extraInfo || "",
             };
             const result = skill ? await updateSkill(skill.skillId, input) : await createSkill(input);
@@ -121,7 +118,7 @@ export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boo
                     <span className="text-xs text-foreground/45">将使用你的文本模型生成一次草稿</span>
                     <Button type="primary" loading={drafting} disabled={!draftIdea.trim()} icon={<Wand2 className="size-4" />} onClick={() => void draftFromIdea()}>生成草稿</Button>
                 </div>
-            </div> : <div className="mb-4 rounded-xl border bg-foreground/[.02] p-3 text-sm leading-6 text-foreground/58">这是多文件技能包。这里仅编辑名称、简介、分类和展示信息；技能正文请更新 ZIP，或在 GitHub 仓库修改后执行同步。</div>}
+            </div> : <div className="mb-4 rounded-xl border bg-foreground/[.02] p-3 text-sm leading-6 text-foreground/58">这是多文件技能包。这里仅编辑名称、简介和分类；技能正文请更新 ZIP，或在 GitHub 仓库修改后执行同步。</div>}
             <Form form={form} layout="vertical" requiredMark="optional" onFinish={submit} onValuesChange={() => setDirty(true)}>
                 <div className="grid gap-x-4 sm:grid-cols-2">
                     <Form.Item name="skillName" label="技能名称" rules={[{ required: true, message: "请填写技能名称" }, { max: 80, message: "最多 80 个字符" }]}>
@@ -140,39 +137,9 @@ export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boo
                     <Input.TextArea className="font-mono text-xs leading-5" autoSize={{ minRows: 14, maxRows: 28 }} maxLength={100000} showCount placeholder="使用 Markdown 编写角色、约束、流程、检查清单和输出格式" />
                 </Form.Item> : null}
 
-                <div className="grid gap-x-4 sm:grid-cols-[minmax(0,1fr)_180px]">
-                    <Form.Item name="markdownUrl" label={isPackageSkill ? "来源地址" : "Markdown 地址"} rules={[{ type: "url", message: "请输入有效的 HTTP(S) 链接" }]}>
-                        <Input type="url" inputMode="url" spellCheck={false} placeholder="https://example.com/SKILL.md" />
-                    </Form.Item>
-                    <Form.Item name="is_public" label="公开状态" valuePropName="checked" extra="公开后其他用户可以加入使用。">
-                        <Switch checkedChildren="公开" unCheckedChildren="私有" />
-                    </Form.Item>
-                </div>
-
-                <Form.List name="showcaseMedia">
-                    {(fields, { add, remove }) => (
-                        <section aria-labelledby="skill-media-title">
-                            <div className="mb-3 flex items-center justify-between">
-                                <div><h3 id="skill-media-title" className="text-sm font-medium">展示媒体</h3><p className="mt-1 text-xs text-foreground/50">可选，最多 8 个公开图片或视频链接。</p></div>
-                                <Button disabled={fields.length >= 8} icon={<Plus className="size-4" />} onClick={() => add(emptyMedia())}>添加媒体</Button>
-                            </div>
-                            <div className="space-y-2">
-                                {fields.map((field) => (
-                                    <div key={field.key} className="grid grid-cols-[112px_minmax(0,1fr)_36px] gap-2">
-                                        <Form.Item {...field} name={[field.name, "type"]} className="mb-0" rules={[{ required: true, message: "选择类型" }]}>
-                                            <Select options={[{ value: "image", label: "图片" }, { value: "video", label: "视频" }]} />
-                                        </Form.Item>
-                                        <Form.Item {...field} name={[field.name, "showcaseUrl"]} className="mb-0" rules={[{ required: true, message: "请填写媒体链接" }, { type: "url", message: "链接格式无效" }]}>
-                                            <Input type="url" inputMode="url" spellCheck={false} placeholder="https://example.com/media" />
-                                        </Form.Item>
-                                        <Button aria-label="移除媒体" title="移除媒体" icon={<Minus className="size-4" />} onClick={() => remove(field.name)} />
-                                        <Form.Item {...field} name={[field.name, "showcaseUri"]} hidden><Input /></Form.Item>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-                </Form.List>
+                <Form.Item name="markdownUrl" label={isPackageSkill ? "来源地址" : "Markdown 地址"} rules={[{ type: "url", message: "请输入有效的 HTTP(S) 链接" }]}>
+                    <Input type="url" inputMode="url" spellCheck={false} placeholder="https://example.com/SKILL.md" />
+                </Form.Item>
 
                 <Form.Item name="extraInfo" label="补充信息" className="mt-5" rules={[{ max: 2000, message: "最多 2000 个字符" }]}>
                     <Input.TextArea autoSize={{ minRows: 2, maxRows: 5 }} maxLength={2000} showCount placeholder="版本说明、依赖工具或使用注意事项" />
@@ -180,8 +147,4 @@ export function SkillEditorDrawer({ open, skill, onClose, onSaved }: { open: boo
             </Form>
         </AppDrawer>
     );
-}
-
-function emptyMedia(): SkillShowcaseMedia {
-    return { type: "image", showcaseUri: "", showcaseUrl: "" };
 }

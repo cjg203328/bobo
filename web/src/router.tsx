@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation, useParams } from "react-router";
 
 import { createWorkspaceRouter } from "@/lib/app-routing";
 import { FullScreenLoader, WorkspaceRouteLoader } from "@/components/ui/aceternity/full-screen-loader";
-import { loadAgentsPage, loadAssetsPage, loadCanvasPage, loadCanvasProjectPage, loadCreatePage, loadHomePage, loadProjectDetailPage, loadSkillsPage, loadSkillsReferencePage, loadTasksPage } from "@/lib/workspace-route-modules";
+import { loadAgentsPage, loadAssetsPage, loadCanvasPage, loadCanvasProjectPage, loadCreatePage, loadHomePage, loadProjectDetailPage, loadSkillsPage, loadTasksPage } from "@/lib/workspace-route-modules";
 import { CanvasRefreshShell } from "@/pages/canvas/canvas-refresh-shell";
 import RouteErrorPage from "@/pages/route-error";
 import { isLocalWorkspaceMode } from "@/services/workspace-mode";
@@ -20,7 +20,6 @@ const EagleLibraryPage = lazy(() => import("@/pages/plugins/eagle"));
 const ProjectDetailPage = lazy(loadProjectDetailPage);
 const SettingsPage = lazy(() => import("@/pages/settings"));
 const SkillsPage = lazy(loadSkillsPage);
-const SkillsReferencePage = lazy(loadSkillsReferencePage);
 const TasksPage = lazy(loadTasksPage);
 const TestVoiceRecording = lazy(() => import("@/pages/test-voice-recording"));
 const UserLayout = lazy(() => import("@/layouts/user-layout"));
@@ -82,10 +81,9 @@ export const router = createWorkspaceRouter([
             { path: "/create", element: deferred(<CreatePage />) },
             { path: "/tasks", element: <RequireFeature feature="taskCenterEnabled">{deferred(<TasksPage />)}</RequireFeature> },
             { path: "/assets", element: deferred(<AssetsPage />) },
-            // 技能库在本地优先工作区可用：技能广场 / 我的技能 / 我创建的 / 我的收藏。
-            // 上游按“公共工作区未完成”隐藏该页；本地运行时无公共工作区分支，故恢复入口。
+            // 技能库只管理个人安装和自建技能；旧公共橱窗入口收敛到个人技能库。
             { path: "/skills", element: deferred(<SkillsPage />) },
-            { path: "/skills/reference", element: deferred(<SkillsReferencePage />) },
+            { path: "/skills/reference", element: <Navigate to="/skills" replace /> },
             { path: "/skill", element: <Navigate to="/skills" replace /> },
             {
                 path: "/plugins",

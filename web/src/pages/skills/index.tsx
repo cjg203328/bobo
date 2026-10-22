@@ -1,25 +1,22 @@
 import { CollectionToolbar } from "@/components/layout/collection-toolbar";
 import { App, Button, Dropdown, Input, Select } from "antd";
-import { Tooltip } from "@/components/ui/base/tooltip";
 
-import { Boxes, Check, Clapperboard, EyeOff, Heart, Library, LoaderCircle, Megaphone, MoreHorizontal, Palette, Plus, Puzzle, Search, ShoppingBag, Sparkles, UserRound } from "lucide-react";
+import { Boxes, Check, Clapperboard, Library, Megaphone, MoreHorizontal, Palette, Plus, Puzzle, Search, ShoppingBag, UserRound } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { PageHeader, PaginationBar, WorkspacePage } from "@/components/layout/workspace-page";
 import { WorkspaceErrorState, WorkspaceState } from "@/components/layout/workspace-state";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { fallbackSkillCategories, formatSkillCount, groupSkills, skillCategoryLabel } from "@/pages/skills/skill-catalog";
+import { fallbackSkillCategories, groupSkills, skillCategoryLabel } from "@/pages/skills/skill-catalog";
 import { SkillDetailModal } from "@/pages/skills/skill-detail-drawer";
 import { SkillEditorDrawer } from "@/pages/skills/skill-editor-drawer";
 import { SkillInstallModal } from "@/pages/skills/skill-install-modal";
-import { addSkill, deleteSkill, getSkill, likeSkill, listSkills, publishSkill, removeSkill, syncSkill, unlikeSkill, unpublishSkill, type Skill, type SkillCategory, type SkillScope, type SkillSort } from "@/services/api/skills";
+import { addSkill, deleteSkill, getSkill, listSkills, removeSkill, syncSkill, type Skill, type SkillCategory, type SkillScope, type SkillSort } from "@/services/api/skills";
 
 const scopeOptions = [
-    { label: "技能广场", value: "public", icon: Sparkles },
-    { label: "我的技能", value: "mine", icon: Library },
+    { label: "已安装", value: "mine", icon: Library },
     { label: "我创建的", value: "created", icon: UserRound },
-    { label: "我的收藏", value: "favorites", icon: Heart },
 ];
 
 /* 分类图标映射：画廊卡片顶部的图标块，未知分类回退 Boxes。 */
@@ -33,15 +30,14 @@ const categoryIcons: Record<string, LucideIcon> = {
 const categoryIconOf = (value: string) => categoryIcons[value] ?? Boxes;
 
 const sortOptions: { label: string; value: SkillSort }[] = [
-    { label: "最多加入", value: "popular" },
-    { label: "最新发布", value: "new" },
     { label: "最近更新", value: "updated" },
+    { label: "最近创建", value: "new" },
 ];
 
 export default function SkillsPage() {
     const { message, modal } = App.useApp();
-    const [scope, setScope] = useState<SkillScope>("public");
-    const [sort, setSort] = useState<SkillSort>("popular");
+    const [scope, setScope] = useState<SkillScope>("mine");
+    const [sort, setSort] = useState<SkillSort>("updated");
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebouncedValue(search, 250);
     const [tag, setTag] = useState("all");
@@ -100,8 +96,8 @@ export default function SkillsPage() {
     }, [debouncedSearch, page, pageSize, reloadKey, scope, sort, tag]);
 
     const groupedSkills = useMemo(() => groupSkills(skills, categories), [categories, skills]);
-    const filtersActive = Boolean(search || tag !== "all" || sort !== "popular");
-    const resetFilters = useCallback(() => { setSearch(""); setTag("all"); setSort("popular"); setPage(1); }, []);
+    const filtersActive = Boolean(search || tag !== "all" || sort !== "updated");
+    const resetFilters = useCallback(() => { setSearch(""); setTag("all"); setSort("updated"); setPage(1); }, []);
 
     const openSkill = async (skill: Skill) => {
         setActiveSkill(skill);
@@ -154,36 +150,6 @@ export default function SkillsPage() {
         }
     };
 
-    const toggleLiked = async (skill: Skill) => {
-        setMutatingID(skill.skillId);
-        try {
-            const result = skill.isLike ? await unlikeSkill(skill.skillId) : await likeSkill(skill.skillId);
-            patchSkill(result.skill);
-            message.success(result.skill.isLike ? "已收藏" : "已取消收藏");
-            if (scope === "favorites" && !result.skill.isLike) reload();
-        } catch (error) {
-            message.error(error instanceof Error ? error.message : "收藏状态更新失败");
-        } finally {
-            setMutatingID("");
-        }
-    };
-
-    /* 发布/下架是技能生命周期的头等动作：发布后进入技能广场供所有人加入，
-       下架后仅作者可见。在广场视野里下架自己的技能需要刷新列表。 */
-    const togglePublished = async (skill: Skill) => {
-        setMutatingID(skill.skillId);
-        try {
-            const result = skill.isPrivate ? await publishSkill(skill.skillId) : await unpublishSkill(skill.skillId);
-            patchSkill(result.skill);
-            message.success(result.skill.isPrivate ? "已下架，仅自己可见" : "已发布到技能广场");
-            if (scope === "public" && result.skill.isPrivate) reload();
-        } catch (error) {
-            message.error(error instanceof Error ? error.message : "技能发布状态更新失败");
-        } finally {
-            setMutatingID("");
-        }
-    };
-
     const synchronizeSkill = async (skill: Skill) => {
         setMutatingID(skill.skillId);
         try {
@@ -201,7 +167,7 @@ export default function SkillsPage() {
     const confirmDelete = (skill: Skill) => {
         modal.confirm({
             title: `删除“${skill.skillName}”？`,
-            content: "删除后，其他用户将无法继续使用该技能，已有加入和收藏关系也会一并移除。",
+            content: "删除后将从你的技能库移除，Agent 也无法再选择它。此操作不可恢复。",
             okText: "删除技能",
             okButtonProps: { danger: true },
             cancelText: "取消",
@@ -222,7 +188,7 @@ export default function SkillsPage() {
     return (
         <>
             <WorkspacePage className="library-page skills-library-page" grid>
-                <PageHeader title="技能库" description="把提示词、角色设定和创作方法，变成随时可用的能力。" actions={<Button type="primary" icon={<Plus className="size-4" />} onClick={() => setInstallOpen(true)}>安装技能</Button>} />
+                <PageHeader title="技能库" description="管理自建、导入和已安装的创作技能。" actions={<Button type="primary" icon={<Plus className="size-4" />} onClick={() => setInstallOpen(true)}>安装技能</Button>} />
 
                 <div className="skills-browse-bar">
                 <div className="skills-navigation">
@@ -259,7 +225,7 @@ export default function SkillsPage() {
                     </div>
                 </div>
                 <CollectionToolbar active={filtersActive} onReset={resetFilters}>
-                        <Input className="min-w-0 sm:!w-56" prefix={<Search className="size-4 text-foreground/38" />} value={search} allowClear placeholder="搜索技能或作者" onChange={(event) => { setSearch(event.target.value); setPage(1); }} />
+                        <Input className="min-w-0 sm:!w-56" prefix={<Search className="size-4 text-foreground/38" />} value={search} allowClear placeholder="搜索技能" onChange={(event) => { setSearch(event.target.value); setPage(1); }} />
                         <Select aria-label="技能分类" className="w-28" value={tag} options={[{ value: "all", label: "全部分类" }, ...categories]} onChange={(value) => { setTag(value); setPage(1); }} />
                         <Select aria-label="技能排序" className="w-24" value={sort} options={sortOptions} onChange={(value) => { setSort(value); setPage(1); }} />
                 </CollectionToolbar>
@@ -279,7 +245,7 @@ export default function SkillsPage() {
                                         <span className="text-[var(--fs-label)] text-foreground/32">{group.skills.length} 个</span>
                                     </div>
                                     <div className="library-grid skill-library-grid">
-                                        {group.skills.map((skill, index) => <SkillCard key={skill.skillId} skill={skill} categories={categories} loading={mutatingID === skill.skillId} style={{ animationDelay: `${Math.min(index, 5) * 30}ms` }} onOpen={() => void openSkill(skill)} onAdd={() => void toggleAdded(skill)} onLike={() => void toggleLiked(skill)} onPublish={() => void togglePublished(skill)} onEdit={() => void openEditor(skill)} onDelete={() => confirmDelete(skill)} />)}
+                                        {group.skills.map((skill, index) => <SkillCard key={skill.skillId} skill={skill} categories={categories} loading={mutatingID === skill.skillId} style={{ animationDelay: `${Math.min(index, 5) * 30}ms` }} onOpen={() => void openSkill(skill)} onAdd={() => void toggleAdded(skill)} onEdit={() => void openEditor(skill)} onDelete={() => confirmDelete(skill)} />)}
                                     </div>
                                 </section>
                             );
@@ -290,27 +256,25 @@ export default function SkillsPage() {
                         compact
                         className="min-h-[188px]"
                         icon="skills"
-                        title={filtersActive ? "没有找到匹配技能" : scope === "created" ? "还没有创建技能" : scope === "public" ? "技能广场还是空的" : "这里还没有技能"}
-                        description={filtersActive ? "换个关键词或分类试试。" : scope === "favorites" ? "收藏的公开技能会显示在这里。" : scope === "mine" ? "从技能广场加入后会显示在这里。" : "创建并公开第一个技能，其他用户就能直接加入使用。"}
+                        title={filtersActive ? "没有找到匹配技能" : scope === "created" ? "还没有自建技能" : "还没有已安装的技能"}
+                        description={filtersActive ? "换个关键词或分类试试。" : scope === "mine" ? "安装技能包后，它会保存在你的技能库中。" : "创建或导入一个技能包，后续可以在 Agent 和画布中使用。"}
                         action={filtersActive
-                            ? <Button onClick={() => { setSearch(""); setTag("all"); setSort("popular"); setPage(1); }}>清除筛选</Button>
-                            : (scope === "created" || scope === "public")
-                              ? <Button type="primary" icon={<Plus className="size-4" />} onClick={() => setInstallOpen(true)}>安装技能</Button>
-                              : undefined}
+                            ? <Button onClick={() => { setSearch(""); setTag("all"); setSort("updated"); setPage(1); }}>清除筛选</Button>
+                            : <Button type="primary" icon={<Plus className="size-4" />} onClick={() => setInstallOpen(true)}>安装技能</Button>}
                     />
                 )}
 
                 <PaginationBar current={page} pageSize={pageSize} total={total} pageSizeOptions={[20, 40, 80]} onChange={(nextPage, nextPageSize) => { setPage(nextPageSize !== pageSize ? 1 : nextPage); setPageSize(nextPageSize); }} />
             </WorkspacePage>
 
-            <SkillDetailModal skill={activeSkill} loading={detailLoading} mutating={Boolean(activeSkill && mutatingID === activeSkill.skillId)} categories={categories} onClose={() => setActiveSkill(null)} onAdd={(skill) => void toggleAdded(skill)} onLike={(skill) => void toggleLiked(skill)} onPublish={(skill) => void togglePublished(skill)} onEdit={(skill) => void openEditor(skill)} onSync={(skill) => void synchronizeSkill(skill)} />
+            <SkillDetailModal skill={activeSkill} loading={detailLoading} mutating={Boolean(activeSkill && mutatingID === activeSkill.skillId)} categories={categories} onClose={() => setActiveSkill(null)} onAdd={(skill) => void toggleAdded(skill)} onEdit={(skill) => void openEditor(skill)} onSync={(skill) => void synchronizeSkill(skill)} />
             <SkillInstallModal open={installOpen} onClose={() => setInstallOpen(false)} onInstalled={(skill) => { setInstallOpen(false); setActiveSkill(skill); reload(); }} onManualCreate={() => { setInstallOpen(false); void openEditor(); }} />
             <SkillEditorDrawer open={editorOpen} skill={editingSkill} onClose={() => setEditorOpen(false)} onSaved={(skill) => { setEditorOpen(false); setEditingSkill(null); setActiveSkill(skill); reload(); }} />
         </>
     );
 }
 
-function SkillCard({ skill, categories, loading, style, onOpen, onAdd, onLike, onPublish, onEdit, onDelete }: { skill: Skill; categories: SkillCategory[]; loading: boolean; style?: CSSProperties; onOpen: () => void; onAdd: () => void; onLike: () => void; onPublish: () => void; onEdit: () => void; onDelete: () => void }) {
+function SkillCard({ skill, categories, loading, style, onOpen, onAdd, onEdit, onDelete }: { skill: Skill; categories: SkillCategory[]; loading: boolean; style?: CSSProperties; onOpen: () => void; onAdd: () => void; onEdit: () => void; onDelete: () => void }) {
     const CategoryIcon = categoryIconOf(skill.tag);
     return (
         <article style={style} className={`product-collection-card library-card library-card-surface skill-library-card group${skill.isAdded ? " is-added" : ""}`}>
@@ -324,11 +288,10 @@ function SkillCard({ skill, categories, loading, style, onOpen, onAdd, onLike, o
                         trigger={["click"]}
                         menu={{
                             items: [
-                                { key: "publish", label: skill.isPrivate ? "发布到广场" : "下架", icon: <Megaphone className="size-4" /> },
                                 { key: "edit", label: "编辑技能" },
                                 { key: "delete", label: "删除技能", danger: true },
                             ],
-                            onClick: ({ key }) => key === "edit" ? onEdit() : key === "delete" ? onDelete() : onPublish(),
+                            onClick: ({ key }) => key === "edit" ? onEdit() : onDelete(),
                         }}
                     >
                         <button type="button" aria-label="技能操作" className="skill-card-more">
@@ -341,34 +304,21 @@ function SkillCard({ skill, categories, loading, style, onOpen, onAdd, onLike, o
                 <p>{skill.description || "暂无技能简介"}</p>
             </button>
             <div className="skill-card-footer">
-                <button type="button" disabled={loading} className="skill-card-like" aria-label={skill.isLike ? "取消收藏" : "收藏"} onClick={onLike}>
-                    <Heart className={`size-3.5 ${skill.isLike ? "fill-current text-rose-500" : ""}`} />
-                    <span>{formatSkillCount(skill.likeCount)}</span>
-                </button>
-                <span className="skill-card-author">{skill.effectiveUser.name || "未知用户"}</span>
                 <span className="skill-card-tag">{skillCategoryLabel(skill.tag, categories)}</span>
-                {skill.isOwner
-                    ? (skill.isPrivate ? <span className="skill-card-flag">仅自己</span> : <span className="skill-card-flag is-published">已公开</span>)
-                    : skill.isPrivate ? <span className="skill-card-flag">仅自己</span> : null}
+                <span className="skill-card-flag">v{skill.version || "1"}</span>
             </div>
-            {/* 加入是这个页面的主行为，给它完整的按钮 + 文案 + 已加入人数，不再藏在角落的加号里。 */}
             {skill.isOwner
                 ? (
                     <div className="skill-card-action">
-                        {/* 发布/下架：作者在卡片上一键切换公开状态，发布后广场可见。 */}
-                        <Button loading={loading} icon={skill.isPrivate ? <Megaphone className="size-4" /> : <EyeOff className="size-4" />} onClick={onPublish}>
-                            {skill.isPrivate ? "发布" : "下架"}
-                        </Button>
+                        <Button icon={<MoreHorizontal className="size-4" />} onClick={onEdit}>编辑技能</Button>
                         <span className="skill-card-owner-flag">我创建的</span>
-                        <span className="skill-card-added-count">{formatSkillCount(skill.addedCount)} 人已加入</span>
                     </div>
                 )
                 : (
                     <div className="skill-card-action">
                         <Button loading={loading} aria-pressed={skill.isAdded} icon={skill.isAdded ? <Check /> : <Plus />} onClick={onAdd}>
-                            {skill.isAdded ? "已加入" : "加入技能库"}
+                            {skill.isAdded ? "从我的技能移除" : "安装到我的技能"}
                         </Button>
-                        <Tooltip title={`${formatSkillCount(skill.addedCount)} 人已加入`}><span className="skill-card-added-count">{formatSkillCount(skill.addedCount)}</span></Tooltip>
                     </div>
                 )}
         </article>
