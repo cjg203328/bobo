@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"huabu/backend/internal/app"
+	"huabu/backend/internal/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -63,10 +64,19 @@ func RegisterProjectRoutes(r *gin.RouterGroup, svc *app.Service) {
 			failService(c, err)
 			return
 		}
+		scope, err := requestTenantScope(c, svc, user.ID)
+		if err != nil {
+			failService(c, err)
+			return
+		}
+		if err := scope.RequireWrite(func(p model.TenantPermissions) bool { return p.ReadTenant }, "无权读取该租户项目"); err != nil {
+			failService(c, err)
+			return
+		}
 		pageParam, hasPage := c.GetQuery("page")
 		pageSizeParam, hasPageSize := c.GetQuery("pageSize")
 		if !hasPage && !hasPageSize {
-			projects, err := requestProjectPort(c, svc).ListProjects(user.ID)
+			projects, err := requestProjectPort(c, svc).ListProjects(scope.TenantID)
 			if err != nil {
 				failService(c, err)
 				return
@@ -84,7 +94,7 @@ func RegisterProjectRoutes(r *gin.RouterGroup, svc *app.Service) {
 			fail(c, http.StatusBadRequest, err)
 			return
 		}
-		projects, err := svc.ListProjectsPage(user.ID, page, pageSize)
+		projects, err := svc.ListProjectsPage(scope.TenantID, page, pageSize)
 		if err != nil {
 			failService(c, err)
 			return
@@ -156,6 +166,10 @@ func RegisterProjectRoutes(r *gin.RouterGroup, svc *app.Service) {
 			failService(c, err)
 			return
 		}
+		if err := requireRequestedTenantProject(c, svc, user.ID, c.Param("id")); err != nil {
+			failService(c, err)
+			return
+		}
 		detail, err := svc.ProjectDetail(user.ID, c.Param("id"))
 		if err != nil {
 			if app.IsProjectNotFound(err) {
@@ -173,6 +187,10 @@ func RegisterProjectRoutes(r *gin.RouterGroup, svc *app.Service) {
 			failService(c, err)
 			return
 		}
+		if err := requireRequestedTenantProject(c, svc, user.ID, c.Param("id")); err != nil {
+			failService(c, err)
+			return
+		}
 		core, err := svc.ProjectCore(user.ID, c.Param("id"))
 		if err != nil {
 			if app.IsProjectNotFound(err) {
@@ -187,6 +205,10 @@ func RegisterProjectRoutes(r *gin.RouterGroup, svc *app.Service) {
 	r.GET("/projects/:id/overview", func(c *gin.Context) {
 		user, err := currentUser(c, svc)
 		if err != nil {
+			failService(c, err)
+			return
+		}
+		if err := requireRequestedTenantProject(c, svc, user.ID, c.Param("id")); err != nil {
 			failService(c, err)
 			return
 		}

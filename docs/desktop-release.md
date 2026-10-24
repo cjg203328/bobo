@@ -118,6 +118,16 @@ backend\cmd\desktop\build\bin\plugin-packages\*.beeftv-plugin
 
 发布前先停止 Wails/Vite 开发进程，避免开发输出与生产构建并发写入同一目录。
 
+### 构建资源保护
+
+前端生产构建和 Wails 的 `build:desktop` 都把 TypeScript 检查与 Vite 打包放进 `scripts/run-bun-build-safe.mjs` 启动的独立 Bun 子进程。包装器默认启用 `--smol`，不把构建输出积存在父进程内存中，并使用原子锁拒绝并发构建；子进程树超过 4096 MiB RSS 或 20 分钟未退出时会被终止，锁文件会在成功、失败和中断后清理。独立 Bun 编译也应使用同一入口，例如：
+
+```bash
+bun scripts/run-bun-build-safe.mjs -- build --compile --outfile ./dist/bobo-archive.exe ./src/archive.ts
+```
+
+已确认构建机有足够内存、且产物确实需要更高上限时，才设置 `BOBO_BUILD_MAX_RSS_MB` 或 `BOBO_BUILD_TIMEOUT_MS`；不要通过重复启动构建进程来绕过上限。
+
 ## 桌面自动更新
 
 自动更新只服务于已经装过「带更新器的生产包」的用户。检查、下载、安装都在应用内完成；安装并重启前，正在运行的版本不会被替换。
@@ -242,7 +252,7 @@ v1.5.6 及以前的更新器仍内置 GitHub 清单地址。如果旧客户端�
 
 如果 GitHub 发布成功而 CF 激活失败，保留正式版本及所有不可变对象。核对失败原因后，用同一版本的原始清单重跑 `activate`；不要删除正式 tag 或重建不同内容的同版本包。切换前失败不会改变旧 CF 清单；条件写成功但最终回读失败时，新清单可能已经生效，必须先核对存储与公开入口，不能把它当作未发布。已经安装新版本的客户端不自动降级。
 
-在 `glanderness/BeefTV` 的 `main` 上手动运行 `.github/workflows/release-desktop.yml`。输入的 `confirm_version` 必须和 `VERSION` 一致。`CHANGELOG.md` 必须有对应的 `## vX.Y.Z` 段落，这段文字会同时成为 GitHub Release 说明和清单里的 `notes`。
+在 `cjg203328/bobo` 的 `main` 上手动运行 `.github/workflows/release-desktop.yml`。输入的 `confirm_version` 必须和 `VERSION` 一致。`CHANGELOG.md` 必须有对应的 `## vX.Y.Z` 段落，这段文字会同时成为 GitHub Release 说明和清单里的 `notes`。
 
 工作流会拒绝：
 

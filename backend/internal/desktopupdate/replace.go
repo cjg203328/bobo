@@ -16,9 +16,17 @@ var relaunchInstall = relaunchTarget
 func SwapInstall(req HelperRequest) error {
 	switch {
 	case strings.HasPrefix(req.Platform, "darwin"):
-		return swapBundle(req, appBundleName)
+		name, err := detectDarwinBundleName(req.StagedPath)
+		if err != nil {
+			return err
+		}
+		return swapBundle(req, name)
 	case req.Platform == "linux-amd64":
-		return swapBundle(req, linuxBundleName)
+		name, err := detectLinuxBundleName(req.StagedPath)
+		if err != nil {
+			return err
+		}
+		return swapBundle(req, name)
 	case strings.HasPrefix(req.Platform, "windows"):
 		return swapWindows(req)
 	default:
@@ -47,14 +55,20 @@ func swapBundle(req HelperRequest, name string) error {
 
 func swapWindows(req HelperRequest) error {
 	targetDir := filepath.Dir(req.TargetPath)
-	stagedExe := filepath.Join(req.StagedPath, windowsExeName)
 	if err := validateWindowsLayout(req.StagedPath); err != nil {
 		return err
 	}
+	stagedExeName, err := detectWindowsExeName(req.StagedPath)
+	if err != nil {
+		return err
+	}
+	stagedExe := filepath.Join(req.StagedPath, stagedExeName)
 	if err := os.MkdirAll(req.BackupPath, 0o755); err != nil {
 		return err
 	}
-	backupExe := filepath.Join(req.BackupPath, windowsExeName)
+	// 备份沿用目标文件自己的名字：旧安装是 Huabu.exe，新安装是 Bobo.exe，
+	// 用固定的新名会让旧备份还原不到原路径。
+	backupExe := filepath.Join(req.BackupPath, filepath.Base(req.TargetPath))
 	if err := retryIO(func() error { return renamePath(req.TargetPath, backupExe) }); err != nil {
 		return err
 	}
@@ -93,7 +107,8 @@ var windowsSidecarEntries = []string{pluginDirName, "agent-host", cliDirName, "m
 
 func restoreWindows(req HelperRequest) error {
 	targetDir := filepath.Dir(req.TargetPath)
-	backupExe := filepath.Join(req.BackupPath, windowsExeName)
+	// 备份键与 swapWindows 一致：用目标文件当时的名字，而非固定新名。
+	backupExe := filepath.Join(req.BackupPath, filepath.Base(req.TargetPath))
 	var failures []error
 	if pathExists(backupExe) {
 		if err := retryIO(func() error {
@@ -205,14 +220,18 @@ func relaunchTarget(req HelperRequest) error {
 	}
 	switch {
 	case req.Platform == "linux-amd64":
-		cmd := exec.Command(filepath.Join(req.TargetPath, "Huabu"), args...)
+		// 包内主程序名随包名迁移：先试新名，过渡期回落旧名。
+		exe := pickExistingFile(req.TargetPath, linuxExeName, "Huabu")
+		cmd := exec.Command(exe, args...)
 		cmd.Dir = req.TargetPath
 		if err := cmd.Start(); err != nil {
 			return err
 		}
 		return cmd.Process.Release()
 	case strings.HasPrefix(req.Platform, "darwin"):
-		cmd := exec.Command(filepath.Join(req.TargetPath, "Contents", "MacOS", "Huabu"), args...)
+		macOSDir := filepath.Join(req.TargetPath, "Contents", "MacOS")
+		exe := pickExistingFile(macOSDir, darwinExeName, "Huabu")
+		cmd := exec.Command(exe, args...)
 		cmd.Dir = filepath.Dir(req.TargetPath)
 		if err := cmd.Start(); err != nil {
 			return err

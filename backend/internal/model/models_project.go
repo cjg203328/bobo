@@ -184,6 +184,7 @@ type CharacterVoiceBinding struct {
 // Project 是短剧领域聚合根；CanvasProject 仍代表可独立创作的画布文档。
 type Project struct {
 	ID                string        `json:"id" gorm:"primaryKey;size:36"`
+	TenantID          string        `json:"tenantId,omitempty" gorm:"index:idx_projects_tenant,size:80"`
 	UserID            string        `json:"userId" gorm:"index;size:36;uniqueIndex:idx_projects_user_name,priority:1"`
 	Name              string        `json:"name" gorm:"size:240;uniqueIndex:idx_projects_user_name,priority:2"`
 	Type              string        `json:"type" gorm:"size:32;index"`

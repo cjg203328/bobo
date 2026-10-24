@@ -87,13 +87,52 @@ func mapProjectWriteError(err error) error {
 	return err
 }
 
+// Owned 只回答“能不能看”：同租户成员即可，创建者字段不参与判断。
 func (s *Service) Owned(userID, projectID string) (*model.Project, error) {
 	return s.repo.ProjectForUser(userID, projectID)
 }
 
+// OwnedInTenant 在请求选中的空间内解析项目。多空间场景下，项目自身归属
+// 与请求空间不一致时必须当作不存在，否则切换空间后仍能按 ID 读到旧空间数据。
+// 空 tenantID 表示调用方未指定空间，退回按成员关系判断。
+func (s *Service) OwnedInTenant(userID, tenantID, projectID string) (*model.Project, error) {
+	project, err := s.Owned(userID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	if tenantID == "" || project.TenantID == "" {
+		return project, nil
+	}
+	if project.TenantID != tenantID {
+		return nil, kernel.NotFound("项目不存在")
+	}
+	return project, nil
+}
+
+// requireProjectWrite 是写路径的角色闸门。成员关系只证明可见，
+// 真正能否改动由角色决定；viewer 在代码层也必须被挡住，不能只靠前端隐藏按钮。
+// 没有租户归属的历史行已被 Owned 限定为创建者本人，这里不再二次收紧。
+func (s *Service) requireProjectWrite(userID string, project *model.Project) error {
+	if project == nil || project.TenantID == "" {
+		return nil
+	}
+	membership, err := s.repo.Membership(project.TenantID, userID)
+	if err != nil {
+		return kernel.Forbidden("不是该项目所属空间的成员")
+	}
+	if !model.PermissionsFor(membership.Role).WriteProject {
+		return kernel.Forbidden("当前角色无权修改该项目")
+	}
+	return nil
+}
+
+// Active 是写路径入口：可读 + 有写权限 + 项目未归档，三者缺一不可。
 func (s *Service) Active(userID, projectID string) (*model.Project, error) {
 	project, err := s.Owned(userID, projectID)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.requireProjectWrite(userID, project); err != nil {
 		return nil, err
 	}
 	if project.Status == model.ProjectStatusArchived {
@@ -118,27 +157,31 @@ func (s *Service) EnsureTaskScopeActive(userID, canvasOrProjectID string) error 
 	return nil
 }
 
-func (s *Service) ListProjects(userID string) ([]Summary, error) {
-	projects, err := s.repo.Projects(userID)
+// ListProjects 按租户返回项目列表。租户是可见性边界，user_id 只是创建者，
+// 因此这里不再用创建者过滤，否则同空间的协作者项目会被藏掉。
+func (s *Service) ListProjects(tenantID string) ([]Summary, error) {
+	projects, err := s.repo.ProjectsInTenant(tenantID)
 	if err != nil {
 		return nil, err
 	}
-	return s.summarizeProjects(userID, projects)
+	return s.summarizeProjects(projects)
 }
 
-func (s *Service) ListProjectsPage(userID string, page int, pageSize int) (ListPage, error) {
-	projects, total, err := s.repo.ProjectsPage(userID, page, pageSize)
+func (s *Service) ListProjectsPage(tenantID string, page int, pageSize int) (ListPage, error) {
+	projects, total, err := s.repo.ProjectsInTenantPage(tenantID, page, pageSize)
 	if err != nil {
 		return ListPage{}, err
 	}
-	result, err := s.summarizeProjects(userID, projects)
+	result, err := s.summarizeProjects(projects)
 	if err != nil {
 		return ListPage{}, err
 	}
 	return ListPage{Projects: result, Page: page, PageSize: pageSize, Total: total, HasMore: int64(page*pageSize) < total}, nil
 }
 
-func (s *Service) summarizeProjects(userID string, projects []model.Project) ([]Summary, error) {
+// summarizeProjects 只做汇总，不再按创建者过滤画布。项目级可见性已在
+// 取得 projects 时确定，这里再套 user_id 会把协作者的画布计数抹成 0。
+func (s *Service) summarizeProjects(projects []model.Project) ([]Summary, error) {
 	result := make([]Summary, 0, len(projects))
 	for _, item := range projects {
 		summary := Summary{Project: item}
@@ -149,7 +192,7 @@ func (s *Service) summarizeProjects(userID string, projects []model.Project) ([]
 		if unitsErr != nil {
 			return nil, unitsErr
 		}
-		canvases, canvasesErr := s.repo.ProjectCanvasSummaries(userID, item.ID)
+		canvases, canvasesErr := s.repo.ProjectCanvasSummariesByProject(item.ID)
 		if canvasesErr != nil {
 			return nil, canvasesErr
 		}
@@ -267,8 +310,12 @@ func (s *Service) CreateProject(userID string, req CreateProjectRequest) (model.
 	if err != nil {
 		return model.Project{}, err
 	}
+	tenantID, err := s.repo.PrimaryTenantForUser(userID)
+	if err != nil {
+		return model.Project{}, kernel.BadAuthRequest("当前用户没有可用的工作空间，无法创建项目")
+	}
 	item := model.Project{
-		ID: kernel.NewID(), UserID: userID, Name: name, Type: projectType, AspectRatio: aspectRatio, SourceType: sourceType,
+		ID: kernel.NewID(), TenantID: tenantID, UserID: userID, Name: name, Type: projectType, AspectRatio: aspectRatio, SourceType: sourceType,
 		Description: strings.TrimSpace(req.Description), StylePresetID: stylePresetID, StyleProfileJSON: styleProfileJSON,
 		DefaultImageModel: defaultImageModel, DefaultVideoModel: defaultVideoModel, Status: model.ProjectStatusActive,
 		Revision: 1, CreatedAt: now, UpdatedAt: now,

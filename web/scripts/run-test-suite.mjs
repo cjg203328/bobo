@@ -29,6 +29,10 @@ const isolated = files.filter((file) => {
     // Browser suites own subprocesses and should not share a Bun worker with
     // shell-script tests or modules that replace browser globals.
     if (/\.browser\.test\.[jt]sx?$/.test(file)) return true;
+    // This suite replaces fetch and spies on the shared API runtime. Keeping
+    // it in its own worker also prevents duplicate request-module instances
+    // from changing ApiError identity/reason semantics after another suite.
+    if (file.endsWith("canvas-agent-assistant-stream.test.ts")) return true;
     const source = readFileSync(join(root, file), "utf8");
     // Bun module replacements persist beyond mock.restore(); isolate their import graphs.
     if (source.includes("mock.module(")) return true;

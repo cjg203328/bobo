@@ -35,7 +35,7 @@ def smoke(archive):
                         log.seek(0)
                         raise RuntimeError("desktop exited: " + log.read()[-4000:])
                     descriptor = data / "runtime.json"
-                    window = subprocess.run(["xdotool", "search", "--onlyvisible", "--name", "^Huabu$"], capture_output=True, text=True)
+                    window = subprocess.run(["xdotool", "search", "--onlyvisible", "--name", "^波波 AI 画布$"], capture_output=True, text=True)
                     if descriptor.exists() and window.returncode == 0:
                         info = json.loads(descriptor.read_text())
                         if info["pid"] != process.pid:

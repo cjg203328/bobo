@@ -267,7 +267,14 @@ export async function confirmAssistantProposalRunnable(turnId: string, proposalI
 }
 
 export function assistantUndoFailure(error: unknown): AssistantUndoFailure {
-    const reason = error instanceof ApiError ? error.reason : undefined;
+    // Keep the classifier resilient across browser bundles and test runners
+    // that can load the request module through different specifier paths.
+    // The backend contract is the stable `reason` field, not the JS prototype.
+    const reason = error && typeof error === "object" && "reason" in error && typeof (error as { reason?: unknown }).reason === "string"
+        ? (error as { reason: string }).reason
+        : error instanceof ApiError
+            ? error.reason
+            : undefined;
     switch (reason) {
         case "canvas_changed_since_turn":
             return "canvas_changed";

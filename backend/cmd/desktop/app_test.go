@@ -178,6 +178,9 @@ func TestDesktopAppBoundMethodsStayTiny(t *testing.T) {
 func TestDesktopAppOptionsUseDarkNativeChrome(t *testing.T) {
 	app := newDesktopApp(t.TempDir())
 	opts := desktopAppOptions(app)
+	if opts.Title != "波波 AI 画布" {
+		t.Fatalf("window title = %q, want Bobo brand", opts.Title)
+	}
 	if opts.BackgroundColour == nil || opts.BackgroundColour.R != 13 || opts.BackgroundColour.G != 15 || opts.BackgroundColour.B != 18 || opts.BackgroundColour.A != 255 {
 		t.Fatalf("background colour = %#v, want dark workspace surface", opts.BackgroundColour)
 	}

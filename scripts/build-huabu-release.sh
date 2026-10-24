@@ -80,7 +80,7 @@ if [[ -n "${HUABU_WAILS_PLATFORM:-}" ]]; then
   esac
 fi
 
-echo "Building Huabu $VERSION_VALUE ($COMMIT_VALUE)"
+echo "Building Bobo AI Canvas $VERSION_VALUE ($COMMIT_VALUE)"
 
 mkdir -p "$DESKTOP_DIR/build"
 cp "$ROOT_DIR/assets/app-icon.png" "$DESKTOP_DIR/build/appicon.png"
@@ -163,6 +163,8 @@ fi
 APP_PLIST="$APP_BUNDLE/Contents/Info.plist"
 if [[ -f "$APP_PLIST" ]] && command -v plutil >/dev/null 2>&1; then
   MACOS_VERSION="${VERSION_VALUE#v}"
+  plutil -replace CFBundleName -string "Bobo AI Canvas" "$APP_PLIST"
+  plutil -insert CFBundleDisplayName -string "波波 AI 画布" "$APP_PLIST"
   plutil -replace CFBundleShortVersionString -string "$MACOS_VERSION" "$APP_PLIST"
   plutil -replace CFBundleVersion -string "$MACOS_VERSION" "$APP_PLIST"
 fi

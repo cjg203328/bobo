@@ -10,6 +10,11 @@
   "assetdir": "frontend/dist",
   "wailsjsdir": "frontend/wailsjs",
   "author": {
-    "name": "Huabu Contributors"
+    "name": "Bobo AI Canvas Contributors"
+  },
+  "info": {
+    "companyName": "Bobo AI Canvas",
+    "productName": "波波 AI 画布",
+    "copyright": "波波 AI 画布"
   }
 }

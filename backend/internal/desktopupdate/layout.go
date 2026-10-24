@@ -26,9 +26,15 @@ func validateExtractedLayout(root, platform string) error {
 }
 
 func validateLinuxLayout(root string) error {
-	bundle := filepath.Join(root, linuxBundleName)
-	if err := requireRegularFile(filepath.Join(bundle, "Huabu"), true); err != nil {
+	bundleName, err := detectLinuxBundleName(root)
+	if err != nil {
 		return err
+	}
+	bundle := filepath.Join(root, bundleName)
+	if err := requireRegularFile(filepath.Join(bundle, linuxExeName), true); err != nil {
+		if err := requireRegularFile(filepath.Join(bundle, "Huabu"), true); err != nil {
+			return err
+		}
 	}
 	if err := requireRegularFile(filepath.Join(bundle, cliDirName, darwinCLIName), true); err != nil {
 		return err
@@ -53,11 +59,16 @@ func validateLinuxLayout(root string) error {
 		return fmt.Errorf("更新包缺少官方插件")
 	}
 	return walkAllowed(root, func(rel string, entry fs.DirEntry) error {
-		if rel == "." || rel == linuxBundleName || rel == filepath.Join(linuxBundleName, "Huabu") || rel == filepath.Join(linuxBundleName, "README.md") {
+		if rel == "." || rel == bundleName {
 			return nil
 		}
+		for _, name := range []string{"Huabu", linuxExeName, "README.md"} {
+			if rel == filepath.Join(bundleName, name) {
+				return nil
+			}
+		}
 		for _, name := range []string{pluginDirName, "agent-host", cliDirName} {
-			prefix := filepath.Join(linuxBundleName, name)
+			prefix := filepath.Join(bundleName, name)
 			if rel == prefix || strings.HasPrefix(rel, prefix+string(filepath.Separator)) {
 				return nil
 			}
@@ -67,14 +78,21 @@ func validateLinuxLayout(root string) error {
 }
 
 func validateDarwinLayout(root string) error {
-	bundle := filepath.Join(root, appBundleName)
+	bundleName, err := detectDarwinBundleName(root)
+	if err != nil {
+		return err
+	}
+	bundle := filepath.Join(root, bundleName)
 	info, err := os.Lstat(bundle)
 	if err != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
-		return fmt.Errorf("更新包缺少 Huabu.app")
+		return fmt.Errorf("更新包缺少应用包")
 	}
-	exe := filepath.Join(bundle, "Contents", "MacOS", "Huabu")
+	exe := filepath.Join(bundle, "Contents", "MacOS", darwinExeName)
 	if err := requireRegularFile(exe, true); err != nil {
-		return err
+		// 过渡期接受旧包内可执行文件名。
+		if err := requireRegularFile(filepath.Join(bundle, "Contents", "MacOS", "Huabu"), true); err != nil {
+			return err
+		}
 	}
 	// 随包 CLI 在主程序旁的 cli 目录里：外部 Agent 靠它接入，缺了就不是完整的安装版。
 	if err := requireRegularFile(filepath.Join(bundle, "Contents", "MacOS", cliDirName, darwinCLIName), true); err != nil {
@@ -87,7 +105,7 @@ func validateDarwinLayout(root string) error {
 		if rel == "." {
 			return nil
 		}
-		if rel == appBundleName || strings.HasPrefix(rel, appBundleName+string(filepath.Separator)) {
+		if rel == bundleName || strings.HasPrefix(rel, bundleName+string(filepath.Separator)) {
 			return nil
 		}
 		return fmt.Errorf("更新包包含额外文件")
@@ -98,7 +116,11 @@ func validateWindowsLayout(root string) error {
 	if err := validateAgentHost(filepath.Join(root, "agent-host"), "runtime/node.exe", false); err != nil {
 		return err
 	}
-	exe := filepath.Join(root, windowsExeName)
+	exeName, err := detectWindowsExeName(root)
+	if err != nil {
+		return err
+	}
+	exe := filepath.Join(root, exeName)
 	// Nest new media in agent-host so old helpers replace it with that sidecar.
 	// Accept the earlier standalone layout too, but require complete resources.
 	for _, media := range []string{filepath.Join(root, "agent-host", "media-runtime"), filepath.Join(root, "media-runtime")} {
@@ -143,7 +165,9 @@ func validateWindowsLayout(root string) error {
 		return fmt.Errorf("更新包缺少官方插件")
 	}
 	return walkAllowed(root, func(rel string, entry fs.DirEntry) error {
-		if rel == "." || rel == windowsExeName {
+		// 新旧两个可执行文件名都要放行：过渡期打出的包仍叫 Huabu.exe，
+		// 只认新名会把整包判成“包含额外文件”。
+		if rel == "." || rel == windowsExeName || (legacyNamesAccepted && rel == legacyWindowsExe) {
 			return nil
 		}
 		if rel == cliDirName || strings.HasPrefix(rel, cliDirName+string(filepath.Separator)) {

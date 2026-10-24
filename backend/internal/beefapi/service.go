@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	errRevoked      = errors.New("Huabu 连接已失效，请重新连接")
-	errNotConnected = errors.New("尚未连接 Huabu")
+	errRevoked      = errors.New("官方算力连接已失效，请重新连接")
+	errNotConnected = errors.New("尚未连接官方算力")
 	errStore        = errors.New("保存连接失败，请重试")
 )
 
@@ -81,7 +81,7 @@ func New(opts Options) (*Service, error) {
 		hostname, _ = os.Hostname()
 	}
 	if hostname == "" {
-		hostname = "Huabu"
+		hostname = "波波 AI 画布"
 	}
 	clientVersion := strings.TrimSpace(opts.ClientVersion)
 	if clientVersion == "" {
@@ -334,7 +334,7 @@ func (s *Service) Start(ctx context.Context) (Summary, error) {
 	s.state.AuthorizationOrigin = s.origin
 	s.state.ProviderBaseURL = ""
 	s.state.Status = StateConnecting
-	s.state.LastError = "正在连接 Huabu"
+	s.state.LastError = "正在连接官方算力"
 	s.mu.Unlock()
 
 	device, err := s.requestDeviceCode()

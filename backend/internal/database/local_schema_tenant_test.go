@@ -55,3 +55,95 @@ func TestV17TenantMigrationBackfillsPersonalWorkspace(t *testing.T) {
 		t.Fatal("schema readiness accepted a missing tenant membership table")
 	}
 }
+
+func TestV18ProjectTenantOwnershipBackfillsLegacyRows(t *testing.T) {
+	db := openHistorical(t, "preview-v9")
+	workspace := model.Workspace{ID: "workspace-v18", Name: "归属工作区"}
+	if err := db.Create(&workspace).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.AutoMigrate(&model.Project{}); err != nil {
+		t.Fatal(err)
+	}
+	legacy := model.Project{ID: "legacy-no-tenant", UserID: workspace.ID, Name: "无归属项目"}
+	if err := db.Create(&legacy).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Model(&model.Project{}).Where("id = ?", legacy.ID).Update("tenant_id", "").Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := MigrateLocalSchema(db); err != nil {
+		t.Fatal(err)
+	}
+	if err := RequireLocalSchema(db); err != nil {
+		t.Fatal(err)
+	}
+	if !db.Migrator().HasColumn(&model.Project{}, "tenant_id") {
+		t.Fatal("v18 did not add projects.tenant_id")
+	}
+	var reloaded model.Project
+	if err := db.First(&reloaded, "id = ?", legacy.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if reloaded.TenantID != workspace.ID {
+		t.Fatalf("legacy project tenant_id = %q, want %q", reloaded.TenantID, workspace.ID)
+	}
+	var migration localSchemaMigration
+	if err := db.First(&migration, "version = ?", 18).Error; err != nil || migration.Name != "project-tenant-ownership" {
+		t.Fatalf("v18 identity = %+v, err = %v", migration, err)
+	}
+}
+
+func TestV18ProjectTenantOwnershipKeepsExistingValue(t *testing.T) {
+	db := openHistorical(t, "preview-v9")
+	workspace := model.Workspace{ID: "workspace-v18-keep", Name: "保留工作区"}
+	if err := db.Create(&workspace).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := MigrateLocalSchema(db); err != nil {
+		t.Fatal(err)
+	}
+	project := model.Project{ID: "explicit-tenant", UserID: workspace.ID, Name: "已有归属", TenantID: "tn_explicit"}
+	if err := db.Create(&project).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := migrateProjectTenantID(db); err != nil {
+		t.Fatal(err)
+	}
+	var reloaded model.Project
+	if err := db.First(&reloaded, "id = ?", project.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if reloaded.TenantID != "tn_explicit" {
+		t.Fatalf("existing tenant ownership overwritten: %q", reloaded.TenantID)
+	}
+}
+
+func TestV18SchemaRejectsMissingProjectTenantIndex(t *testing.T) {
+	db := openHistorical(t, "preview-v9")
+	if err := MigrateLocalSchema(db); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Exec("DROP INDEX idx_projects_tenant").Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := RequireLocalSchema(db); err == nil {
+		t.Fatal("schema readiness accepted a project table without tenant index")
+	}
+}
+
+func TestV18SchemaRejectsMissingProjectTenantColumn(t *testing.T) {
+	db := openHistorical(t, "preview-v9")
+	if err := MigrateLocalSchema(db); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Exec("DROP INDEX idx_projects_tenant").Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Exec("ALTER TABLE projects DROP COLUMN tenant_id").Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := RequireLocalSchema(db); err == nil {
+		t.Fatal("schema readiness accepted a project table without tenant column")
+	}
+}

@@ -88,7 +88,7 @@ func HTTPSProxyEnvironment() []string {
 
 // Explicit environment configuration must never be bypassed automatically.
 func ExplicitProxyConfigured() bool {
-	for _, name := range []string{"HTTP_PROXY", "http_proxy", "HTTPS_PROXY", "https_proxy"} {
+	for _, name := range []string{"HTTP_PROXY", "http_proxy", "HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy"} {
 		if strings.TrimSpace(os.Getenv(name)) != "" {
 			return true
 		}

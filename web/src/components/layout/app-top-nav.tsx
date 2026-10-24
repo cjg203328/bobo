@@ -17,7 +17,7 @@ export function AppWorkspaceShell({ children }: { children: ReactNode }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
     const [mobileSidebarExpanded, setMobileSidebarExpanded] = useState(false);
-    const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(readWorkspaceSidebarCollapsed);
+    const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(() => pathname === "/" || readWorkspaceSidebarCollapsed());
     const [paletteOpen, setPaletteOpen] = useState(false);
     const sessionHydrated = useUserStore((state) => state.hydrated);
     const storageMode = useUserStore((state) => state.storageMode);
@@ -68,6 +68,13 @@ export function AppWorkspaceShell({ children }: { children: ReactNode }) {
         window.addEventListener("keydown", handler);
         return () => window.removeEventListener("keydown", handler);
     }, []);
+
+    useEffect(() => {
+        if (pathname === "/") {
+            setDesktopSidebarCollapsed(true);
+            writeWorkspaceSidebarCollapsed(true);
+        }
+    }, [pathname]);
 
     useEffect(() => {
         const handleWorkspaceNavigation = (rawEvent: Event) => {

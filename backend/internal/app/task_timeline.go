@@ -40,15 +40,15 @@ func (w *taskWorkerCoordinator) processTimelineTranscription(task *model.Task, c
 			return w.failTimelineTask(task, "转写已中断", "上次云端转写结果未确认，未重复提交。请检查原任务和用量后重新创建转写")
 		}
 		if s.beefAPI == nil {
-			return w.failTimelineTask(task, "转写失败", "请先连接 Huabu")
+			return w.failTimelineTask(task, "转写失败", "请先连接官方算力")
 		}
 		cred, err := s.beefAPI.Resolve()
 		if err != nil || input.ManagedTokenID == "" || cred.TokenID != input.ManagedTokenID {
-			return w.failTimelineTask(task, "转写失败", "Huabu 连接已改变，请重新提交转写")
+			return w.failTimelineTask(task, "转写失败", "官方算力连接已改变，请重新提交转写")
 		}
 		executor.Client = transcription.NewClient(cred.BaseURL)
 		if _, err := outbound.ValidateOutboundURL(cred.BaseURL); err != nil {
-			return w.failTimelineTask(task, "转写失败", "云端转写地址不可用，请重新连接 Huabu")
+			return w.failTimelineTask(task, "转写失败", "云端转写地址不可用，请重新连接官方算力")
 		}
 		executor.Client.HTTP = outbound.OutboundHTTPClient(20 * time.Minute)
 		executor.Client.Model, executor.Client.APIKey = input.Model, cred.APIKey
@@ -113,7 +113,7 @@ func (s *Service) CreateTimelineTranscriptionTask(userID string, req TimelineTra
 
 func (s *Service) bindTranscriptionModel(modelID string) (string, error) {
 	if s.beefAPI == nil {
-		return "", BadAuthRequest("请先连接 Huabu")
+		return "", BadAuthRequest("请先连接官方算力")
 	}
 	cred, err := s.beefAPI.Resolve()
 	if err != nil {
@@ -140,7 +140,7 @@ func (s *Service) bindTranscriptionModel(modelID string) (string, error) {
 	}
 	next, err := s.beefAPI.Resolve()
 	if err != nil || next.TokenID != cred.TokenID || next.AccountID != cred.AccountID {
-		return "", BadAuthRequest("Huabu 连接已改变，请重新提交转写")
+		return "", BadAuthRequest("官方算力连接已改变，请重新提交转写")
 	}
 	return cred.TokenID, nil
 }

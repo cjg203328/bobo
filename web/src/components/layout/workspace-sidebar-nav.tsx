@@ -262,8 +262,9 @@ export function WorkspaceSidebarNav({ collapsed, onNavigate, onOpenSearch, onExp
     const { groups, footer } = useMemo(() => buildNav(features), [features]);
 
     const rawSlug = pathname.split("/").filter(Boolean)[0] || "home";
-    // `/project` is the LibTV-compatible alias for the existing canvas library route.
-    const slug = rawSlug === "project" ? "canvas" : rawSlug;
+    // `/project` 是 LibTV 兼容别名，`/projects` 是项目库主路由，`/projects/:id` 是项目详情；
+    // 三者同属侧栏的「画布」入口，不归一化会让这三个路由在导航里全部丢高亮。
+    const slug = rawSlug === "project" || rawSlug === "projects" ? "canvas" : rawSlug;
     const section = searchParams.get("section");
     const activeId = slug === "settings" && section ? `settings:${section}` : slug;
 

@@ -368,3 +368,195 @@
     .huabu-agent-launcher { border-radius: 20px; }
     .huabu-agent-tools-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
 }
+
+/* Home composition: an Agent-first workbench with the lighter content rhythm
+   of a skill browser. The shared workspace shell keeps ownership of the rail;
+   this page owns the content hierarchy and its glass surfaces. */
+.huabu-home {
+    align-items: stretch;
+    gap: 30px;
+    padding: 30px clamp(20px, 4vw, 64px) 56px;
+    background:
+        radial-gradient(circle at 72% 0%, color-mix(in srgb, var(--home-accent-blue) 9%, transparent), transparent 34%),
+        radial-gradient(circle at 20% 18%, color-mix(in srgb, var(--home-accent) 7%, transparent), transparent 28%),
+        var(--user-page-bg);
+}
+
+.huabu-home-header,
+.huabu-home-section,
+.huabu-agent-launcher { box-sizing: border-box; width: min(1180px, 100%); margin-inline: auto; }
+
+.huabu-home-header { min-height: 46px; }
+.huabu-home-heading > span { letter-spacing: .02em; text-transform: uppercase; }
+/* 首页只保留 hero 一个主标题，顶部这块降级为定位说明，避免两套标题互相抢焦点。 */
+.huabu-home-heading h1 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: var(--user-ink-muted); }
+.huabu-home-header-actions { display: flex; align-items: center; gap: 10px; }
+.huabu-home-search {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--home-hairline);
+    border-radius: 12px;
+    padding: 0 13px;
+    background: color-mix(in srgb, var(--user-surface) 66%, transparent);
+    color: var(--user-ink-muted);
+    font-size: 12px;
+    text-decoration: none;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+.huabu-home-search svg { width: 15px; height: 15px; }
+.huabu-home-search:hover { border-color: color-mix(in srgb, var(--home-accent) 56%, var(--home-hairline)); background: var(--user-surface-hover); color: var(--user-ink); }
+
+.huabu-agent-launcher {
+    max-width: 1180px;
+    gap: 14px;
+    border-radius: 24px;
+    padding: clamp(20px, 3vw, 32px);
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--home-accent) 10%, var(--user-surface)) 0%, color-mix(in srgb, var(--user-surface) 92%, transparent) 50%, color-mix(in srgb, var(--home-accent-blue) 8%, var(--user-surface)) 100%);
+    background-color: var(--user-surface);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 48%, transparent), 0 22px 60px color-mix(in srgb, var(--user-ink) 9%, transparent);
+}
+.huabu-agent-launcher-topline { display: flex; min-height: 24px; align-items: center; justify-content: center; gap: 12px; }
+.huabu-agent-launcher-label { display: inline-flex; align-items: center; gap: 7px; color: var(--home-accent); font-size: 12px; font-weight: 650; }
+.huabu-agent-launcher-label svg { width: 15px; height: 15px; stroke-width: 2; }
+.huabu-agent-launcher-topline > .huabu-agent-state { color: var(--user-ink-soft); }
+.huabu-agent-heading { align-items: center; gap: 8px; text-align: center; }
+.huabu-agent-heading-meta { display: none; }
+.huabu-agent-heading h2 { max-width: 760px; font-size: clamp(25px, 4vw, 40px); letter-spacing: -.04em; }
+.huabu-agent-heading p { max-width: 700px; margin-inline: auto; font-size: 14px; }
+.huabu-agent-intake { border-radius: 20px; background: color-mix(in srgb, var(--home-glass-strong) 84%, transparent); }
+.huabu-agent-intake textarea { min-height: 122px; padding: 20px 20px 12px; font-size: 15px; }
+.huabu-agent-intake-footer { min-height: 62px; padding: 8px 12px 12px 16px; }
+.huabu-agent-input-tools { display: flex; min-width: 0; align-items: center; gap: 6px; }
+.huabu-agent-input-tools button,
+.huabu-agent-input-tools a {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 0 8px;
+    background: transparent;
+    color: var(--user-ink-muted);
+    font: inherit;
+    font-size: 11px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.huabu-agent-input-tools button svg,
+.huabu-agent-input-tools a svg { width: 14px; height: 14px; }
+.huabu-agent-input-tools button:hover,
+.huabu-agent-input-tools a:hover { border-color: var(--home-hairline); background: color-mix(in srgb, var(--user-ink) 6%, transparent); color: var(--user-ink); }
+.huabu-agent-input-tools small { margin-left: 5px; color: var(--user-ink-soft); font-size: 10px; white-space: nowrap; }
+.huabu-agent-intake-footer > button { min-height: 40px; border-radius: 12px; padding-inline: 15px; font-size: 12px; }
+.huabu-agent-quick-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.huabu-agent-quick-action { min-width: 104px; min-height: 82px; flex-direction: column; justify-content: center; gap: 8px; border-color: transparent; border-radius: 14px; padding: 12px 10px; background: transparent; text-align: center; }
+.huabu-agent-quick-action:hover { border-color: transparent; background: color-mix(in srgb, var(--user-ink) 5%, transparent); }
+.huabu-agent-quick-action > svg { width: 22px; height: 22px; flex: 0 0 22px; stroke-width: 1.6; }
+.huabu-agent-quick-action span { align-items: center; }
+.huabu-agent-quick-action strong { font-size: 12px; }
+.huabu-agent-quick-action small { font-size: 10px; }
+
+.huabu-section-heading { min-height: 34px; }
+.huabu-section-heading-with-tabs { align-items: flex-end; }
+.huabu-section-heading h2 { font-size: 17px; letter-spacing: -.02em; }
+.huabu-section-kicker { display: block; margin-bottom: 2px; color: var(--home-accent); font-family: var(--font-mono, ui-monospace, monospace); font-size: 10px; line-height: 15px; letter-spacing: .08em; text-transform: uppercase; }
+.huabu-scene-filters { display: flex; align-items: center; gap: 4px; }
+.huabu-scene-filters button { min-height: 26px; border: 0; border-radius: 9999px; padding: 6px 14px; background: transparent; color: var(--user-ink-soft); font: inherit; font-size: 12px; font-weight: 500; line-height: 14px; cursor: pointer; transition: background 140ms ease, color 140ms ease; }
+.huabu-scene-filters button:hover { background: color-mix(in srgb, var(--user-ink) 6%, transparent); color: var(--user-ink); }
+.huabu-scene-filters button.is-active { background: color-mix(in srgb, var(--home-accent) 13%, var(--user-surface)); color: var(--home-accent); font-weight: 650; }
+
+.huabu-scenes { gap: 14px; }
+.huabu-scenes .huabu-agent-workflows { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.huabu-agent-workflow {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    min-height: 178px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    gap: 10px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--user-ink) 7%, transparent);
+    border-radius: 16px;
+    padding: 12px;
+    background: var(--user-surface);
+    box-shadow: 0 2px 5px color-mix(in srgb, var(--user-ink) 5%, transparent);
+}
+/* 封面区替代原先的渐变遮罩带：参考站用真实缩略图，这里用同尺寸色块承担视觉锚点。 */
+.huabu-agent-workflow::before { display: none; }
+.huabu-agent-workflow[data-workflow="product-visual"]::before { background: none; }
+.huabu-agent-workflow[data-workflow="social-content"]::before { background: none; }
+.huabu-agent-workflow[data-workflow="short-video"]::before { background: none; }
+.huabu-agent-workflow:hover,
+.huabu-agent-workflow[aria-pressed="true"] { transform: translateY(-2px); border-color: color-mix(in srgb, var(--user-ink) 14%, transparent); background: var(--user-surface); box-shadow: 0 8px 22px color-mix(in srgb, var(--user-ink) 9%, transparent); }
+.huabu-agent-workflow-art { position: relative; z-index: 1; display: grid; width: 100%; height: 88px; flex: 0 0 88px; place-items: center; border-radius: 11px; background: color-mix(in srgb, var(--user-ink) 4%, var(--user-surface)); color: var(--home-accent); }
+.huabu-agent-workflow-art svg { width: 22px; height: 22px; stroke-width: 1.6; }
+.huabu-agent-workflow[data-workflow="product-visual"] .huabu-agent-workflow-art { background: linear-gradient(150deg, color-mix(in srgb, #d6a35c 20%, var(--user-surface)), color-mix(in srgb, #d6a35c 5%, var(--user-surface))); }
+.huabu-agent-workflow[data-workflow="social-content"] .huabu-agent-workflow-art { background: linear-gradient(150deg, color-mix(in srgb, #719edc 20%, var(--user-surface)), color-mix(in srgb, #719edc 5%, var(--user-surface))); color: var(--home-accent-blue); }
+.huabu-agent-workflow[data-workflow="short-video"] .huabu-agent-workflow-art { background: linear-gradient(150deg, color-mix(in srgb, #c77c9e 20%, var(--user-surface)), color-mix(in srgb, #c77c9e 5%, var(--user-surface))); color: var(--home-accent-rose); }
+.huabu-agent-workflow[data-workflow="social-content"] .huabu-agent-workflow-art { color: var(--home-accent-blue); }
+.huabu-agent-workflow[data-workflow="short-video"] .huabu-agent-workflow-art { color: var(--home-accent-rose); }
+.huabu-agent-workflow-copy { position: relative; z-index: 1; display: flex; min-width: 0; flex-direction: column; gap: 2px; padding-right: 22px; }
+.huabu-agent-workflow-copy small { color: var(--user-ink-soft); font-size: 10px; line-height: 15px; }
+.huabu-agent-workflow-copy strong { overflow: hidden; color: var(--user-ink); font-size: 13px; font-weight: 650; line-height: 19px; text-overflow: ellipsis; white-space: nowrap; }
+.huabu-agent-workflow-copy > span { overflow: hidden; color: var(--user-ink-muted); font-size: 11px; line-height: 17px; text-overflow: ellipsis; white-space: nowrap; }
+.huabu-agent-workflow > svg { position: absolute; right: 14px; bottom: 20px; z-index: 1; width: 15px; height: 15px; color: var(--user-ink-soft); transition: transform 150ms ease, color 150ms ease; }
+.huabu-agent-workflow:hover > svg { transform: translateX(3px); color: var(--home-accent); }
+
+.huabu-skills { gap: 13px; }
+.huabu-skills .huabu-agent-tools { gap: 10px; }
+.huabu-agent-tools-heading { min-height: 18px; }
+.huabu-agent-tools-grid { gap: 10px; }
+.huabu-agent-tool { min-height: 76px; border-radius: 16px; padding: 12px 13px; background: var(--user-surface); }
+.huabu-agent-tool strong { font-size: 13px; }
+.huabu-agent-tool small { font-size: 10px; }
+.huabu-agent-tool-icon { width: 34px; height: 34px; border-radius: 11px; }
+.huabu-agent-tool-icon svg { width: 16px; height: 16px; }
+
+.huabu-modules { gap: 13px; }
+.huabu-modules .huabu-module-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.huabu-modules .huabu-module-link { min-height: 74px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 7px; border-radius: 15px; padding: 12px; font-size: 12px; }
+.huabu-modules .huabu-module-icon { width: 30px; height: 30px; flex-basis: 30px; border-radius: 10px; }
+.huabu-modules .huabu-module-arrow { display: none; }
+
+.huabu-recents { gap: 13px; }
+.huabu-recent-grid { gap: 12px; }
+.huabu-recent-card { border-radius: 16px; background: var(--user-surface); }
+.huabu-recent-copy { padding: 10px 12px; }
+
+@media (max-width: 980px) {
+    .huabu-modules .huabu-module-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+    .huabu-home { gap: 24px; padding: 20px 16px 36px; }
+    .huabu-home-header { align-items: flex-start; }
+    .huabu-home-header-actions { flex-direction: column; align-items: flex-end; gap: 6px; }
+    .huabu-home-search span { display: none; }
+    .huabu-home-search { min-height: 36px; padding: 0 10px; }
+    .huabu-agent-launcher { gap: 16px; padding: 20px; }
+    .huabu-agent-launcher-topline { align-items: flex-start; flex-direction: column; gap: 4px; }
+    .huabu-agent-heading h2 { font-size: 27px; }
+    .huabu-agent-intake textarea { min-height: 112px; }
+    .huabu-agent-input-tools small { display: none; }
+    .huabu-scenes .huabu-agent-workflows { grid-template-columns: 1fr; }
+    .huabu-agent-workflow { min-height: 98px; }
+    .huabu-section-heading-with-tabs { align-items: flex-start; flex-direction: column; gap: 9px; }
+    .huabu-modules .huabu-module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 400px) {
+    .huabu-home-header-actions { gap: 4px; }
+    .huabu-home-secondary-action { min-height: 36px; }
+    .huabu-agent-launcher { padding: 16px; }
+    .huabu-agent-intake-footer { align-items: flex-end; }
+    .huabu-agent-input-tools button span,
+    .huabu-agent-input-tools a span { display: none; }
+    .huabu-agent-intake-footer > button { padding-inline: 12px; }
+}

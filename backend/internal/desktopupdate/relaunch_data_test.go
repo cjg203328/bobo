@@ -12,8 +12,8 @@ import (
 
 func TestRelaunchPreservesDataDirectoryAsOneArgument(t *testing.T) {
 	dir := t.TempDir()
-	target := filepath.Join(dir, "Huabu.app")
-	exe := filepath.Join(target, "Contents", "MacOS", "Huabu")
+	target := filepath.Join(dir, "Bobo.app")
+	exe := filepath.Join(target, "Contents", "MacOS", "Bobo")
 	output := filepath.Join(dir, "arguments")
 	if err := os.MkdirAll(filepath.Dir(exe), 0700); err != nil {
 		t.Fatal(err)

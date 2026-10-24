@@ -6,7 +6,7 @@
 !include "FileFunc.nsh"
 ${StrStr}
 ${UnStrStr}
-Name "Huabu"
+Name "波波 AI 画布"
 OutFile "${OUTPUT}"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
@@ -28,10 +28,10 @@ Var MoveError
 Var MoveAttempt
 Var OldMoved
 VIProductVersion "${VERSION}.0"
-VIAddVersionKey "ProductName" "Huabu"
+VIAddVersionKey "ProductName" "波波 AI 画布"
 VIAddVersionKey "FileVersion" "${VERSION}"
-VIAddVersionKey "FileDescription" "Huabu Setup"
-VIAddVersionKey "LegalCopyright" "Huabu"
+VIAddVersionKey "FileDescription" "波波 AI 画布 安装程序"
+VIAddVersionKey "LegalCopyright" "波波 AI 画布"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirectoryPageLeave
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -42,14 +42,14 @@ VIAddVersionKey "LegalCopyright" "Huabu"
 !insertmacro MUI_LANGUAGE "English"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 
-LangString HUABU_DIR_FOREIGN ${LANG_ENGLISH} "This folder already holds other files and is not a Huabu installation. Choose an empty folder or the current Huabu location."
-LangString HUABU_DIR_FOREIGN ${LANG_SIMPCHINESE} "这个文件夹里已有其他文件，不是 Huabu 安装位置。请选择一个空文件夹，或当前的 Huabu 安装位置。"
-LangString HUABU_DIR_WRITE ${LANG_ENGLISH} "Huabu cannot write here. Administrator rights are required, so choose another folder."
+LangString HUABU_DIR_FOREIGN ${LANG_ENGLISH} "This folder already holds other files and is not a Bobo AI Canvas installation. Choose an empty folder or the current installation location."
+LangString HUABU_DIR_FOREIGN ${LANG_SIMPCHINESE} "这个文件夹里已有其他文件，不是波波 AI 画布安装位置。请选择一个空文件夹，或当前的安装位置。"
+LangString HUABU_DIR_WRITE ${LANG_ENGLISH} "Bobo AI Canvas cannot write here. Administrator rights are required, so choose another folder."
 LangString HUABU_DIR_WRITE ${LANG_SIMPCHINESE} "需要管理员权限，请选择其他文件夹。"
-LangString HUABU_BUSY ${LANG_ENGLISH} "Another Huabu installer or uninstaller is running. Close it and try again."
-LangString HUABU_BUSY ${LANG_SIMPCHINESE} "另一个 Huabu 安装或卸载程序正在运行。请先关闭它，再试一次。"
-LangString HUABU_CLOSE ${LANG_ENGLISH} "Please close Huabu and its CLI, then choose Retry."
-LangString HUABU_CLOSE ${LANG_SIMPCHINESE} "请退出 Huabu 及其命令行程序，然后点击“重试”。"
+LangString HUABU_BUSY ${LANG_ENGLISH} "Another Bobo AI Canvas installer or uninstaller is running. Close it and try again."
+LangString HUABU_BUSY ${LANG_SIMPCHINESE} "另一个波波 AI 画布安装或卸载程序正在运行。请先关闭它，再试一次。"
+LangString HUABU_CLOSE ${LANG_ENGLISH} "Please close Bobo AI Canvas and its CLI, then choose Retry."
+LangString HUABU_CLOSE ${LANG_SIMPCHINESE} "请退出波波 AI 画布及其命令行程序，然后点击“重试”。"
 LangString HUABU_RETRY ${LANG_ENGLISH} "Windows could not move this application folder (error $MoveError):$\r$\n$MoveFrom$\r$\n$\r$\nClose programs or terminal windows using it, then choose Retry. Cancel stops this installation.$\r$\nLog: $InstallLog"
 LangString HUABU_RETRY ${LANG_SIMPCHINESE} "Windows 无法移动以下程序文件夹（错误 $MoveError）：$\r$\n$MoveFrom$\r$\n$\r$\n请关闭正在使用它的程序或终端窗口，然后点击“重试”。点击“取消”将停止安装。$\r$\n安装日志：$InstallLog"
 LangString HUABU_PRESERVED ${LANG_ENGLISH} "Installation stopped. The previous application is still at $INSTDIR. Your projects are preserved.$\r$\nLog: $InstallLog"
@@ -145,11 +145,12 @@ Function PrepareInstallDir
       StrCpy $1 "$1\Huabu"
     ${EndIf}
   ${EndIf}
-  # An existing final folder is only reused when it is a previous Huabu
-  # install (or portable Huabu directory) or empty.
+  # An existing final folder is only reused when it is a previous Huabu install,
+  # a Bobo install, or empty. Both executable names count during the rename window.
   StrCpy $5 ""
   ${If} ${FileExists} "$1\*.*"
     ${IfNot} ${FileExists} "$1\.installed-root-files.txt"
+    ${AndIfNot} ${FileExists} "$1\Bobo.exe"
     ${AndIfNot} ${FileExists} "$1\Huabu.exe"
       StrCpy $3 ""
       FindFirst $2 $4 "$1\*"
@@ -216,14 +217,30 @@ Function ${PREFIX}RequireClosed
   retry_closed_${PREFIX}:
   StrCpy $3 0
   check_closed_${PREFIX}:
-  nsExec::ExecToStack '"$SYSDIR\tasklist.exe" /FI "IMAGENAME eq Huabu.exe" /NH'
+  # Read the complete process list so both the renamed Bobo executable and
+  # the legacy Huabu executable are covered by the same close gate.
+  nsExec::ExecToStack '"$SYSDIR\tasklist.exe" /NH'
   Pop $0
   Pop $1
 !if "${PREFIX}" == "un."
-  ${UnStrStr} $2 $1 "Huabu.exe"
+  ${UnStrStr} $2 $1 "Bobo.exe"
 !else
-  ${StrStr} $2 $1 "Huabu.exe"
+  ${StrStr} $2 $1 "Bobo.exe"
 !endif
+  ${If} $2 == ""
+!if "${PREFIX}" == "un."
+    ${UnStrStr} $2 $1 "bobo.exe"
+!else
+    ${StrStr} $2 $1 "bobo.exe"
+!endif
+  ${EndIf}
+  ${If} $2 == ""
+!if "${PREFIX}" == "un."
+    ${UnStrStr} $2 $1 "Huabu.exe"
+!else
+    ${StrStr} $2 $1 "Huabu.exe"
+!endif
+  ${EndIf}
   ${If} $2 == ""
 !if "${PREFIX}" == "un."
     ${UnStrStr} $2 $1 "huabu.exe"
@@ -241,8 +258,10 @@ Function ${PREFIX}RequireClosed
   ${EndIf}
   IntOp $3 $3 + 1
   ${If} $3 == 1
-    # Ask Huabu's main window to close cleanly first so SQLite and WebView2
+    # Ask the main window to close cleanly first so SQLite and WebView2
     # flush state before exiting.
+    nsExec::Exec '"$SYSDIR\taskkill.exe" /IM Bobo.exe'
+    Pop $0
     nsExec::Exec '"$SYSDIR\taskkill.exe" /IM Huabu.exe'
     Pop $0
     Sleep 500
@@ -251,7 +270,9 @@ Function ${PREFIX}RequireClosed
     Sleep 500
     Goto check_closed_${PREFIX}
   ${ElseIf} $3 == 11
-    # Force-terminate any remaining Huabu or CLI process tree.
+    # Force-terminate any remaining app or CLI process tree.
+    nsExec::Exec '"$SYSDIR\taskkill.exe" /F /IM Bobo.exe /T'
+    Pop $0
     nsExec::Exec '"$SYSDIR\taskkill.exe" /F /IM Huabu.exe /T'
     Pop $0
     nsExec::Exec '"$SYSDIR\taskkill.exe" /F /IM huabu.exe /T'
@@ -302,6 +323,7 @@ Function ${PREFIX}RemovePayload
     done_${PREFIX}:
     FileClose $0
   ${EndIf}
+  Delete "$CleanDir\Bobo.exe"
   Delete "$CleanDir\Huabu.exe"
   Delete "$CleanDir\.installed-root-files.txt"
   Delete "$CleanDir\Uninstall.exe"
@@ -359,7 +381,7 @@ Function .onInstFailed
   Call WriteInstallLog
 FunctionEnd
 
-Section "Huabu (required)" SEC_APP
+Section "波波 AI 画布（必需）" SEC_APP
   SectionIn RO
   Call RequireClosed
   StrCpy $InstallPhase "prepare"
@@ -471,11 +493,15 @@ Section "Huabu (required)" SEC_APP
   Abort
   install_registered:
   SetOutPath "$INSTDIR"
-  CreateDirectory "$SMPROGRAMS\Huabu"
-  CreateShortcut "$SMPROGRAMS\Huabu\Huabu.lnk" "$INSTDIR\Huabu.exe"
-  CreateShortcut "$SMPROGRAMS\Huabu\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  CreateShortcut "$DESKTOP\Huabu.lnk" "$INSTDIR\Huabu.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu" "DisplayName" "Huabu"
+  Delete "$DESKTOP\Huabu.lnk"
+  Delete "$SMPROGRAMS\Huabu\Huabu.lnk"
+  Delete "$SMPROGRAMS\Huabu\Uninstall.lnk"
+  RMDir "$SMPROGRAMS\Huabu"
+  CreateDirectory "$SMPROGRAMS\波波 AI 画布"
+  CreateShortcut "$SMPROGRAMS\波波 AI 画布\波波 AI 画布.lnk" "$INSTDIR\Huabu.exe"
+  CreateShortcut "$SMPROGRAMS\波波 AI 画布\波波 AI 画布 卸载.lnk" "$INSTDIR\Uninstall.exe"
+  CreateShortcut "$DESKTOP\波波 AI 画布.lnk" "$INSTDIR\Huabu.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu" "DisplayName" "波波 AI 画布"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu" "QuietUninstallString" '$\"$INSTDIR\Uninstall.exe$\" /S'
@@ -512,6 +538,10 @@ Section "Uninstall"
   # or remove shortcuts for the current installation.
   ReadRegStr $RegisteredInstallDir HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu" "InstallLocation"
   ${If} $RegisteredInstallDir == $INSTDIR
+    Delete "$DESKTOP\波波 AI 画布.lnk"
+    Delete "$SMPROGRAMS\波波 AI 画布\波波 AI 画布.lnk"
+    Delete "$SMPROGRAMS\波波 AI 画布\波波 AI 画布 卸载.lnk"
+    RMDir "$SMPROGRAMS\波波 AI 画布"
     Delete "$DESKTOP\Huabu.lnk"
     Delete "$SMPROGRAMS\Huabu\Huabu.lnk"
     Delete "$SMPROGRAMS\Huabu\Uninstall.lnk"

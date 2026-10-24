@@ -70,6 +70,24 @@ describe("desktop release build contract", () => {
         expect(script).toContain('"$ROOT_DIR/plugin-packages/"*.beeftv-plugin');
     });
 
+    test("routes Bun production builds through the bounded compiler runner", () => {
+        const packageJson = JSON.parse(readFileSync(resolve(root, "web/package.json"), "utf8")) as {
+            scripts?: Record<string, string>;
+        };
+        const runnerPath = resolve(root, "scripts/run-bun-build-safe.mjs");
+        const runner = readFileSync(runnerPath, "utf8");
+        expect(existsSync(runnerPath)).toBe(true);
+        expect(packageJson.scripts?.build).toContain("run-bun-build-safe.mjs");
+        expect(packageJson.scripts?.["build:desktop"]).toContain("run-bun-build-safe.mjs");
+        expect(packageJson.scripts?.build).toContain("run-bun-build-safe.mjs -- run tsc --noEmit");
+        expect(packageJson.scripts?.["build:desktop"]).toContain("run-bun-build-safe.mjs -- run tsc --noEmit");
+        expect(runner).toContain("--smol");
+        expect(runner).toContain("BOBO_BUILD_MAX_RSS_MB");
+        expect(runner).toContain("BOBO_BUILD_TIMEOUT_MS");
+        expect(runner).toContain("taskkill.exe");
+        expect(runner).toContain("Another Bobo build is already running");
+    });
+
     test("keeps every source file required by the local release gate", () => {
         const gate = readFileSync(resolve(root, "scripts/verify-huabu-local-release.sh"), "utf8");
         const exporter = readFileSync(resolve(root, "scripts/public-release-export.sh"), "utf8");

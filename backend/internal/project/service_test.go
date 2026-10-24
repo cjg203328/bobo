@@ -78,7 +78,20 @@ func newTestService(t *testing.T, workflows Workflows) (*Service, *gorm.DB) {
 		&model.WorkflowStepTask{},
 		&model.ProductionTaskLink{},
 		&model.AgentOpRecord{},
+		&model.Tenant{},
+		&model.TenantMembership{},
 	); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&model.Tenant{
+		ID: "tn_test", Name: "测试空间", Kind: "personal",
+		Status: model.TenantStatusActive, OwnerUserID: "user-1",
+	}).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&model.TenantMembership{
+		TenantID: "tn_test", UserID: "user-1", Role: model.TenantRoleOwner,
+	}).Error; err != nil {
 		t.Fatal(err)
 	}
 	return New(repository.New(db), Dependencies{Workflows: workflows}), db
@@ -116,10 +129,10 @@ func seedProject(t *testing.T, db *gorm.DB, project model.Project) model.Project
 
 func TestServiceRejectsInvalidProjectRevision(t *testing.T) {
 	svc, db := newTestService(t, nil)
-	if err := db.Create(&model.Project{ID: "p", UserID: "local", Name: "无修订", Status: model.ProjectStatusActive, Revision: 0}).Error; err != nil {
+	if err := db.Create(&model.Project{ID: "p", TenantID: "tn_test", UserID: "local", Name: "无修订", Status: model.ProjectStatusActive, Revision: 0}).Error; err != nil {
 		t.Fatal(err)
 	}
-	if _, err := svc.ListProjects("local"); err == nil {
+	if _, err := svc.ListProjects("tn_test"); err == nil {
 		t.Fatal("project without a durable revision was accepted")
 	}
 }
@@ -314,22 +327,32 @@ func TestDuplicateProjectPreservesUnitContents(t *testing.T) {
 	}
 }
 
-func TestListProjectsIsolatesUsersAndCountsUnits(t *testing.T) {
+// 可见性边界是租户，不是创建者：同一租户内协作者的项目都要出现，跨租户一条都不能漏。
+func TestListProjectsScopesByTenantAndCountsUnits(t *testing.T) {
 	svc, db := newTestService(t, nil)
-	mine := seedProject(t, db, model.Project{ID: "mine", UserID: "user-1", Name: "我的"})
-	seedProject(t, db, model.Project{ID: "theirs", UserID: "user-2", Name: "别人的"})
+	mine := seedProject(t, db, model.Project{ID: "mine", TenantID: "tn_test", UserID: "user-1", Name: "我的"})
+	seedProject(t, db, model.Project{ID: "teammate", TenantID: "tn_test", UserID: "user-2", Name: "同空间协作者"})
+	seedProject(t, db, model.Project{ID: "foreign", TenantID: "tn_other", UserID: "user-3", Name: "别家"})
 	if err := db.Create(&model.ProjectUnit{ID: "u1", ProjectID: mine.ID, Title: "一", Status: model.ProjectUnitStatusCompleted}).Error; err != nil {
 		t.Fatal(err)
 	}
 	if err := db.Create(&model.ProjectUnit{ID: "u2", ProjectID: mine.ID, Title: "二", Status: model.ProjectUnitStatusDraft}).Error; err != nil {
 		t.Fatal(err)
 	}
-	listed, err := svc.ListProjects("user-1")
+	listed, err := svc.ListProjects("tn_test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(listed) != 1 || listed[0].Project.ID != mine.ID || listed[0].UnitCount != 2 || listed[0].CompletedUnitCount != 1 {
+	if len(listed) != 2 {
 		t.Fatalf("listed = %+v", listed)
+	}
+	for _, item := range listed {
+		if item.Project.TenantID != "tn_test" {
+			t.Fatalf("cross tenant project leaked: %s", item.Project.ID)
+		}
+		if item.Project.ID == mine.ID && (item.UnitCount != 2 || item.CompletedUnitCount != 1) {
+			t.Fatalf("unit counts = %+v", item)
+		}
 	}
 }
 
@@ -576,4 +599,69 @@ func TestUnitOperationsStayInsideOwnedProject(t *testing.T) {
 func fmtString(value any) string {
 	text, _ := value.(string)
 	return text
+}
+
+// 可见不等于可写：viewer 能读项目，但任何写入口都必须被挡。
+func TestActiveRejectsViewerAndAllowsMember(t *testing.T) {
+	svc, db := newTestService(t, nil)
+	for _, member := range []model.TenantMembership{
+		{TenantID: "tn_test", UserID: "viewer-1", Role: model.TenantRoleViewer},
+		{TenantID: "tn_test", UserID: "member-1", Role: model.TenantRoleMember},
+		{TenantID: "tn_test", UserID: "admin-1", Role: model.TenantRoleAdmin},
+	} {
+		value := member
+		if err := db.Create(&value).Error; err != nil {
+			t.Fatal(err)
+		}
+	}
+	project := seedProject(t, db, model.Project{ID: "shared-project", TenantID: "tn_test", UserID: "user-1", Name: "共享项目"})
+
+	if _, err := svc.Owned("viewer-1", project.ID); err != nil {
+		t.Fatalf("viewer must still be able to read: %v", err)
+	}
+	if _, err := svc.Active("viewer-1", project.ID); err == nil {
+		t.Fatal("viewer passed the write gate")
+	}
+	for _, userID := range []string{"member-1", "admin-1", "user-1"} {
+		if _, err := svc.Active(userID, project.ID); err != nil {
+			t.Fatalf("%s should write the project: %v", userID, err)
+		}
+	}
+}
+
+// 角色闸门必须真的拦住写操作，而不只是拦一个探测方法。
+func TestViewerCannotMutateProject(t *testing.T) {
+	svc, db := newTestService(t, nil)
+	if err := db.Create(&model.TenantMembership{
+		TenantID: "tn_test", UserID: "viewer-1", Role: model.TenantRoleViewer,
+	}).Error; err != nil {
+		t.Fatal(err)
+	}
+	project := seedProject(t, db, model.Project{ID: "shared-project", TenantID: "tn_test", UserID: "user-1", Name: "共享项目"})
+
+	if _, err := svc.CreateProjectUnit("viewer-1", project.ID, CreateProjectUnitRequest{Title: "越权章"}); err == nil {
+		t.Fatal("viewer created a project unit")
+	}
+	if _, err := svc.CreateProjectAssetFolder("viewer-1", project.ID, CreateProjectAssetFolderRequest{Name: "越权目录"}); err == nil {
+		t.Fatal("viewer created an asset folder")
+	}
+	if _, err := svc.CreateUnitWorkflow("viewer-1", project.ID, "any-unit"); err == nil {
+		t.Fatal("viewer created a workflow")
+	}
+	var units int64
+	if err := db.Model(&model.ProjectUnit{}).Where("project_id = ?", project.ID).Count(&units).Error; err != nil {
+		t.Fatal(err)
+	}
+	if units != 0 {
+		t.Fatalf("viewer writes leaked %d units", units)
+	}
+}
+
+// 没有租户归属的历史行沿用创建者判定，不做角色校验，也不能因缺成员关系被挡死。
+func TestActiveKeepsLegacyOwnerWriteAccess(t *testing.T) {
+	svc, db := newTestService(t, nil)
+	project := seedProject(t, db, model.Project{ID: "legacy-project", UserID: "user-1", Name: "历史项目"})
+	if _, err := svc.Active("user-1", project.ID); err != nil {
+		t.Fatalf("legacy owner lost write access: %v", err)
+	}
 }

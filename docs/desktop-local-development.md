@@ -1,5 +1,4 @@
 # 波波 AI 画布本地桌面开发与验收
-
 波波 AI 画布桌面版是 Wails 应用：前端运行在 WebView，Go 后端在同一进程内启动一个仅监听 `127.0.0.1` 的 loopback API。桌面 profile 不注册交互式登录路由，首次启动通过 `/api/workspace/bootstrap` 创建或读取本地工作区。现有数据目录名称暂保留 `Huabu`，用于兼容已安装用户。
 
 ## 数据位置

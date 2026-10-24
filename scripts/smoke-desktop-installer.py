@@ -144,6 +144,22 @@ def probe_cache(helper, profile, operation, env, root, cleanup):
         stop(process)
 
 
+def windows_desktop_dir():
+    """Return the desktop folder Windows actually uses.
+
+    %USERPROFILE%\\Desktop is only a default: profiles with a redirected or
+    OneDrive-managed desktop keep the shell folder elsewhere, so asking the
+    shell is the only reliable way to find the shortcut the installer created.
+    """
+    import ctypes
+    from ctypes import wintypes
+    buf = ctypes.create_unicode_buffer(wintypes.MAX_PATH)
+    # CSIDL_DESKTOPDIRECTORY = 0x0010
+    if ctypes.windll.shell32.SHGetFolderPathW(None, 0x0010, None, 0, buf) != 0:
+        return Path(os.environ['USERPROFILE']) / 'Desktop'
+    return Path(buf.value)
+
+
 def build_cache_probe(helper):
     subprocess.run(['go', 'build', '-ldflags=-H=windowsgui', '-o', str(helper), str(Path(__file__).with_name('webview-cache-probe_windows.go').resolve())],
                    cwd=Path(__file__).resolve().parent.parent / 'backend', check=True, timeout=180)
@@ -395,11 +411,13 @@ def smoke(args):
                 import winreg
                 with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu') as key:
                     assert winreg.QueryValueEx(key, 'InstallLocation')[0] == str(installed)
-                menu = Path(os.environ['APPDATA']) / 'Microsoft/Windows/Start Menu/Programs/Huabu'
-                assert (menu / 'Huabu.lnk').is_file()
-                assert (menu / 'Uninstall.lnk').is_file()
-                desktop = Path(os.environ['USERPROFILE']) / 'Desktop/Huabu.lnk'
+                menu = Path(os.environ['APPDATA']) / 'Microsoft/Windows/Start Menu/Programs/波波 AI 画布'
+                assert (menu / '波波 AI 画布.lnk').is_file()
+                assert (menu / '波波 AI 画布 卸载.lnk').is_file()
+                desktop = windows_desktop_dir() / '波波 AI 画布.lnk'
                 assert desktop.is_file()
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Uninstall\Huabu') as key:
+                    assert winreg.QueryValueEx(key, 'DisplayName')[0] == '波波 AI 画布'
             def uninstall():
                 # Normal NSIS uninstall runs a temporary copy so it can delete itself.
                 subprocess.run([str(installed / 'Uninstall.exe'), '/S'], check=True, timeout=90)
@@ -434,7 +452,8 @@ def smoke(args):
                 subprocess.run(['sudo', 'apt-get', 'install', '-y', '--reinstall', str(installer)], check=True, timeout=240)
                 assert (installed / '.package-managed').read_text() == 'deb\n'
                 assert Path('/usr/bin/huabu').resolve() == installed / 'cli/huabu'
-                assert Path('/usr/share/applications/huabu.desktop').is_file()
+                desktop_entry = Path('/usr/share/applications/huabu.desktop').read_text()
+                assert 'Name=波波 AI 画布' in desktop_entry
             def uninstall():
                 subprocess.run(['sudo', 'dpkg', '--remove', 'huabu'], check=True)
                 assert not (installed / relative_exe).exists()

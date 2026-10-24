@@ -1137,29 +1137,22 @@ func (r *Repository) DeleteCanvasProject(userID string, id string) error {
 	})
 }
 
-func (r *Repository) Projects(userID string) ([]model.Project, error) {
-	var projects []model.Project
-	err := r.db.Where("user_id = ?", userID).Order("updated_at desc").Find(&projects).Error
-	return projects, err
-}
-
-func (r *Repository) ProjectsPage(userID string, page int, pageSize int) ([]model.Project, int64, error) {
-	var projects []model.Project
-	var total int64
-	query := r.db.Model(&model.Project{}).Where("user_id = ?", userID)
-	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-	if err := query.Order("updated_at desc").Offset((page - 1) * pageSize).Limit(pageSize).Find(&projects).Error; err != nil {
-		return nil, 0, err
-	}
-	return projects, total, nil
-}
-
+// ProjectForUser 读取用户可访问的项目。可见性由租户成员关系决定，user_id 只是创建者，
+// 因此同空间协作者也能读到；跨租户访问统一返回记录未找到，避免用错误码探测他人项目。
+// 历史上没有租户归属的行退化为创建者精确匹配，不放宽任何权限。
 func (r *Repository) ProjectForUser(userID string, id string) (*model.Project, error) {
 	var project model.Project
-	if err := r.db.First(&project, "id = ? AND user_id = ?", id, userID).Error; err != nil {
+	if err := r.db.First(&project, "id = ?", id).Error; err != nil {
 		return nil, err
+	}
+	if project.TenantID == "" {
+		if project.UserID != userID {
+			return nil, gorm.ErrRecordNotFound
+		}
+		return &project, nil
+	}
+	if _, err := r.Membership(project.TenantID, userID); err != nil {
+		return nil, gorm.ErrRecordNotFound
 	}
 	return &project, nil
 }
@@ -1475,6 +1468,14 @@ func (r *Repository) UpsertCanvasUnitLink(link *model.CanvasUnitLink) error {
 func (r *Repository) ProjectCanvasSummaries(userID string, projectID string) ([]model.CanvasProject, error) {
 	var canvases []model.CanvasProject
 	err := r.db.Select("id", "user_id", "project_id", "title", "revision", "created_at", "updated_at").Where("user_id = ? AND project_id = ?", userID, projectID).Order("updated_at desc").Find(&canvases).Error
+	return canvases, err
+}
+
+// ProjectCanvasSummariesByProject 只按项目查画布，不再附加创建者条件。
+// 调用方必须先完成项目级租户校验，否则这里会成为越权读入口。
+func (r *Repository) ProjectCanvasSummariesByProject(projectID string) ([]model.CanvasProject, error) {
+	var canvases []model.CanvasProject
+	err := r.db.Select("id", "user_id", "project_id", "title", "revision", "created_at", "updated_at").Where("project_id = ?", projectID).Order("updated_at desc").Find(&canvases).Error
 	return canvases, err
 }
 

@@ -36,7 +36,7 @@ func TestHTTPSChildProxyPreservesRedirectBypassAndExplicitDirect(t *testing.T) {
 }
 
 func TestEmptyDesktopProxyEnvironmentUsesSystemSettings(t *testing.T) {
-	for _, name := range []string{"HTTP_PROXY", "http_proxy", "HTTPS_PROXY", "https_proxy"} {
+	for _, name := range []string{"HTTP_PROXY", "http_proxy", "HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy"} {
 		t.Setenv(name, "")
 	}
 	if ExplicitProxyConfigured() {

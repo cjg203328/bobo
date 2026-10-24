@@ -582,6 +582,139 @@ paths:
       responses:
         "200":
           description: 信封 data.stopped=true
+  /tenants:
+    get:
+      tags: [tenants]
+      summary: 当前用户可访问的租户空间
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "401":
+          $ref: "#/components/responses/Error"
+    post:
+      tags: [tenants]
+      summary: 创建租户空间
+      description: kind=personal 创建个人空间，其他值按团队空间处理；创建者成为首位所有者。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                kind: { type: string, enum: [personal, team] }
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "400":
+          $ref: "#/components/responses/Error"
+        "401":
+          $ref: "#/components/responses/Error"
+  /tenants/{tenantId}/scope:
+    get:
+      tags: [tenants]
+      summary: 当前用户在指定租户内的角色与权限
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "403":
+          $ref: "#/components/responses/Error"
+  /tenants/{tenantId}/members:
+    get:
+      tags: [tenants]
+      summary: 租户成员列表
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "403":
+          $ref: "#/components/responses/Error"
+    post:
+      tags: [tenants]
+      summary: 添加租户成员
+      description: 需要成员管理权限；不允许通过该接口直接授予 owner。
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId: { type: string }
+                role: { type: string, enum: [admin, member, viewer] }
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "403":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+  /tenants/{tenantId}/members/{userId}:
+    patch:
+      tags: [tenants]
+      summary: 修改成员角色
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { type: string, enum: [admin, member, viewer] }
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "403":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [tenants]
+      summary: 移除租户成员
+      description: 租户至少保留一名所有者，移除最后一名所有者会被拒绝。
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          $ref: "#/components/responses/Envelope"
+        "403":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
   /openapi.yaml:
     get:
       tags: [meta]

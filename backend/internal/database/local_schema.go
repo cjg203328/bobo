@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const CurrentSchemaVersion int64 = 17
+const CurrentSchemaVersion int64 = 18
 
 type localSchemaMigration struct {
 	Version   int64 `gorm:"primaryKey;autoIncrement:false"`
@@ -92,6 +92,7 @@ func canonicalLocalMigrations() []localMigration {
 		{version: 15, name: "assistant-permission-and-canvas-snapshots", apply: migrateAssistantPermissions},
 		{version: 16, name: "assistant-durable-session-binding", apply: migrateAssistantSessions},
 		{version: 17, name: "tenant-membership", apply: migrateTenantMembership},
+		{version: 18, name: "project-tenant-ownership", apply: migrateProjectTenantID},
 	}
 }
 
@@ -489,7 +490,31 @@ func requireReconciledSchema(db *gorm.DB) error {
 		}
 	}
 	if version >= 17 {
-		return requireTenantSchema(db)
+		if err := requireTenantSchema(db); err != nil {
+			return err
+		}
+	}
+	if version >= 18 {
+		return requireProjectTenantOwnership(db)
+	}
+	return nil
+}
+
+// requireProjectTenantOwnership 校验 v18 的落库结果：列与索引缺一不可，
+// 否则升级看似成功、实际仍按用户 ID 单列判断归属。
+func requireProjectTenantOwnership(db *gorm.DB) error {
+	if !db.Migrator().HasTable(&model.Project{}) {
+		return fmt.Errorf("本地数据库结构缺失表 projects")
+	}
+	has, err := sqliteHasColumn(db, "projects", "tenant_id")
+	if err != nil {
+		return err
+	}
+	if !has {
+		return fmt.Errorf("本地项目表缺失租户归属列 tenant_id")
+	}
+	if !db.Migrator().HasIndex(&model.Project{}, "idx_projects_tenant") {
+		return fmt.Errorf("本地项目表缺失租户归属索引 idx_projects_tenant")
 	}
 	return nil
 }

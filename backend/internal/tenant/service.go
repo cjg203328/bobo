@@ -51,7 +51,9 @@ func (s *Service) Authorize(tenantID, userID string) (Scope, error) {
 	}
 	value, err := s.repo.Tenant(tenantID)
 	if err != nil {
-		return Scope{}, kernel.Unauthorized("租户不存在或无权访问")
+		// 身份已经认证，这里失败的原因只可能是“这个租户不可见”。用 401 会让客户端
+		// 误判成会话过期并清掉登录态，所以统一按越权处理。
+		return Scope{}, kernel.Forbidden("租户不存在或无权访问")
 	}
 	if value.Status != model.TenantStatusActive {
 		return Scope{}, kernel.Forbidden("租户已停用")
@@ -114,6 +116,36 @@ func (s *Service) AddMember(actor Scope, tenantID, userID string, role model.Ten
 	return s.repo.PutMembership(&model.TenantMembership{
 		TenantID: tenantID, UserID: userID, Role: role,
 	})
+}
+
+// UpdateMemberRole 只修改既有成员的角色。新增与修改必须走不同入口，
+// 否则“改角色”会被新增路径的重复检查判成冲突。
+func (s *Service) UpdateMemberRole(actor Scope, tenantID, userID string, role model.TenantRole) error {
+	if err := actor.RequireWrite(func(p model.TenantPermissions) bool { return p.ManageMembers }, "无权管理租户成员"); err != nil {
+		return err
+	}
+	if err := actor.AssertSameTenant(tenantID); err != nil {
+		return err
+	}
+	userID = strings.TrimSpace(userID)
+	if userID == "" {
+		return kernel.BadAuthRequest("成员用户不能为空")
+	}
+	if !model.ValidTenantRole(role) {
+		return kernel.BadAuthRequest("成员角色无效")
+	}
+	if role == model.TenantRoleOwner {
+		return kernel.Forbidden("不允许通过成员接口直接授予所有者")
+	}
+	existing, err := s.repo.Membership(tenantID, userID)
+	if err != nil || existing == nil {
+		return kernel.NotFound("成员不存在")
+	}
+	if existing.Role == model.TenantRoleOwner {
+		return kernel.Forbidden("不允许通过成员接口降级租户所有者")
+	}
+	existing.Role = role
+	return s.repo.PutMembership(existing)
 }
 
 // RemoveMember 拒绝移除最后一名所有者，避免租户失去可管理主体。

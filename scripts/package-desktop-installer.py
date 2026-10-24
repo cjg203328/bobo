@@ -32,7 +32,7 @@ def package(version, platform, payload, output):
             subprocess.run(['ditto', str(payload), str(stage / 'Huabu.app')], check=True)
             (stage / 'Applications').symlink_to('/Applications')
             shutil.copy2(ROOT / 'docs/desktop-install.md', stage / 'Installation.txt')
-            subprocess.run(['hdiutil', 'create', '-volname', 'Huabu', '-srcfolder', str(stage),
+            subprocess.run(['hdiutil', 'create', '-volname', '波波 AI 画布', '-srcfolder', str(stage),
                             '-format', 'UDZO', '-ov', str(output)], check=True)
     elif platform == 'windows-amd64':
         compiler = shutil.which('makensis') or r'C:\Program Files (x86)\NSIS\makensis.exe'
@@ -52,15 +52,15 @@ def package(version, platform, payload, output):
             control.mkdir()
             (control / 'control').write_text(
                 f'Package: huabu\nVersion: {version[1:]}\nArchitecture: amd64\n'
-                'Maintainer: Huabu Contributors <58928515+glanderness@users.noreply.github.com>\n'
-                'Homepage: https://huabu.app\nSection: graphics\nPriority: optional\n'
+                'Maintainer: Bobo AI Canvas Contributors <2667983673@qq.com>\n'
+                'Homepage: https://github.com/cjg203328/bobo\nSection: graphics\nPriority: optional\n'
                 'Depends: libgtk-3-0t64, libwebkit2gtk-4.1-0, gstreamer1.0-plugins-good, '
                 'gstreamer1.0-plugins-bad, gstreamer1.0-libav, ffmpeg, fonts-noto-cjk\n'
-                'Description: Huabu creative workspace (Ubuntu 24.04)\n')
+                'Description: Bobo AI Canvas creative workspace (Ubuntu 24.04)\n')
             applications = stage / 'usr/share/applications'
             applications.mkdir(parents=True)
             (applications / 'huabu.desktop').write_text(
-                '[Desktop Entry]\nType=Application\nName=Huabu\n'
+                '[Desktop Entry]\nType=Application\nName=波波 AI 画布\n'
                 'Exec=/opt/huabu/Huabu-linux/Huabu\nIcon=huabu\n'
                 'Terminal=false\nCategories=Graphics;AudioVideo;\nStartupWMClass=Huabu\n')
             icons = stage / 'usr/share/pixmaps'

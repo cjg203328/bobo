@@ -56,3 +56,25 @@ func backfillPersonalTenant(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+// migrateProjectTenantID 给项目补租户归属列，并把历史行回填到其用户所属的个人空间。
+// 先加列再回填，保证升级库与新建库看到同一套列为准的归属判断。
+func migrateProjectTenantID(tx *gorm.DB) error {
+	if err := tx.AutoMigrate(&model.Project{}); err != nil {
+		return fmt.Errorf("迁移项目租户归属列: %w", err)
+	}
+	var tenantID string
+	if err := tx.Model(&model.TenantMembership{}).
+		Select("tenant_id").Where("role = ?", model.TenantRoleOwner).
+		Order("created_at ASC").Limit(1).Scan(&tenantID).Error; err != nil {
+		return fmt.Errorf("读取回填租户: %w", err)
+	}
+	if tenantID == "" {
+		return nil
+	}
+	if err := tx.Model(&model.Project{}).Where("tenant_id IS NULL OR tenant_id = ?", "").
+		Update("tenant_id", tenantID).Error; err != nil {
+		return fmt.Errorf("回填项目租户归属: %w", err)
+	}
+	return nil
+}

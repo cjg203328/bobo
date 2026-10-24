@@ -111,7 +111,7 @@ func WriteWindowsLayout(root, marker string) error {
 
 func DarwinZipFiles(marker string) (map[string][]byte, map[string]bool) {
 	files := map[string][]byte{
-		"Huabu.app/Contents/MacOS/Huabu":                                     []byte("#!/bin/sh\necho " + marker + "\n"),
+		"Huabu.app/Contents/MacOS/Huabu":                                      []byte("#!/bin/sh\necho " + marker + "\n"),
 		"Huabu.app/Contents/Info.plist":                                       []byte("<plist></plist>"),
 		"Huabu.app/Contents/Resources/plugin-packages/official.beeftv-plugin": []byte("official-" + marker),
 	}
@@ -126,8 +126,8 @@ func DarwinZipFiles(marker string) (map[string][]byte, map[string]bool) {
 
 func WindowsZipFiles(marker string) (map[string][]byte, map[string]bool) {
 	files := map[string][]byte{
-		"Huabu.exe":                             []byte("MZ-" + marker),
-		"cli/huabu.exe":                         []byte("MZ-cli-" + marker),
+		"Bobo.exe":                               []byte("MZ-" + marker),
+		"cli/huabu.exe":                          []byte("MZ-cli-" + marker),
 		"plugin-packages/official.beeftv-plugin": []byte("official-" + marker),
 	}
 	for name, body := range agentFiles("runtime/node.exe", marker) {

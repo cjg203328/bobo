@@ -82,7 +82,6 @@
 .libtv-project-actions:focus-within .libtv-project-more { opacity: 1; pointer-events: auto; }
 .libtv-project-subbar { justify-content: space-between; margin: 18px 0 14px; color: var(--user-ink); font-size: 14px; font-weight: 600; }
 .libtv-project-subbar-actions { color: var(--user-ink-muted); font-size: 12px; font-weight: 400; }
-.app-user-workspace .lib-tv-project-page .canvas-collection-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px 16px; }
 .libtv-create-project-entry { min-width: 0; align-self: start; }
 .libtv-create-project-card { display: flex; min-width: 0; align-self: start; aspect-ratio: 16 / 9; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 16px; background: var(--user-surface-muted); color: var(--user-ink); cursor: pointer; transition: border-color var(--user-motion), background var(--user-motion), transform var(--user-motion); }
 .libtv-create-project-card:hover { border-color: var(--user-accent); background: var(--user-surface-hover); transform: translateY(-1px); }
@@ -183,7 +182,6 @@
 }
 .app-user-workspace .lib-tv-project-page .canvas-collection-preview { aspect-ratio: 16 / 9; border-radius: 12px; }
 .app-user-workspace .lib-tv-project-page .canvas-collection-custom-cover { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; pointer-events: none; }
-.app-user-workspace .lib-tv-project-page .canvas-collection-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
 .app-user-workspace .lib-tv-project-page .libtv-folder-card { aspect-ratio: auto; border: 0; border-radius: 12px; background: transparent; }
 .app-user-workspace .lib-tv-project-page .libtv-folder-card-cover { flex: 0 0 auto; aspect-ratio: 16 / 9; border: 1px solid color-mix(in srgb, var(--user-ink) 10%, transparent); border-radius: 12px; }
 .app-user-workspace .lib-tv-project-page .libtv-folder-card-body { min-height: 58px; padding: 8px 40px 8px 8px; background: transparent; }
@@ -259,7 +257,7 @@
 .app-product-workspace .product-collection-card .project-library-heading strong { font-size: 15px; }
 .app-product-workspace .product-collection-card :is(.project-library-subtitle, .project-library-progress, .project-library-stats, .library-card-meta, .library-card-description) { color: var(--user-ink-muted); }
 .app-product-workspace .product-collection-card .project-library-cover-scrim { background: linear-gradient(transparent 65%, rgba(0, 0, 0, .12)); }
-.app-product-workspace .skill-library-grid.library-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+/* 技能页列数同样归 .app-collection-grid 统一段管理，此处不再单独声明。 */
 .app-product-workspace .skill-library-card.product-collection-card { min-height: 220px; padding: var(--space-4); }
 .app-product-workspace .skill-library-card .skill-card-top { align-items: center; gap: var(--space-3); }
 .app-product-workspace .skill-library-card .skill-card-icon { width: 36px; height: 36px; flex-shrink: 0; margin: 0; border: 0; background: color-mix(in srgb, var(--category-accent, var(--user-ink-muted)) 12%, var(--user-surface)); color: var(--category-accent, var(--user-ink-muted)); }
@@ -530,13 +528,13 @@
 
 @media (max-width: 720px) {
     .app-product-workspace .library-page > div { width: calc(100% - 32px); }
-    .app-product-workspace .assets-library-page .assets-library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+    .app-product-workspace .assets-library-page .assets-library-grid { gap: var(--space-3); }
     .assets-library-source-rail { position: static; width: auto; border-top: 1px solid rgba(255,255,255,.07); border-left: 0; }
     .app-user-workspace .assets-library-page > div:first-child { width: 100% !important; padding-top: 0 !important; padding-left: 20px !important; padding-right: 20px !important; }
     .app-product-workspace .app-pagination-bar { flex-wrap: wrap; gap: var(--space-2); padding-inline: 0; }
     .app-product-workspace .app-pagination-pages { justify-content: center; flex: 1 1 100%; }
     .app-user-workspace .studio-collection-page > div { width: calc(100% - 32px); padding-top: 20px; }
-    .app-user-workspace .canvas-collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+    .app-user-workspace .canvas-collection-grid { gap: var(--space-3); }
     .collection-toolbar-controls > .ant-input-affix-wrapper { width: 100%; }
     .collection-toolbar-controls { flex-basis: 100%; }
     .canvas-collection-meta { flex-wrap: wrap; gap: var(--space-1); }
@@ -547,7 +545,6 @@
     .libtv-project-actions { flex-wrap: wrap; }
     .libtv-project-actions .ant-input-affix-wrapper { width: 100%; }
     .libtv-project-subbar { align-items: flex-start; flex-direction: column; gap: 6px; }
-    .app-user-workspace .lib-tv-project-page .canvas-collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
     .assets-collection-layout,
     .assets-collection-layout.is-filters-open { grid-template-columns: 1fr; gap: var(--space-4); }
     .assets-collection-layout.is-filters-open .assets-collection-filters { display: flex; }
@@ -563,8 +560,6 @@
     .assets-collection-filters .assets-filter-item { width: auto; }
     .assets-collection-filters .collection-folder-list > button,
     .assets-collection-filters .collection-folder-list .assets-folder-row { width: auto; max-width: 220px; }
-    .app-user-workspace .skill-library-grid { grid-template-columns: minmax(0, 1fr); }
-    .app-product-workspace .skill-library-grid.library-grid { grid-template-columns: minmax(0, 1fr); }
     .story-launcher-panel { padding: var(--space-4); }
     .story-launcher-main { flex-wrap: wrap; }
 }
@@ -576,8 +571,8 @@
 
 /* Huabu workspace shell. */
 .app-user-workspace.app-product-workspace {
-    --workspace-reference-sidebar: 252px;
-    --workspace-reference-collapsed: 74px;
+    --workspace-reference-sidebar: 240px;
+    --workspace-reference-collapsed: 64px;
     --workspace-reference-topbar: 89px;
     --workspace-reference-page-bg: var(--user-page-bg);
     --user-accent: #18786f;
@@ -654,7 +649,7 @@
     left: 12px;
 }
 @media (max-width: 1500px) {
-    .app-user-workspace.app-product-workspace { --workspace-reference-sidebar: 240px; --workspace-reference-topbar: 72px; }
+    .app-user-workspace.app-product-workspace { --workspace-reference-topbar: 72px; }
     .app-user-workspace.app-product-workspace .app-workspace-sidebar-brand-row { min-height:72px; }
     .app-user-workspace.app-product-workspace .app-workspace-topbar { height:72px;min-height:72px; }
 }
@@ -767,21 +762,11 @@
     min-height: 0;
 }
 
-.app-product-workspace .canvas-collection-grid,
-.app-product-workspace .library-grid,
-.app-product-workspace .assets-library-grid,
-.app-product-workspace .skill-library-grid,
-.app-product-workspace .plugins-grid,
-.app-product-workspace .task-grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(224px, 1fr));
-    gap: 24px 16px;
-}
-
 .app-product-workspace .assets-library-grid,
 .app-product-workspace .skill-library-grid {
     gap: 20px 16px;
 }
-.app-product-workspace .project-library-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px 16px; }
+.app-product-workspace .project-library-grid { gap: 24px 16px; }
 
 .app-product-workspace .product-collection-card,
 .app-product-workspace .library-card,
@@ -1094,10 +1079,8 @@
     .app-product-workspace .app-page-header h1 { font-size: 19px !important; }
     .app-product-workspace .collection-toolbar-controls { flex-basis: 100%; }
     .app-product-workspace .collection-toolbar-actions { width: 100%; justify-content: flex-start; }
-    .app-product-workspace .canvas-collection-grid,
-    .app-product-workspace .assets-library-grid,
-    .app-product-workspace .task-grid-view { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 10px; }
-    .app-product-workspace .plugins-grid { grid-template-columns: minmax(0, 1fr); }
+    /* 列数与间距归 .app-collection-grid 统一段，这里不再按 620px 另设一套。 */
+    .app-product-workspace .story-launcher-panel { padding: 16px; border-radius: 16px; }
     .app-product-workspace .story-launcher-panel { padding: 16px; border-radius: 16px; }
 }
 
@@ -1301,36 +1284,45 @@
 .app-user-workspace.app-product-workspace .app-workspace-nav-link,
 .app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="new"],
 .app-user-workspace.app-product-workspace .app-workspace-nav-link:not([data-nav-id="new"]) {
-    height: 36px !important;
-    min-height: 36px !important;
-    padding: 0 10px !important;
-    border-radius: 6px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    border: 1px solid transparent !important;
+    border-radius: 10px !important;
     font-size: 14px !important;
     line-height: 22px !important;
     font-weight: 400 !important;
+    transition: background var(--user-motion), color var(--user-motion), border-color var(--user-motion), box-shadow var(--user-motion) !important;
 }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="new"] {
     margin-bottom: 0 !important;
     background: var(--user-action-bg) !important;
     color: var(--user-action-foreground) !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
 }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link[data-nav-id="new"]:hover {
     background: var(--user-action-bg-hover) !important;
 }
+/* 当前位置靠白底浮起区分，不再用整行加深，避免与 hover 状态撞色。 */
 .app-user-workspace.app-product-workspace .app-workspace-nav-link.is-active:not([data-nav-id="new"]) {
-    background: var(--user-surface-hover) !important;
-    font-weight: 400 !important;
+    background: var(--user-surface) !important;
+    border-color: var(--user-border) !important;
+    color: var(--user-ink) !important;
+    font-weight: 560 !important;
+    box-shadow: 0 1px 2px rgba(17, 17, 17, .05) !important;
+}
+.dark .app-user-workspace.app-product-workspace .app-workspace-nav-link.is-active:not([data-nav-id="new"]) {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04) !important;
 }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link .app-workspace-nav-icon {
-    width: 20px !important;
-    height: 20px !important;
-    flex-basis: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
+    flex-basis: 18px !important;
     border-radius: 0 !important;
 }
 .app-user-workspace.app-product-workspace .app-workspace-nav-link .app-workspace-nav-icon svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
 }
 .app-user-workspace.app-product-workspace .app-workspace-topbar-utility {
     height: 32px !important;
@@ -1551,4 +1543,127 @@
 @media (prefers-reduced-motion: reduce) {
     .assets-collection-layout,
     .assets-collection-layout .assets-collection-filters { transition: none !important; transform: none !important; }
+}
+
+/* The skill library keeps an always-available Bobo shelf above account data.
+   It gives an empty local workspace useful starting points without pretending
+   that remote skills have already been installed. */
+.app-product-workspace .skills-featured-shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+    border: 1px solid color-mix(in srgb, var(--user-ink) 10%, transparent);
+    border-radius: 20px;
+    padding: 18px;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--user-accent) 7%, var(--user-surface)) 0%, var(--user-surface) 52%, color-mix(in srgb, #758ed1 5%, var(--user-surface)) 100%);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+}
+.skills-featured-header { display: flex; min-height: 38px; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.skills-featured-header h2 { margin: 0; color: var(--user-ink); font-size: 18px; font-weight: 650; line-height: 24px; letter-spacing: -.02em; }
+.skills-featured-header p { margin: 3px 0 0; color: var(--user-ink-muted); font-size: 12px; line-height: 18px; }
+.skills-featured-kicker { display: block; margin-bottom: 1px; color: var(--user-accent); font-family: var(--font-mono, ui-monospace, monospace); font-size: 9px; letter-spacing: .1em; line-height: 14px; }
+.skills-featured-header > a { display: inline-flex; align-items: center; gap: 5px; color: var(--user-ink-muted); font-size: 12px; text-decoration: none; }
+.skills-featured-header > a svg { width: 14px; height: 14px; }
+.skills-featured-header > a:hover { color: var(--user-accent); }
+.skills-featured-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.skills-featured-card {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 144px;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--user-ink) 10%, transparent);
+    border-radius: 15px;
+    padding: 14px;
+    background: color-mix(in srgb, var(--user-surface) 82%, transparent);
+    color: var(--user-ink);
+    text-decoration: none;
+    transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.skills-featured-card::before { position: absolute; inset: 0 0 auto; height: 56px; content: ""; opacity: .7; pointer-events: none; }
+.skills-featured-card.is-blue::before { background: linear-gradient(135deg, color-mix(in srgb, #719edc 30%, transparent), transparent 70%); }
+.skills-featured-card.is-teal::before { background: linear-gradient(135deg, color-mix(in srgb, #49b6a8 28%, transparent), transparent 70%); }
+.skills-featured-card.is-rose::before { background: linear-gradient(135deg, color-mix(in srgb, #c77c9e 30%, transparent), transparent 70%); }
+.skills-featured-card.is-amber::before { background: linear-gradient(135deg, color-mix(in srgb, #d6a35c 30%, transparent), transparent 70%); }
+.skills-featured-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--user-accent) 48%, var(--user-border)); background: var(--user-surface-hover); }
+.skills-featured-art { position: relative; z-index: 1; display: grid; width: 32px; height: 32px; place-items: center; border-radius: 10px; background: color-mix(in srgb, var(--user-surface) 70%, transparent); color: var(--user-accent); }
+.skills-featured-card.is-blue .skills-featured-art { color: #719edc; }
+.skills-featured-card.is-rose .skills-featured-art { color: #c77c9e; }
+.skills-featured-card.is-amber .skills-featured-art { color: #d6a35c; }
+.skills-featured-art svg { width: 16px; height: 16px; stroke-width: 1.8; }
+.skills-featured-copy { position: relative; z-index: 1; display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.skills-featured-copy small { color: var(--user-ink-soft); font-size: 10px; line-height: 15px; }
+.skills-featured-copy strong { overflow: hidden; font-size: 14px; font-weight: 650; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.skills-featured-copy > span { display: -webkit-box; overflow: hidden; color: var(--user-ink-muted); font-size: 11px; line-height: 17px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.skills-featured-arrow { position: absolute; right: 13px; bottom: 14px; width: 14px; height: 14px; color: var(--user-ink-soft); transition: transform 150ms ease, color 150ms ease; }
+.skills-featured-card:hover .skills-featured-arrow { transform: translateX(3px); color: var(--user-accent); }
+@media (max-width: 1100px) {
+    .skills-featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+    .app-product-workspace .skills-featured-shelf { padding: 14px; }
+    .skills-featured-header { align-items: flex-start; flex-direction: column; gap: 8px; }
+    .skills-featured-grid { grid-template-columns: 1fr; }
+    .skills-featured-card { min-height: 116px; }
+}
+
+/* ===== 列表页统一骨架 =====
+   CollectionGrid 只输出 .app-collection-grid，列数与间距在这里单点决定。
+   历史上 assets / project / skill / library / canvas 各自硬编码列数，
+   同一元素可能同时命中两套规则，逐页调间距等于把同一件事做六遍。
+   两种作用域（user / product）都要覆盖：技能、任务、插件三页不用 CollectionGrid，
+   而是自带 library-grid / skill-library-grid / task-grid-view / plugins-grid，
+   只写一侧会让这些页面继续沿用旧的固定列数。 */
+.app-user-workspace .app-section-page .app-collection-grid,
+.app-user-workspace .app-section-page .canvas-collection-grid,
+.app-user-workspace .app-section-page .library-grid,
+.app-user-workspace .app-section-page .assets-library-grid,
+.app-user-workspace .app-section-page .project-assets-grid,
+.app-user-workspace .app-section-page .project-library-grid,
+.app-user-workspace .app-section-page .skill-library-grid,
+.app-user-workspace .app-section-page .plugins-grid,
+.app-user-workspace .app-section-page .task-grid-view,
+.app-product-workspace .app-section-page .app-collection-grid,
+.app-product-workspace .app-section-page .canvas-collection-grid,
+.app-product-workspace .app-section-page .library-grid,
+.app-product-workspace .app-section-page .assets-library-grid,
+.app-product-workspace .app-section-page .project-assets-grid,
+.app-product-workspace .app-section-page .project-library-grid,
+.app-product-workspace .app-section-page .skill-library-grid,
+.app-product-workspace .app-section-page .plugins-grid,
+.app-product-workspace .app-section-page .task-grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--collection-grid-min, 248px), 1fr));
+    align-items: start;
+    gap: var(--collection-grid-row-gap, 24px) var(--collection-grid-col-gap, 18px);
+    margin-top: 16px;
+}
+
+/* 窄屏单列：卡片按内容高度自然堆叠，不再维持两列挤压标题。 */
+@media (max-width: 639px) {
+    .app-user-workspace .app-section-page .app-collection-grid,
+    .app-user-workspace .app-section-page .canvas-collection-grid,
+    .app-user-workspace .app-section-page .library-grid,
+    .app-user-workspace .app-section-page .assets-library-grid,
+    .app-user-workspace .app-section-page .project-assets-grid,
+    .app-user-workspace .app-section-page .project-library-grid,
+    .app-user-workspace .app-section-page .skill-library-grid,
+    .app-user-workspace .app-section-page .plugins-grid,
+    .app-user-workspace .app-section-page .task-grid-view,
+    .app-product-workspace .app-section-page .app-collection-grid,
+    .app-product-workspace .app-section-page .canvas-collection-grid,
+    .app-product-workspace .app-section-page .library-grid,
+    .app-product-workspace .app-section-page .assets-library-grid,
+    .app-product-workspace .app-section-page .project-assets-grid,
+    .app-product-workspace .app-section-page .project-library-grid,
+    .app-product-workspace .app-section-page .skill-library-grid,
+    .app-product-workspace .app-section-page .plugins-grid,
+    .app-product-workspace .app-section-page .task-grid-view {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
 }

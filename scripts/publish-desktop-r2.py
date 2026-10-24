@@ -25,7 +25,12 @@ LATEST = f"{PREFIX}/desktop-update.json"
 IMMUTABLE = "public, max-age=31536000, immutable"
 REVALIDATE = "no-store, max-age=0"
 MAX_MANIFEST = 2 * 1024 * 1024
-GITHUB_LATEST_FEED = "https://github.com/glanderness/BeefTV/releases/latest/download/desktop-update.json"
+# The public repository moved to Bobo. Archive names and the R2 prefix stay
+# Huabu-compatible because installed clients and signed manifests still use
+# those identifiers during the migration window.
+GITHUB_REPOSITORY = "cjg203328/bobo"
+GITHUB_LATEST_FEED = f"https://github.com/{GITHUB_REPOSITORY}/releases/latest/download/desktop-update.json"
+UPDATER_USER_AGENT = "Bobo-Desktop-Updater"
 
 
 class PublishError(Exception):
@@ -111,7 +116,7 @@ class PublicHTTP:
         digest = hashlib.sha256()
         size = 0
         try:
-            request = urllib.request.Request(url, headers={"Cache-Control": "no-cache", "User-Agent": f"Huabu-Desktop-Updater/{version}"})
+            request = urllib.request.Request(url, headers={"Cache-Control": "no-cache", "User-Agent": f"{UPDATER_USER_AGENT}/{version}"})
             with self.opener(request, timeout=60) as response:
                 if response.status != 200:
                     raise PublishError("Public object did not return HTTP 200")
@@ -127,7 +132,7 @@ class PublicHTTP:
 
 
 def require_github_release(payload, manifest, public):
-    result = run(["gh", "api", f"repos/glanderness/BeefTV/releases/tags/{payload['version']}"])
+    result = run(["gh", "api", f"repos/{GITHUB_REPOSITORY}/releases/tags/{payload['version']}"])
     if result.returncode:
         raise PublishError("Cannot verify published GitHub release")
     release = json.loads(result.stdout)
@@ -140,7 +145,7 @@ def require_github_release(payload, manifest, public):
     uploaded = {asset.get("name") for asset in release.get("assets", []) if asset.get("state") == "uploaded"}
     if not expected.issubset(uploaded):
         raise PublishError("GitHub release assets are incomplete")
-    latest = run(["gh", "api", "repos/glanderness/BeefTV/releases/latest"])
+    latest = run(["gh", "api", f"repos/{GITHUB_REPOSITORY}/releases/latest"])
     if latest.returncode or json.loads(latest.stdout).get("tag_name") != payload["version"]:
         raise PublishError("GitHub latest does not point to this version")
     public.check(GITHUB_LATEST_FEED, *fingerprint(manifest), version=payload["version"])

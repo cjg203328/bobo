@@ -1,6 +1,7 @@
 import errno
 import importlib.util
 from pathlib import Path
+import sys
 import urllib.error
 import unittest
 from unittest.mock import MagicMock, patch
@@ -41,7 +42,14 @@ class WindowsInstallerContractTests(unittest.TestCase):
         self.assertNotIn('MUI_PAGE_COMPONENTS', text)
         self.assertNotIn('StageDir', text)
         self.assertIn('!define MUI_FINISHPAGE_RUN "$INSTDIR\\Huabu.exe"', text)
-        self.assertIn('CreateShortcut "$DESKTOP\\Huabu.lnk" "$INSTDIR\\Huabu.exe"', text)
+        self.assertIn('Name "波波 AI 画布"', text)
+        self.assertIn('CreateShortcut "$DESKTOP\\波波 AI 画布.lnk" "$INSTDIR\\Huabu.exe"', text)
+        self.assertIn('Delete "$DESKTOP\\Huabu.lnk"', text)
+        self.assertIn('tasklist.exe" /NH', text)
+        self.assertIn('"Bobo.exe"', text)
+        self.assertIn('"Huabu.exe"', text)
+        self.assertIn('Delete "$CleanDir\\Bobo.exe"', text)
+        self.assertEqual(text.count('ReadRegStr $PreviousInstallDir'), 1)
         self.assertIn('taskkill.exe', text)
         self.assertIn('Windows 无法移动以下程序文件夹', text)
 
@@ -62,7 +70,7 @@ class WindowsInstallerContractTests(unittest.TestCase):
             (payload / 'Huabu.exe').write_bytes(b'fixture')
             out_dir = root / 'dist'
             result = subprocess.run(
-                ['python3', str(packager_path), '--platform', 'windows-amd64',
+                [sys.executable, str(packager_path), '--platform', 'windows-amd64',
                  '--input', str(payload), '--output-dir', str(out_dir)],
                 capture_output=True, text=True, check=True,
             )

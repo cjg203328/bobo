@@ -64,7 +64,7 @@ description: 签名清单、打包布局、密钥、发布工作流、回滚和�
   "notes": "发行说明",
   "platforms": {
     "darwin-arm64": {
-      "url": "https://github.com/glanderness/BeefTV/releases/download/vX.Y.Z/Huabu-vX.Y.Z-darwin-arm64.zip",
+      "url": "https://github.com/cjg203328/bobo/releases/download/vX.Y.Z/Huabu-vX.Y.Z-darwin-arm64.zip",
       "sha256": "hex",
       "size": 123
     }
@@ -104,7 +104,7 @@ go run ./cmd/update-release gen-key \
 
 ## 发布流水线
 
-在 `glanderness/BeefTV` 的 `main` 上手动运行 `Release desktop`。`confirm_version` 必须等于 `VERSION`。`CHANGELOG.md` 里对应的 `## vX.Y.Z` 会同时成为 GitHub Release 说明和清单 `notes`。
+在 `cjg203328/bobo` 的 `main` 上手动运行 `Release desktop`。`confirm_version` 必须等于 `VERSION`。`CHANGELOG.md` 里对应的 `## vX.Y.Z` 会同时成为 GitHub Release 说明和清单 `notes`。
 
 工作流默认只读；仅创建草稿和最终发布的任务申请 `contents: write`。构建任务不持有发布写权限或签名私钥。步骤：
 

@@ -8,25 +8,25 @@ import { cn } from "@/lib/utils";
 export function WorkspacePage({ children, className, grid = false, fluid = false, scroll = true, sectionPage = true }: { children: ReactNode; className?: string; grid?: boolean; fluid?: boolean; scroll?: boolean; sectionPage?: boolean }) {
     return (
         <main className={cn("app-user-content h-full text-foreground", sectionPage && "app-section-page", scroll && "app-workspace-scroll overflow-y-auto", grid && "app-workspace-grid", className)}>
-            <div className={cn(fluid ? "h-full w-full" : "w-full px-3 py-3 sm:px-4 sm:py-4 xl:px-5", sectionPage && !fluid && "app-section-page-content")}>{children}</div>
+            <div className={cn("app-section-page-content-shell", fluid ? "h-full w-full" : "w-full", sectionPage && !fluid && "app-section-page-content")}>{children}</div>
         </main>
     );
 }
 
 export function PageHeader({ title, description, meta, actions, leading }: { title: string; description?: string; meta?: ReactNode; actions?: ReactNode; leading?: ReactNode }) {
     return (
-        <header className="app-page-header app-section-page-header flex min-h-14 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="app-page-header-main flex min-w-0 items-center gap-3">
-                {leading ? <div className="app-page-header-leading flex shrink-0 items-center">{leading}</div> : null}
-                <div className="min-w-0">
-                    <div className="flex min-w-0 flex-wrap items-center gap-2.5">
-                        <h1 className="app-page-header-title truncate font-semibold leading-7">{title}</h1>
+        <header className="app-page-header app-section-page-header">
+            <div className="app-page-header-main">
+                {leading ? <div className="app-page-header-leading">{leading}</div> : null}
+                <div className="app-page-header-copy">
+                    <div className="app-page-header-title-row">
+                        <h1 className="app-page-header-title">{title}</h1>
                         {meta}
                     </div>
-                    {description ? <p className="mt-1 text-xs leading-5 text-foreground/58">{description}</p> : null}
+                    {description ? <p className="app-page-header-description">{description}</p> : null}
                 </div>
             </div>
-            {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+            {actions ? <div className="app-page-header-actions">{actions}</div> : null}
         </header>
     );
 }
@@ -89,7 +89,7 @@ export function TableSurface({ children, className }: { children: ReactNode; cla
 }
 
 export function CollectionGrid({ children, className, style }: { children: ReactNode; className?: string; style?: React.CSSProperties }) {
-    return <div className={cn("mt-4 grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(248px,1fr))]", className)} style={style}>{children}</div>;
+    return <div className={cn("app-collection-grid", className)} style={style}>{children}</div>;
 }
 
 /* 自研轻量分页：页码胶囊 + 省略号 + 每页条数 + 总数，替代 AntD Pagination（无 AntD 残留样式，与工具栏容器同语言）。 */

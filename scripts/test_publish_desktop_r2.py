@@ -62,7 +62,7 @@ class PublicationTests(unittest.TestCase):
             def do_GET(self):
                 agent = self.headers.get("User-Agent", "")
                 requests.append((self.path, agent))
-                if not re.fullmatch(r"Huabu-Desktop-Updater/v\d+\.\d+\.\d+", agent):
+                if not re.fullmatch(r"Bobo-Desktop-Updater/v\d+\.\d+\.\d+", agent):
                     self.send_error(403)
                     return
                 content = store.objects.get(self.path.lstrip("/"))
@@ -131,7 +131,7 @@ class PublicationTests(unittest.TestCase):
         self.publisher.stage(manifest, self.root)
         self.assertNotIn(release.LATEST, self.store.objects)
         self.assertEqual(len(self.store.writes), len(release.PLATFORMS) + 1)
-        self.assertTrue(all(agent == "Huabu-Desktop-Updater/v1.5.7" for _, agent in self.public_requests))
+        self.assertTrue(all(agent == "Bobo-Desktop-Updater/v1.5.7" for _, agent in self.public_requests))
         self.publisher.stage(manifest, self.root)
         self.assertEqual(len(self.store.writes), len(release.PLATFORMS) + 1)
         self.assertEqual(self.verify_command.call_args.args[0], ["/tmp/update-release", "verify", "--envelope", str(manifest)])
@@ -144,7 +144,7 @@ class PublicationTests(unittest.TestCase):
             urllib.request.urlopen(url)
         self.assertEqual(failure.exception.code, 403)
         release.PublicHTTP().check(url, len(data), hashlib.sha256(data).hexdigest(), version="v1.5.8")
-        self.assertEqual(self.public_requests[-1][1], "Huabu-Desktop-Updater/v1.5.8")
+        self.assertEqual(self.public_requests[-1][1], "Bobo-Desktop-Updater/v1.5.8")
 
     def test_incomplete_platform_set_cannot_activate(self):
         manifest = self.manifest(omit="windows-amd64")
@@ -274,7 +274,7 @@ class PublicationTests(unittest.TestCase):
         self.store.objects[key] = manifest.read_bytes()
         self.publisher.activate(manifest)
         self.assertEqual(self.store.objects[release.LATEST], manifest.read_bytes())
-        self.assertIn(("/" + key, "Huabu-Desktop-Updater/v1.5.7"), self.public_requests)
+        self.assertIn(("/" + key, "Bobo-Desktop-Updater/v1.5.7"), self.public_requests)
 
 
 class S3AdapterTests(unittest.TestCase):

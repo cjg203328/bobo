@@ -56,12 +56,18 @@ func (s *Service) DuplicateProject(userID, projectID string) (model.Project, err
 	return s.projectDomain().DuplicateProject(userID, projectID)
 }
 
-func (s *Service) ListProjects(userID string) ([]ProjectSummary, error) {
-	return s.projectDomain().ListProjects(userID)
+func (s *Service) ListProjects(tenantID string) ([]ProjectSummary, error) {
+	return s.projectDomain().ListProjects(tenantID)
 }
 
-func (s *Service) ListProjectsPage(userID string, page int, pageSize int) (ProjectListPage, error) {
-	return s.projectDomain().ListProjectsPage(userID, page, pageSize)
+func (s *Service) ListProjectsPage(tenantID string, page int, pageSize int) (ProjectListPage, error) {
+	return s.projectDomain().ListProjectsPage(tenantID, page, pageSize)
+}
+
+// OwnedProjectInTenant 校验项目属于请求选中的空间，供详情类只读路由前置断言。
+// 它只做归属判断，不返回业务数据，避免在 handler 里直接查库。
+func (s *Service) OwnedProjectInTenant(userID string, tenantID string, projectID string) (*model.Project, error) {
+	return s.projectDomain().OwnedInTenant(userID, tenantID, projectID)
 }
 
 func (s *Service) ProjectDetail(userID string, id string) (ProjectDetail, error) {

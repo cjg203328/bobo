@@ -174,15 +174,15 @@ func validateHelperRequest(req HelperRequest) error {
 	}
 	switch {
 	case strings.HasPrefix(req.Platform, "darwin"):
-		if filepath.Base(req.TargetPath) != appBundleName {
+		if !matchesAnyBase(filepath.Base(req.TargetPath), appBundleName, legacyAppBundleName) {
 			return fmt.Errorf("当前应用包名称不支持自动更新")
 		}
 	case strings.HasPrefix(req.Platform, "windows"):
-		if filepath.Base(req.TargetPath) != windowsExeName {
+		if !matchesAnyBase(filepath.Base(req.TargetPath), windowsExeName, legacyWindowsExe) {
 			return fmt.Errorf("当前应用名称不支持自动更新")
 		}
 	case req.Platform == "linux-amd64":
-		if filepath.Base(req.TargetPath) != linuxBundleName {
+		if !matchesAnyBase(filepath.Base(req.TargetPath), linuxBundleName, legacyLinuxBundle) {
 			return fmt.Errorf("当前应用包名称不支持自动更新")
 		}
 	default:

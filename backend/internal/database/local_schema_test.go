@@ -421,8 +421,26 @@ func TestAssistantTurnsMigrationFromPreviewV9(t *testing.T) {
 	if err := db.Order("version").Find(&ledger).Error; err != nil {
 		t.Fatal(err)
 	}
-	if ledger[len(ledger)-1].Version != CurrentSchemaVersion || ledger[len(ledger)-1].Name != "tenant-membership" {
+	if ledger[len(ledger)-1].Version != CurrentSchemaVersion || ledger[len(ledger)-1].Name != "project-tenant-ownership" {
 		t.Fatalf("current identity: %+v", ledger[len(ledger)-1])
+	}
+	for version, name := range map[int64]string{
+		16: "assistant-durable-session-binding",
+		17: "tenant-membership",
+		18: "project-tenant-ownership",
+	} {
+		found := false
+		for _, row := range ledger {
+			if row.Version == version {
+				found = true
+				if row.Name != name {
+					t.Fatalf("v%d identity rewritten: %+v", version, row)
+				}
+			}
+		}
+		if !found {
+			t.Fatalf("v%d %s missing after upgrade", version, name)
+		}
 	}
 	foundV10 := false
 	for _, row := range ledger {

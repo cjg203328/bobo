@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Native Windows amd64 release entrypoint for the Huabu Wails desktop app.
+    Native Windows amd64 release entrypoint for the Bobo Wails desktop app.
 
 .DESCRIPTION
     Builds the same desktop source as scripts/build-huabu-release.sh, packages
@@ -168,7 +168,7 @@ function Test-PluginZipEntries([string]$ZipPath) {
         }
         foreach ($name in $names) {
             if ($name.Contains("\")) {
-                throw "Plugin package $ZipPath entry '$name' uses backslash paths. Huabu rejects those archives; zip entries must use forward slashes."
+                throw "Plugin package $ZipPath entry '$name' uses backslash paths. Bobo rejects those archives; zip entries must use forward slashes."
             }
         }
     }
@@ -390,7 +390,7 @@ if (-not [string]::IsNullOrWhiteSpace($env:HUABU_EXTRA_LDFLAGS)) {
     $ldflags = "$ldflags $($env:HUABU_EXTRA_LDFLAGS.Trim())"
 }
 
-Write-Step "Building Huabu $versionValue ($commitValue) for windows/amd64"
+Write-Step "Building Bobo AI Canvas $versionValue ($commitValue) for windows/amd64"
 $appIconSource = Join-Path $repoRoot "assets\app-icon.png"
 $buildDir = Join-Path $desktopDir "build"
 New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
@@ -463,7 +463,7 @@ if (-not (Test-Path -LiteralPath $cliPath -PathType Leaf)) {
 Write-Host "Release executable: $exePath"
 Write-Host "Bundled agent CLI: $cliPath"
 Write-Host "Official plugins: $pluginResourceDir ($($copied.Count) packages)"
-Write-Host "Launch data directory (unless CANVAS_DESKTOP_DATA_DIR is set): %AppData%\Huabu"
+Write-Host "Bobo AI Canvas data directory (legacy-compatible path): %AppData%\Huabu"
 Write-Host "Official plugins are loaded from the executable directory, not from the process working directory."
 Write-Host "WebView2 is required at runtime; Windows 11 usually already has it. Missing runtimes use Wails -webview2 download. See https://wails.io/docs/guides/windows"
-Write-Host "This machine still has to launch Huabu.exe before the Windows build is accepted. NSIS installer output is not produced."
+Write-Host "Launch the Bobo AI Canvas desktop app (Huabu.exe) on this machine before accepting the Windows build. NSIS installer output is not produced."

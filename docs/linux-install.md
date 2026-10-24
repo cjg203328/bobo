@@ -8,7 +8,7 @@ Linux x64 包面向 Ubuntu 24.04，使用 GTK 3 和 WebKitGTK 4.1。其他发行
 sudo apt install ./Huabu-vX.Y.Z-linux-amd64.deb
 ```
 
-安装完成后从应用菜单启动 Huabu。新版仍用上述命令安装；卸载使用 `sudo apt remove huabu`，不会删除用户数据。DEB 由包管理器管理，不使用应用内自动更新。
+安装完成后从应用菜单启动“波波 AI 画布”。新版仍用上述命令安装；卸载使用 `sudo apt remove huabu`，不会删除用户数据。DEB 包名和程序目录保留旧标识以支持升级，DEB 由包管理器管理，不使用应用内自动更新。
 
 使用便携 ZIP 时，先安装运行依赖：
 

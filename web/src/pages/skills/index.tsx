@@ -1,9 +1,10 @@
 import { CollectionToolbar } from "@/components/layout/collection-toolbar";
 import { App, Button, Dropdown, Input, Select } from "antd";
 
-import { Boxes, Check, Clapperboard, Library, Megaphone, MoreHorizontal, Palette, Plus, Puzzle, Search, ShoppingBag, UserRound } from "lucide-react";
+import { ArrowRight, Boxes, Check, Clapperboard, Library, Megaphone, MoreHorizontal, Palette, Plus, Puzzle, ScanSearch, Search, ShoppingBag, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { Link } from "react-router";
 
 import { PageHeader, PaginationBar, WorkspacePage } from "@/components/layout/workspace-page";
 import { WorkspaceErrorState, WorkspaceState } from "@/components/layout/workspace-state";
@@ -33,6 +34,13 @@ const sortOptions: { label: string; value: SkillSort }[] = [
     { label: "最近更新", value: "updated" },
     { label: "最近创建", value: "new" },
 ];
+
+const BUILTIN_SKILL_FEATURES = [
+    { id: "reverse-prompt", title: "提示词反推", category: "图片", description: "从参考图提取主体、构图、光线和材质，整理成可编辑提示词。", icon: ScanSearch, tone: "blue" },
+    { id: "optimize-prompt", title: "提示词优化", category: "通用", description: "保留创作意图，补齐风格、镜头和细节，让提示词更容易执行。", icon: WandSparkles, tone: "teal" },
+    { id: "refine-image", title: "图片细化", category: "图片", description: "围绕局部编辑、画面质感和细节增强，先确认范围再继续生成。", icon: Sparkles, tone: "rose" },
+    { id: "story-workflow", title: "商品宣传套图", category: "工作流", description: "从产品信息到主视觉、卖点图和封面，一次整理完整创作方案。", icon: Clapperboard, tone: "amber" },
+] as const;
 
 export default function SkillsPage() {
     const { message, modal } = App.useApp();
@@ -189,6 +197,20 @@ export default function SkillsPage() {
         <>
             <WorkspacePage className="library-page skills-library-page" grid>
                 <PageHeader title="技能库" description="管理自建、导入和已安装的创作技能。" actions={<Button type="primary" icon={<Plus className="size-4" />} onClick={() => setInstallOpen(true)}>安装技能</Button>} />
+
+                <section className="skills-featured-shelf" aria-labelledby="skills-featured-title">
+                    <header className="skills-featured-header"><div><span className="skills-featured-kicker">BOBO AGENT</span><h2 id="skills-featured-title">本周精选</h2><p>波波内置能力，打开画布就能继续使用。</p></div><Link to="/">回到 Agent 工作台 <ArrowRight aria-hidden="true" /></Link></header>
+                    <div className="skills-featured-grid">
+                        {BUILTIN_SKILL_FEATURES.map((feature) => {
+                            const Icon = feature.icon;
+                            return <Link key={feature.id} to="/" className={`skills-featured-card is-${feature.tone}`}>
+                                <span className="skills-featured-art" aria-hidden="true"><Icon /></span>
+                                <span className="skills-featured-copy"><small>{feature.category} · 波波内置</small><strong>{feature.title}</strong><span>{feature.description}</span></span>
+                                <ArrowRight className="skills-featured-arrow" aria-hidden="true" />
+                            </Link>;
+                        })}
+                    </div>
+                </section>
 
                 <div className="skills-browse-bar">
                 <div className="skills-navigation">

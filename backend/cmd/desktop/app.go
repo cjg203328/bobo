@@ -135,7 +135,9 @@ func (a *DesktopApp) OpenHuabuGitHub() error {
 	if err != nil {
 		return err
 	}
-	wailsruntime.BrowserOpenURL(ctx, "https://github.com/glanderness/BeefTV")
+	// Keep the binding name for installed clients, but send users to the Bobo
+	// project. Renaming the binding would break older WebView bundles.
+	wailsruntime.BrowserOpenURL(ctx, "https://github.com/cjg203328/bobo")
 	return nil
 }
 
@@ -144,7 +146,7 @@ func (a *DesktopApp) OpenHuabuWebsite() error {
 	if err != nil {
 		return err
 	}
-	wailsruntime.BrowserOpenURL(ctx, "https://huabu.app/")
+	wailsruntime.BrowserOpenURL(ctx, "https://github.com/cjg203328/bobo#readme")
 	return nil
 }
 
@@ -153,7 +155,7 @@ func (a *DesktopApp) OpenHuabuX() error {
 	if err != nil {
 		return err
 	}
-	wailsruntime.BrowserOpenURL(ctx, "https://x.com/beefnoode")
+	wailsruntime.BrowserOpenURL(ctx, "https://github.com/cjg203328/bobo#readme")
 	return nil
 }
 

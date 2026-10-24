@@ -7,6 +7,8 @@ const BOBO_REPOSITORY = "https://github.com/cjg203328/bobo";
 
 export function WorkspaceSidebarSocialLinks() {
     const openGitHub = async (event: React.MouseEvent<HTMLAnchorElement>) => {
+        // The generated Wails binding keeps its legacy name for installed
+        // clients; the destination is the current Bobo project.
         const openInBrowser = getDesktopAppBinding()?.OpenHuabuGitHub;
         if (!openInBrowser) return;
         event.preventDefault();

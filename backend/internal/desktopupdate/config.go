@@ -15,12 +15,28 @@ var (
 	PublicKey = ""
 )
 
+// 应用包名正在从 Huabu 迁到 Bobo。过渡版本必须同时认识两套名字：
+// 旧安装要能被新包替换，新安装要能被旧签名清单以外的路径复用，
+// 否则一次改名的代价是所有存量客户端再也收不到更新。
 const (
-	helperFlag      = "--huabu-update-helper"
-	appBundleName   = "Huabu.app"
-	linuxBundleName = "Huabu-linux"
-	windowsExeName  = "Huabu.exe"
-	pluginDirName   = "plugin-packages"
+	appBundleName       = "Bobo.app"
+	linuxBundleName     = "Bobo-linux"
+	windowsExeName      = "Bobo.exe"
+	legacyAppBundleName = "Huabu.app"
+	legacyLinuxBundle   = "Huabu-linux"
+	legacyWindowsExe    = "Huabu.exe"
+	// macOS 与 Linux 包内可执行文件名随包名一起迁移。
+	darwinExeName = "Bobo"
+	linuxExeName  = "Bobo"
+)
+
+// legacyNamesAccepted 控制过渡期的双名识别。发布一轮之后把它翻成 false，
+// 双名逻辑即可整体退场，不必再逐处删除判断。
+const legacyNamesAccepted = true
+
+const (
+	helperFlag    = "--huabu-update-helper"
+	pluginDirName = "plugin-packages"
 	// 随包 CLI：外部 Agent 的接入入口，升级包里必须带上，否则升级一次就断了接入。
 	// 它必须待在自己的 cli 目录里：macOS 与 Windows 的文件名都不分大小写，
 	// huabu 直接放在主程序旁边会和 Huabu / Huabu.exe 撞成同一个文件。
